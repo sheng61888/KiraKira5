@@ -10,3 +10,7 @@ FLUSH PRIVILEGES;
 
 SELECT User, Host FROM mysql.user;
 
+SHOW VARIABLES LIKE 'bind_address';
+
+
+
