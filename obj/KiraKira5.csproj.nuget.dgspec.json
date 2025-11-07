@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {}
+    "c:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {}
   },
   "projects": {
-    "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {
+    "c:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
+        "projectUniqueName": "c:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
         "projectName": "KiraKira5",
-        "projectPath": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
+        "projectPath": "c:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
         "packagesPath": "C:\\Users\\ggshe\\.nuget\\packages\\",
-        "outputPath": "C:\\KiraKira5\\KiraKira5\\obj\\",
+        "outputPath": "c:\\KiraKira5\\KiraKira5\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -51,9 +51,17 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Mvc": {
+              "target": "Package",
+              "version": "[2.3.0, )"
+            },
             "Microsoft.Data.SqlClient": {
               "target": "Package",
               "version": "[6.1.2, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[9.0.10, )"
             },
             "MySql.Data": {
               "target": "Package",
@@ -76,6 +84,9 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }

@@ -1,10 +1,10 @@
-Console.WriteLine("Testing database connection...");
+var builder = WebApplication.CreateBuilder(args);
 
-if (DatabaseConnection.TestConnection())
-{
-    Console.WriteLine("✓ Connection successful!");
-}
-else
-{
-    Console.WriteLine("✗ Connection failed!");
-}
+builder.Services.AddControllers();
+
+var app = builder.Build();
+
+app.UseStaticFiles();
+app.MapControllers();
+
+app.Run();

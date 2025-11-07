@@ -1,21 +1,30 @@
 using System;
-using Microsoft.Data.SqlClient;
-using System.Configuration;
+using MySql.Data.MySqlClient;
+using Microsoft.Extensions.Configuration;
 
 public class UserManagement
 {
+    private static IConfiguration _configuration;
+    
+    public static void SetConfiguration(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+    
     public static bool AddUser(string username, string name, string email, string password, string usertype)
     {
-        string connectionString = ConfigurationManager.ConnectionStrings["KiraKiraDB"].ConnectionString;
+        string connectionString = _configuration.GetConnectionString("KiraKiraDB");
+        Console.WriteLine($"Connection string: {connectionString}");
         
         try
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 string uid = Guid.NewGuid().ToString();
                 string query = "INSERT INTO usertable (uid, username, name, email, password, usertype) VALUES (@Uid, @Username, @Name, @Email, @Password, @Usertype)";
+                Console.WriteLine($"Executing query: {query}");
                 
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Uid", uid);
                     command.Parameters.AddWithValue("@Username", username);
@@ -25,12 +34,17 @@ public class UserManagement
                     command.Parameters.AddWithValue("@Usertype", usertype);
                     
                     connection.Open();
-                    return command.ExecuteNonQuery() > 0;
+                    Console.WriteLine("Database connection opened");
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"Rows affected: {rowsAffected}");
+                    return rowsAffected > 0;
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
             return false;
         }
     }
