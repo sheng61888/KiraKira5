@@ -1,2 +1,24 @@
 {
+    "dbcode.connections": [
+        {
+            "connectionId": "Ro_4OGPeAs_3XZ0MusQXp",
+            "name": "KiraKiraServer",
+            "driver": "mysql",
+            "color": "#FFB095",
+            "connectionType": "host",
+            "host": "192.168.0.184",
+            "port": 3306,
+            "ssl": false,
+            "username": "root",
+            "password": "",
+            "savePassword": "secretStorage",
+            "database": "kirakiradb",
+            "readOnly": false,
+            "postConnectionSqlType": "inline",
+            "connectionTimeout": 30,
+            "driverOptions": {
+                "retrievePublickey": true
+            }
+        }
+    ]
 }
