@@ -64,6 +64,7 @@
                         <thead>
                             <tr>
                                 <th>User ID</th>
+                                <th>Username</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Role</th>
@@ -85,10 +86,14 @@
             <h2 id="modalTitle">Add User</h2>
             <form id="userForm">
                 <input type="hidden" id="userId">
+                <label>Username:</label>
+                <input type="text" id="userUsername" required>
                 <label>Name:</label>
                 <input type="text" id="userName" required>
                 <label>Email:</label>
                 <input type="email" id="userEmail" required>
+                <label>Password:</label>
+                <input type="password" id="userPassword" required>
                 <label>Role:</label>
                 <select id="userRole" required>
                     <option value="learner">Learner</option>
@@ -104,6 +109,7 @@
 
 
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="../js/admin.js"></script>
 </body>
 </html>

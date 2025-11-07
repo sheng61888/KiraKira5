@@ -4,28 +4,42 @@ styleSheet.textContent = adminStyles;
 document.head.appendChild(styleSheet);
 
 // User Management JavaScript
-let users = [
-    {id: 1, name: 'Aina Suzuki', email: 'aina@kirakira.edu', role: 'learner'},
-    {id: 2, name: 'Mr. Tan Wei Ming', email: 'tan@kirakira.edu', role: 'teacher'},
-    {id: 3, name: 'Sarah Chen', email: 'sarah@kirakira.edu', role: 'learner'},
-    {id: 4, name: 'Dr. Lim Hui Ling', email: 'lim@kirakira.edu', role: 'teacher'}
-];
+let users = [];
 
 function loadUsers() {
     const tbody = document.getElementById('usersTableBody');
     if (!tbody) return;
     
+    // Call C# web method to get users
+    $.ajax({
+        type: "POST",
+        url: "../code/user_management.cs/GetUsers",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(response) {
+            users = JSON.parse(response.d);
+            displayUsers(users);
+        },
+        error: function() {
+            console.error('Failed to load users');
+        }
+    });
+}
+
+function displayUsers(userList) {
+    const tbody = document.getElementById('usersTableBody');
     tbody.innerHTML = '';
-    users.forEach(user => {
+    userList.forEach(user => {
         const row = `
             <tr>
-                <td>${user.id}</td>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
+                <td>${user.Id}</td>
+                <td>${user.Username}</td>
+                <td>${user.Name}</td>
+                <td>${user.Email}</td>
+                <td>${user.Role}</td>
                 <td>
-                    <button onclick="editUser(${user.id})">Edit</button>
-                    <button onclick="deleteUser(${user.id})">Delete</button>
+                    <button onclick="editUser('${user.Id}')">Edit</button>
+                    <button onclick="deleteUser('${user.Id}')">Delete</button>
                 </td>
             </tr>
         `;
@@ -37,30 +51,19 @@ function searchUsers() {
     const searchId = document.getElementById('searchUserId').value;
     const roleFilter = document.getElementById('roleFilter').value;
     
-    let filtered = users;
-    if (searchId) {
-        filtered = filtered.filter(user => user.id.toString().includes(searchId));
-    }
-    if (roleFilter) {
-        filtered = filtered.filter(user => user.role === roleFilter);
-    }
-    
-    const tbody = document.getElementById('usersTableBody');
-    tbody.innerHTML = '';
-    filtered.forEach(user => {
-        const row = `
-            <tr>
-                <td>${user.id}</td>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
-                <td>
-                    <button onclick="editUser(${user.id})">Edit</button>
-                    <button onclick="deleteUser(${user.id})">Delete</button>
-                </td>
-            </tr>
-        `;
-        tbody.innerHTML += row;
+    $.ajax({
+        type: "POST",
+        url: "../code/user_management.cs/SearchUsers",
+        data: JSON.stringify({ searchId: searchId, roleFilter: roleFilter }),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(response) {
+            const filteredUsers = JSON.parse(response.d);
+            displayUsers(filteredUsers);
+        },
+        error: function() {
+            console.error('Failed to search users');
+        }
     });
 }
 
@@ -68,23 +71,43 @@ function showAddModal() {
     document.getElementById('modalTitle').textContent = 'Add User';
     document.getElementById('userForm').reset();
     document.getElementById('userId').value = '';
+    document.getElementById('userPassword').style.display = 'block';
+    document.getElementById('userPassword').previousElementSibling.style.display = 'block';
     document.getElementById('userModal').style.display = 'block';
 }
 
 function editUser(id) {
-    const user = users.find(u => u.id === id);
+    const user = users.find(u => u.Id === id);
     document.getElementById('modalTitle').textContent = 'Edit User';
-    document.getElementById('userId').value = user.id;
-    document.getElementById('userName').value = user.name;
-    document.getElementById('userEmail').value = user.email;
-    document.getElementById('userRole').value = user.role;
+    document.getElementById('userId').value = user.Id;
+    document.getElementById('userUsername').value = user.Username;
+    document.getElementById('userName').value = user.Name;
+    document.getElementById('userEmail').value = user.Email;
+    document.getElementById('userRole').value = user.Role;
+    document.getElementById('userPassword').style.display = 'none';
+    document.getElementById('userPassword').previousElementSibling.style.display = 'none';
     document.getElementById('userModal').style.display = 'block';
 }
 
 function deleteUser(id) {
     if (confirm('Are you sure you want to delete this user?')) {
-        users = users.filter(user => user.id !== id);
-        loadUsers();
+        $.ajax({
+            type: "POST",
+            url: "../code/user_management.cs/DeleteUser",
+            data: JSON.stringify({ id: id }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function(response) {
+                if (response.d) {
+                    loadUsers();
+                } else {
+                    alert('Failed to delete user');
+                }
+            },
+            error: function() {
+                alert('Error deleting user');
+            }
+        });
     }
 }
 
@@ -101,20 +124,53 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('userForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = document.getElementById('userId').value;
+            const username = document.getElementById('userUsername').value;
             const name = document.getElementById('userName').value;
             const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
             const role = document.getElementById('userRole').value;
 
             if (id) {
-                const userIndex = users.findIndex(u => u.id == id);
-                users[userIndex] = {id: parseInt(id), name, email, role};
+                // Update existing user
+                $.ajax({
+                    type: "POST",
+                    url: "../code/user_management.cs/UpdateUser",
+                    data: JSON.stringify({ id: id, username: username, name: name, email: email, role: role }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.d) {
+                            closeModal();
+                            loadUsers();
+                        } else {
+                            alert('Failed to update user');
+                        }
+                    },
+                    error: function() {
+                        alert('Error updating user');
+                    }
+                });
             } else {
-                const newId = Math.max(...users.map(u => u.id)) + 1;
-                users.push({id: newId, name, email, role});
+                // Add new user
+                $.ajax({
+                    type: "POST",
+                    url: "../code/user_management.cs/AddUser",
+                    data: JSON.stringify({ username: username, name: name, email: email, password: password, role: role }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.d) {
+                            closeModal();
+                            loadUsers();
+                        } else {
+                            alert('Failed to add user');
+                        }
+                    },
+                    error: function() {
+                        alert('Error adding user');
+                    }
+                });
             }
-            
-            closeModal();
-            loadUsers();
         });
     }
 });
