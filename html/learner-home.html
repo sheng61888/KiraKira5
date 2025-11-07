@@ -13,70 +13,251 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="images/logo.png" alt="Smart Cat Logo">
+        <img src="images/logo.png" alt="KiraKira logo">
       </div>
 
       <div class="profile">
         <div class="username">Aina</div>
-        <div class="avatar"></div>
-        <small class="streak">🔥 7-day streak</small>
-        <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 - 1200 XP</small>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak" aria-live="polite">🔥 7-day streak</div>
+        <div class="xp-bar" aria-label="XP progress toward level 4"><span style="width:65%"></span></div>
+        <small>Level 3 • 1200 XP</small>
       </div>
 
-      <nav class="nav">
-        <a class="active" href="learner-dashboard.html"> Dashboard</a>
-        <a href="learner-progress.html"> Progress</a>
-        <a href="learner-pastyears.html"> Past Papers</a>
-        <a href="learner-classes.html"> Classes</a>
-        <a href="learner-profile.html"> Profile</a>
+      <nav class="nav" aria-label="Learner navigation">
+        <a href="learner-home.html" aria-current="page">Dashboard</a>
+        <a href="learner-progress.html">Progress</a>
+        <a href="learner-pastyears.html">Past Papers</a>
+        <a href="learner-classes.html">Classes</a>
+        <a href="learner-profile.html">Profile</a>
       </nav>
     </aside>
 
     <!-- Main Dashboard -->
     <main class="main">
-      <header class="topbar">
-        <h1>Welcome back, <span id="username">Aina</span> </h1>
-        <p>Let’s continue where you left off!</p>
+      <header class="page-heading">
+        <div>
+          <p class="eyebrow">Streak: <strong>7 days 🔥</strong></p>
+          <h1>Welcome back, <span id="username">Aina</span></h1>
+          <p>Your Algebra sprint is halfway done—let’s finish strong today.</p>
+        </div>
+
+        <div class="heading-actions">
+          <button class="btn btn--ghost" type="button">View weekly plan</button>
+          <button class="btn btn--primary" type="button">Resume warm-up</button>
+        </div>
       </header>
 
-      <!-- Daily Goal -->
-      <section class="daily-goal">
-        <h2> Today's Goal</h2>
-        <p>Finish one topic from Algebra to earn +50 XP!</p>
-        <div class="goal-bar"><span style="width:45%"></span></div>
+      <!-- Daily Goal + Stats -->
+      <section class="card card--glow daily-goal" aria-labelledby="goal-title">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Today’s goal</p>
+            <h2 id="goal-title">Complete Algebraic Proofs practice</h2>
+          </div>
+          <span class="chip chip--success">+50 XP</span>
+        </div>
+        <p>Finish 1 guided problem set plus 1 timed drill to lock in your understanding.</p>
+        <div class="goal-meta">
+          <span>Progress</span>
+          <strong>45%</strong>
+        </div>
+        <div class="meter goal-bar"><span style="width:45%"></span></div>
       </section>
 
-      <!-- Courses Section (uses cat cards) -->
-      <section class="courses">
-        <h2>Your Courses</h2>
+      <section class="grid stats-grid" aria-label="Learning stats">
+        <article class="card stat-block">
+          <h3>XP to next level</h3>
+          <strong>350</strong>
+          <p class="muted">Keep up the streak to level up by Friday.</p>
+          <div class="meter"><span style="width:72%"></span></div>
+        </article>
+
+        <article class="card stat-block">
+          <h3>Weekly focus</h3>
+          <strong>Algebra</strong>
+          <p class="muted">3 / 5 focus sessions completed.</p>
+          <div class="meter"><span style="width:60%"></span></div>
+        </article>
+
+        <article class="card stat-block">
+          <h3>Upcoming</h3>
+          <strong>4:30 PM</strong>
+          <p class="muted">Coordinate Geometry class with Mr. Tan.</p>
+          <span class="chip chip--info">Starts in 2h 15m</span>
+        </article>
+      </section>
+
+      <!-- Courses Section -->
+      <section class="card courses" aria-labelledby="courses-title">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Active courses</p>
+            <h2 id="courses-title">Your journeys</h2>
+          </div>
+          <button class="btn btn--ghost" type="button">See course map</button>
+        </div>
+
         <div class="course-grid">
-          <div class="course-card">
+          <article class="course-card">
             <h3>Algebra Basics</h3>
-            <img src="images/cat card 1.png" alt="Algebra Cat" />
-            <div class="progress-bar"><span style="width:60%"></span></div>
-            <button onclick="location.href='course-algebra.html'">Continue</button>
-          </div>
+            <img src="images/cat card 1.png" alt="Illustration of algebra cat holding numbers">
+            <div class="meter progress-bar"><span style="width:60%"></span></div>
+            <button type="button" onclick="location.href='course-algebra.html'">Continue lesson</button>
+          </article>
 
-          <div class="course-card">
+          <article class="course-card">
             <h3>Geometry</h3>
-            <img src="images/cat card 2.png" alt="Geometry Cat" />
-            <div class="progress-bar"><span style="width:30%"></span></div>
-            <button onclick="location.href='course-geometry.html'">Continue</button>
-          </div>
+            <img src="images/cat card 2.png" alt="Geometry cat surrounded by shapes">
+            <div class="meter progress-bar"><span style="width:30%"></span></div>
+            <button type="button" onclick="location.href='course-geometry.html'">Resume practice</button>
+          </article>
 
-          <div class="course-card">
+          <article class="course-card">
             <h3>Statistics</h3>
-            <img src="images/cat card 3.png" alt="Statistics Cat" />
-            <div class="progress-bar"><span style="width:85%"></span></div>
-            <button onclick="location.href='course-statistics.html'">Continue</button>
-          </div>
+            <img src="images/cat card 3.png" alt="Statistics cat with charts">
+            <div class="meter progress-bar"><span style="width:85%"></span></div>
+            <button type="button" onclick="location.href='course-statistics.html'">Review notes</button>
+          </article>
         </div>
       </section>
 
+      <!-- Schedule & Recommendations -->
+      <section class="grid grid--two" aria-label="Schedule and drills">
+        <article class="card schedule-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Next up</p>
+              <h2>Today’s timeline</h2>
+            </div>
+            <span class="chip">GMT+8</span>
+          </div>
+          <ul>
+            <li>
+              <div>
+                <strong>Live class</strong>
+                <small>Coordinate Geometry · with Mr. Tan</small>
+              </div>
+              <span class="chip chip--info">4:30 PM</span>
+            </li>
+            <li>
+              <div>
+                <strong>Drill session</strong>
+                <small>Quadratic word problems · self-paced</small>
+              </div>
+              <span class="chip">Due 7 PM</span>
+            </li>
+            <li>
+              <div>
+                <strong>Reflection note</strong>
+                <small>Share 1 win + 1 question</small>
+              </div>
+              <span class="chip chip--success">Earn +15 XP</span>
+            </li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Skill boosts</p>
+              <h2>Recommended drills</h2>
+            </div>
+            <button class="btn btn--ghost" type="button">Shuffle</button>
+          </div>
+          <ul class="recommended-list">
+            <li>
+              <div>
+                <strong>Factorising speed round</strong>
+                <small>Target: under 4 minutes</small>
+              </div>
+              <button class="btn btn--primary" type="button">Start</button>
+            </li>
+            <li>
+              <div>
+                <strong>Graph sketch critique</strong>
+                <small>Upload 1 photo for coach review</small>
+              </div>
+              <button class="btn btn--ghost" type="button">Upload</button>
+            </li>
+            <li>
+              <div>
+                <strong>Mixed mastery quiz</strong>
+                <small>Algebra + Geometry checkpoint</small>
+              </div>
+              <button class="btn btn--ghost" type="button">Preview</button>
+            </li>
+          </ul>
+        </article>
+      </section>
+
+      <!-- Achievements & Activity -->
+      <section class="grid grid--two" aria-label="Motivation section">
+        <article class="card achievements">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Milestones</p>
+              <h2>Recent achievements</h2>
+            </div>
+            <span class="chip chip--success">+120 XP this week</span>
+          </div>
+          <div class="badge-grid">
+            <div class="badge">
+              <img src="images/badge-streak.png" alt="7 day streak badge">
+              <p>7-day streak</p>
+            </div>
+            <div class="badge">
+              <img src="images/badge-topscore.png" alt="Top score badge">
+              <p>Top Algebra scorer</p>
+            </div>
+            <div class="badge">
+              <img src="images/badge-quiz.png" alt="Quiz master badge">
+              <p>50 quizzes done</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card activity-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Momentum</p>
+              <h2>Learning activity</h2>
+            </div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div>
+                <strong>Unlocked new Algebra badge</strong>
+                <p>Perfect score on “Manipulating Expressions”.</p>
+              </div>
+              <span>Just now</span>
+            </div>
+            <div class="activity-item">
+              <div>
+                <strong>Submitted Quadratics drill</strong>
+                <p>Coach feedback arriving tomorrow.</p>
+              </div>
+              <span>1 hour ago</span>
+            </div>
+            <div class="activity-item">
+              <div>
+                <strong>Booked next coaching slot</strong>
+                <p>Friday, 5:30 PM · focus on Probability.</p>
+              </div>
+              <span>Yesterday</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
       <!-- Fun Fact -->
-      <section class="fun-fact">
-        <h2> Math Fact of the Day</h2>
+      <section class="card fun-fact" aria-live="polite">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Brain break</p>
+            <h2>Math fact of the day</h2>
+          </div>
+        </div>
         <p id="fact"></p>
       </section>
     </main>
@@ -88,9 +269,11 @@
       "A circle has 360 degrees because the Babylonians used base 60 counting.",
       "Zero is the only number that cannot be represented in Roman numerals.",
       "The equals sign (=) was invented in 1557 by Robert Recorde.",
-      "The Fibonacci sequence appears in pinecones and sunflower seeds!"
+      "The Fibonacci sequence appears in pinecones and sunflower seeds!",
+      "There are more possible games of chess than atoms in the observable universe."
     ];
-    document.getElementById("fact").textContent = facts[Math.floor(Math.random() * facts.length)];
+    document.getElementById("fact").textContent =
+      facts[Math.floor(Math.random() * facts.length)];
   </script>
 </body>
 </html>
