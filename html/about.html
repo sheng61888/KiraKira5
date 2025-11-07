@@ -15,8 +15,15 @@
             <a href="home.html" class="brand-logo">KiraKira</a>
             <div class="nav-links">
                 <a href="home.html">Home</a>
-                <a href="learner-classes.html">Learner Classes</a>
-                <a href="login_signup.html" class="btn btn-primary">Get Started</a>
+                <a href="catalogue-classes.html">Browse Classes</a>
+                <a href="login_signup.html">Login</a>
+                <div class="nav-cta">
+                    <a href="login_signup.html" class="btn btn-primary">Get Started</a>
+                    <div class="theme-switcher" role="group" aria-label="Theme selection">
+                        <button type="button" class="theme-button" data-theme-select="light">Day</button>
+                        <button type="button" class="theme-button" data-theme-select="dark">Night</button>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
@@ -92,7 +99,7 @@
                     <li>Uses Bahasa Melayu and English terminology side by side so you can switch seamlessly between textbooks and KiraKira.</li>
                     <li>Includes real PT3 & SPM trend questions to highlight HOTS-style reasoning.</li>
                     <li>Shows exam tips based on common mistakes from recent marking schemes.</li>
-                    <li>Designed for laptop and mobile, so rural and urban students get the same quality practice.</li>
+                    <li>Designed for laptops and computers so that students can get quality practice.</li>
                 </ul>
             </div>
             <div class="impact-stats">
@@ -130,8 +137,8 @@
         </div>
     </footer>
 
+    <script src="../js/theme.js"></script>
     <script>
-        // Keep the footer year accurate without manual edits
         document.getElementById("current-year").textContent = new Date().getFullYear();
     </script>
 </body>

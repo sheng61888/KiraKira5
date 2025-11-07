@@ -13,42 +13,50 @@ document.addEventListener("DOMContentLoaded", () => {
                 {
                     number: "01",
                     title: "Quadratic Functions and Equations in One Variable",
-                    lessons: ["Quadratic Functions", "Quadratic Equations"]
+                    lessons: ["Quadratic Functions", "Quadratic Equations"],
+                    link: "lesson-form4-01.html"
                 },
                 {
                     number: "02",
                     title: "Number Bases",
-                    lessons: ["Number Bases"]
+                    lessons: ["Number Bases"],
+                    link: "lesson-form4-02.html"
                 },
                 {
                     number: "03",
                     title: "Logical Reasoning",
-                    lessons: ["Statements", "Arguments"]
+                    lessons: ["Statements", "Arguments"],
+                    link: "lesson-form4-03.html"
                 },
                 {
                     number: "04",
                     title: "Operations on Sets",
-                    lessons: ["Intersection of Sets", "Union of Sets", "Combined Operations on Sets"]
+                    lessons: ["Intersection of Sets", "Union of Sets", "Combined Operations on Sets"],
+                    link: "lesson-form4-04.html"
                 },
                 {
                     number: "05",
                     title: "Network in Graph Theory",
-                    lessons: ["Network"]
+                    lessons: ["Network"],
+                    link: "lesson-form4-05.html"
                 },
                 {
                     number: "06",
                     title: "Linear Inequalities in Two Variables",
-                    lessons: ["Linear Inequalities in Two Variables", "Systems of Linear Inequalities in Two Variables"]
+                    lessons: ["Linear Inequalities in Two Variables", "Systems of Linear Inequalities in Two Variables"],
+                    link: "lesson-form4-06.html"
                 },
                 {
                     number: "07",
                     title: "Graphs of Motion",
-                    lessons: ["Distance-Time Graph", "Speed-Time Graph"]
+                    lessons: ["Distance-Time Graph", "Speed-Time Graph"],
+                    link: "lesson-form4-07.html"
                 },
                 {
                     number: "08",
                     title: "Measures of Dispersion for Ungrouped Data",
-                    lessons: ["Dispersion", "Measures of Dispersion"]
+                    lessons: ["Dispersion", "Measures of Dispersion"],
+                    link: "lesson-form4-08.html"
                 },
                 {
                     number: "09",
@@ -58,12 +66,14 @@ document.addEventListener("DOMContentLoaded", () => {
                         "Dependent Events and Independent Events",
                         "Mutually Exclusive and Non-Mutually Exclusive Events",
                         "Applications of Probability of Combined Events"
-                    ]
+                    ],
+                    link: "lesson-form4-09.html"
                 },
                 {
                     number: "10",
                     title: "Consumer Mathematics: Financial Management",
-                    lessons: ["Financial Planning and Management"]
+                    lessons: ["Financial Planning and Management"],
+                    link: "lesson-form4-10.html"
                 }
             ]
         },
@@ -144,7 +154,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const modulesWrapper = createElement("div", "class-modules");
 
             section.modules.forEach(module => {
-                const moduleEl = createElement("div", "class-module");
+                const wrapperTag = module.link ? "a" : "div";
+                const classes = module.link ? "class-module module-link" : "class-module";
+                const moduleEl = createElement(wrapperTag, classes);
+                if (module.link) {
+                    moduleEl.href = module.link;
+                }
                 const moduleHeading = createElement("p", "module-heading", `${module.number} ${module.title}`);
                 const lessonList = createElement("ul", "module-lessons");
 

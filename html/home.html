@@ -35,10 +35,17 @@
             <!-- Navigation Links -->
             <div class="nav-links">
                 <a href="about.html">About Us</a>
+                <a href="catalogue-classes.html">Learner Classes</a>
                 <a href="login_signup.html">Login</a>
-                <a href="login_signup.html" class="btn btn-primary">
-                    Sign Up
-                </a>
+                <div class="nav-cta">
+                    <a href="login_signup.html" class="btn btn-primary">
+                        Sign Up
+                    </a>
+                    <div class="theme-switcher" role="group" aria-label="Theme selection">
+                        <button type="button" class="theme-button" data-theme-select="light">Day</button>
+                        <button type="button" class="theme-button" data-theme-select="dark">Night</button>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
@@ -335,5 +342,6 @@
             }
         }
     </script>
+    <script src="../js/theme.js"></script>
 </body>
 </html>

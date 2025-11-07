@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 02 - Number Bases | KiraKira</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <header class="header">
+        <nav class="container nav-container">
+            <a href="home.html" class="brand-logo">KiraKira</a>
+            <div class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="catalogue-classes.html">Catalogue</a>
+                <a href="login_signup.html">Login</a>
+                <div class="nav-cta">
+                    <div class="theme-switcher" role="group" aria-label="Theme selection">
+                        <button type="button" class="theme-button" data-theme-select="light">Day</button>
+                        <button type="button" class="theme-button" data-theme-select="dark">Night</button>
+                    </div>
+                    <a href="login_signup.html" class="btn btn-primary">Get Started</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section lesson-hero">
+            <div class="container hero-container">
+                <p class="eyebrow">Form 4 - Module 02</p>
+                <h1>Number Bases & Conversions</h1>
+                <p class="subtitle">
+                    Learn how digits, place value, and conversion methods change across bases so you can confidently switch between binary,
+                    octal, decimal, and hexadecimal representations.
+                </p>
+                <a class="btn btn-primary btn-large" href="catalogue-classes.html">Back to Catalogue</a>
+            </div>
+        </section>
+
+        <section class="container lesson-overview">
+            <article class="lesson-card">
+                <h2>Lesson Overview</h2>
+                <p>
+                    A number base tells you which digits are allowed and how each place represents powers of that base.
+                    In any base b (where b is at least 2) the valid digits run from 0 up to b minus 1.
+                    That means base 2 allows only 0 and 1, base 8 allows 0 through 7, base 10 allows 0 through 9,
+                    and base 16 extends 0 through 9 with the letters A to F for values 10 to 15.
+                </p>
+                <p>
+                    A numeral such as (d<sub>k</sub> d<sub>k-1</sub> ... d<sub>1</sub> d<sub>0</sub>)<sub>b</sub> represents
+                    the expanded sum d<sub>k</sub>b<sup>k</sup> + d<sub>k-1</sub>b<sup>k-1</sup> + ... + d<sub>1</sub>b + d<sub>0</sub>.
+                    The structure mirrors the familiar decimal system; only the allowed digits and the base of each power change.
+                </p>
+                <p>Source: Pandai</p>
+            </article>
+            <article class="lesson-card">
+                <h2>Conversions You Must Know</h2>
+                <ul>
+                    <li><strong>Base b to base 10:</strong> Expand using place value and sum digit times b to the relevant power.</li>
+                    <li><strong>Base 10 to base b:</strong> Use repeated division by b and read the remainders from last to first.</li>
+                    <li><strong>Between non-decimal bases:</strong> Convert via base 10 or group digits when bases are related (for example binary to octal or hex).</li>
+                </ul>
+                <p>Skills referenced from Pandai Chapter 2, Number Bases.</p>
+            </article>
+        </section>
+
+        <section class="quiz-section" id="lesson-quizzes">
+            <div class="container">
+                <div class="section-header">
+                    <p class="eyebrow">Quizzes</p>
+                    <h2 class="section-title">Choose A Challenge</h2>
+                    <p>Quiz 1 covers core checks on validity, place value, and conversions. Quiz 2 raises the difficulty with mixed-base reasoning.</p>
+                </div>
+                <div class="quiz-tabs" role="tablist">
+                    <button class="quiz-tab active" data-quiz="quizA" type="button">Quiz A</button>
+                    <button class="quiz-tab" data-quiz="quizB" type="button">Quiz B</button>
+                </div>
+                <p id="quizDescription" class="quiz-description"></p>
+                <div id="quizContent" class="quiz-question-list"></div>
+                <div class="quiz-actions">
+                    <button id="resetQuiz" class="btn btn-secondary" type="button">Reset Quiz</button>
+                    <button id="submitQuiz" class="btn btn-primary" type="button">Check Answers</button>
+                </div>
+                <div id="quizSummary" class="quiz-summary" aria-live="polite"></div>
+                <div id="answerKeyWrapper" class="answer-key is-hidden">
+                    <h3>Answer Key</h3>
+                    <div id="answerKeyContent"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <p>&copy; <span id="current-year"></span> KiraKira. Built in Malaysia for Malaysian learners.</p>
+            <p><a href="mailto:hello@kirakira.my">hello@kirakira.my</a></p>
+        </div>
+    </footer>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/lesson-form4-02.js"></script>
+    <script>
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

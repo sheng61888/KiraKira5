@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 03 - Logical Reasoning | KiraKira</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <header class="header">
+        <nav class="container nav-container">
+            <a href="home.html" class="brand-logo">KiraKira</a>
+            <div class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="catalogue-classes.html">Catalogue</a>
+                <a href="login_signup.html">Login</a>
+                <div class="nav-cta">
+                    <a href="login_signup.html" class="btn btn-primary">Get Started</a>
+                    <div class="theme-switcher" role="group" aria-label="Theme selection">
+                        <button type="button" class="theme-button" data-theme-select="light">Day</button>
+                        <button type="button" class="theme-button" data-theme-select="dark">Night</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section lesson-hero">
+            <div class="container hero-container">
+                <p class="eyebrow">Form 4 - Module 03</p>
+                <h1>Logical Reasoning: Statements & Arguments</h1>
+                <p class="subtitle">
+                    Treat logic as math for sentences. Learn how statements combine, how arguments are built, and how to spot fallacies before they trap you.
+                </p>
+                <a class="btn btn-primary btn-large" href="catalogue-classes.html">Back to Catalogue</a>
+            </div>
+        </section>
+
+        <section class="container lesson-overview">
+            <article class="lesson-card">
+                <h2>Lesson Overview</h2>
+                <p>
+                    A statement is any sentence that can be labelled true or false. We build complex statements with AND (written as and or P && Q), OR (P or Q), and NOT (not P),
+                    then track their truth values using tables. Conditional statements (if P then Q) have relatives: converse, inverse, and contrapositive.
+                </p>
+                <p>
+                    Arguments chain statements together. An argument is valid when true premises force the conclusion to be true. Validity depends on structure,
+                    not the topic of the sentence. Classic traps include affirming the consequent and denying the antecedent.
+                </p>
+            </article>
+            <article class="lesson-card">
+                <h2>Key Skills</h2>
+                <ul>
+                    <li>Classify sentences as statements or non-statements.</li>
+                    <li>Write truth tables and find negations, converses, and contrapositives.</li>
+                    <li>Test arguments for validity and identify common fallacies.</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="quiz-section" id="lesson-quizzes">
+            <div class="container">
+                <div class="section-header">
+                    <p class="eyebrow">Quizzes</p>
+                    <h2 class="section-title">Statements & Arguments Practice</h2>
+                    <p>Quiz A warms up key definitions, while Quiz B mixes negations, logical equivalences, and argument forms.</p>
+                </div>
+                <div class="quiz-tabs" role="tablist">
+                    <button class="quiz-tab active" data-quiz="quizA" type="button">Quiz A</button>
+                    <button class="quiz-tab" data-quiz="quizB" type="button">Quiz B</button>
+                </div>
+                <p id="quizDescription" class="quiz-description"></p>
+                <div id="quizContent" class="quiz-question-list"></div>
+                <div class="quiz-actions">
+                    <button id="resetQuiz" class="btn btn-secondary" type="button">Reset Quiz</button>
+                    <button id="submitQuiz" class="btn btn-primary" type="button">Check Answers</button>
+                </div>
+                <div id="quizSummary" class="quiz-summary" aria-live="polite"></div>
+                <div id="answerKeyWrapper" class="answer-key is-hidden">
+                    <h3>Answer Key</h3>
+                    <div id="answerKeyContent"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <p>&copy; <span id="current-year"></span> KiraKira. Built in Malaysia for Malaysian learners.</p>
+            <p><a href="mailto:hello@kirakira.my">hello@kirakira.my</a></p>
+        </div>
+    </footer>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/lesson-form4-03.js"></script>
+    <script>
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
