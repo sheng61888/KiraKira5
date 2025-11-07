@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Cat Learns Math - Class Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/learner.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="images/logo.png" alt="Smart Cat Logo">
+      </div>
+
+      <div class="profile">
+        <div class="username">Aina</div>
+        <div class="avatar"></div>
+        <small class="streak">🔥 7-day streak</small>
+        <div class="xp-bar"><span style="width:65%"></span></div>
+        <small>Level 3 - 1200 XP</small>
+      </div>
+
+      <nav class="nav">
+        <a href="learner-home.html">Dashboard</a>
+        <a href="learner-progress.html">Progress</a>
+        <a href="learner-pastyears.html">Past Papers</a>
+        <a class="active" href="learner-classes.html">Classes</a>
+        <a href="learner-profile.html">Profile</a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="topbar">
+        <h1>Class Dashboard</h1>
+        <p>Access your class materials, assignments, and progress here.</p>
+      </header>
+
+      <!-- Join a Class (hidden if already joined) -->
+      <section class="join-class" id="joinClassSection">
+        <h2>Join a Class</h2>
+        <form id="joinClassForm">
+          <input type="text" id="classCode" placeholder="Enter class code (e.g., MATH2025-A1)" required>
+          <button type="submit">Join</button>
+        </form>
+      </section>
+
+      <!-- Class Overview -->
+      <section class="class-dashboard" id="classDashboard" style="display:none;">
+        <div class="class-info">
+          <h2 id="classTitle">Form 5 Mathematics - Mr. Tan</h2>
+          <p id="classCodeDisplay">Code: MATH2025-A1</p>
+        </div>
+
+        <!-- Tasks Section -->
+        <div class="tasks-section">
+          <h3>📘 Ongoing Topics</h3>
+          <div class="task">
+            <span>1. Linear Functions</span>
+            <div class="progress-bar"><span style="width: 80%"></span></div>
+          </div>
+          <div class="task">
+            <span>2. Quadratic Equations</span>
+            <div class="progress-bar"><span style="width: 40%"></span></div>
+          </div>
+          <div class="task">
+            <span>3. Coordinate Geometry</span>
+            <div class="progress-bar"><span style="width: 10%"></span></div>
+          </div>
+        </div>
+
+        <!-- Assignments Section -->
+        <div class="assignments-section">
+          <h3>📝 Assignments</h3>
+          <div class="assignment">
+            <div class="assignment-info">
+              <span class="assignment-title">Algebra Practice Set</span>
+              <span class="assignment-date">Due: Oct 20, 2025</span>
+            </div>
+            <div class="completion">
+              <div class="completion-bar"><span style="width: 100%"></span></div>
+              <small>Completed</small>
+            </div>
+          </div>
+
+          <div class="assignment">
+            <div class="assignment-info">
+              <span class="assignment-title">Quadratic Quiz</span>
+              <span class="assignment-date">Due: Oct 25, 2025</span>
+            </div>
+            <div class="completion">
+              <div class="completion-bar"><span style="width: 60%"></span></div>
+              <small>In Progress</small>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- JS -->
+  <script>
+    const joinSection = document.getElementById("joinClassSection");
+    const classDashboard = document.getElementById("classDashboard");
+
+    document.getElementById("joinClassForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const code = document.getElementById("classCode").value.trim();
+
+      if (code) {
+        localStorage.setItem("enrolledClass", code);
+        updateClassDashboard(code);
+      }
+    });
+
+    function updateClassDashboard(code) {
+      document.getElementById("classCodeDisplay").textContent = "Code: " + code;
+      joinSection.style.display = "none";
+      classDashboard.style.display = "block";
+    }
+
+    // Auto-load class if already joined
+    const storedClass = localStorage.getItem("enrolledClass");
+    if (storedClass) {
+      updateClassDashboard(storedClass);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Cat Learns Math - Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/learner.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="images/logo.png" alt="Smart Cat Logo">
+      </div>
+
+      <div class="profile">
+        <div class="username">Aina</div>
+        <div class="avatar"></div>
+        <small class="streak">🔥 7-day streak</small>
+        <div class="xp-bar"><span style="width:65%"></span></div>
+        <small>Level 3 - 1200 XP</small>
+      </div>
+
+      <nav class="nav">
+        <a href="learner-home.html">Dashboard</a>
+        <a href="learner-progress.html">Progress</a>
+        <a href="learner-pastyears.html">Past Papers</a>
+        <a href="learner-classes.html">Classes</a>
+        <a class="active" href="learner-profile.html">Profile</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <header class="topbar">
+        <h1>Your Profile</h1>
+        <p>Manage your personal details, achievements, and preferences.</p>
+      </header>
+
+      <section class="profile-summary">
+        <div class="profile-card">
+          <img src="images/profile-cat.png" alt="Profile Cat" class="profile-img">
+          <h2>Aina</h2>
+          <p>“Learning one formula at a time”</p>
+          <div class="xp-summary">
+            <span><strong>Level:</strong> 3</span>
+            <span><strong>XP:</strong> 1200</span>
+            <span><strong>Rank:</strong> Gold Learner</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="personal-info">
+        <h2>Personal Information</h2>
+        <form class="info-form">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" value="Aina" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" value="aina123@gmail.com" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>School</label>
+            <input type="text" value="SMK Taman Melati" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Year</label>
+            <input type="text" value="Form 5" readonly>
+          </div>
+        </form>
+      </section>
+
+      <section class="achievements">
+        <h2>Achievements 🏆</h2>
+        <div class="badge-grid">
+          <div class="badge">
+            <img src="images/badge-streak.png" alt="Streak Badge">
+            <p>7-Day Streak</p>
+          </div>
+          <div class="badge">
+            <img src="images/badge-topscore.png" alt="Top Score">
+            <p>Top Scorer in Algebra</p>
+          </div>
+          <div class="badge">
+            <img src="images/badge-quiz.png" alt="Quiz Master">
+            <p>Completed 50 Quizzes</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

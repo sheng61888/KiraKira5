@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Cat - Past Papers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/learner.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="images/logo.png" alt="Smart Cat Logo">
+      </div>
+
+      <div class="profile">
+        <div class="username">Aina</div>
+        <div class="avatar"></div>
+        <small class="streak">🔥 7-day streak</small>
+        <div class="xp-bar"><span style="width:65%"></span></div>
+        <small>Level 3 - 1200 XP</small>
+      </div>
+
+      <nav class="nav">
+        <a href="learner-home.html"> Dashboard</a>
+        <a href="learner-progress.html"> Progress</a>
+        <a class="active" href="learner-pastyears.html"> Past Papers</a>
+        <a href="learner-classes.html"> Classes</a>
+        <a href="learner-profile.html"> Profile</a>
+      </nav>
+    </aside>
+
+      <!-- Main Content -->
+  <main class="main">
+    <header class="topbar">
+      <h1>Past Year Papers</h1>
+      <p>Browse SPM exam papers from previous years and practice your skills.</p>
+    </header>
+
+    <section class="filters">
+      <div class="filter-group">
+        <label for="subject">Type</label>
+        <select id="subject">
+          <option>Trial papers</option>
+          <option>Actual papers</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="year">Year</label>
+        <select id="year">
+          <option>2024</option>
+          <option>2023</option>
+          <option>2022</option>
+          <option>2021</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="papers-list">
+      <div class="paper-row">
+        <div class="paper-info">
+          <span class="paper-title">SPM Mathematics 2023 Paper 2</span>
+          <span class="paper-details">Structured | 45 marks | Moderate difficulty</span>
+        </div>
+        <div class="paper-actions">
+          <button class="btn-view" onclick="window.open('resources/SPM_Math_2023_P2.pdf', '_blank')">View</button>
+          <a href="resources/SPM_Math_2023_P2.pdf" download>
+            <button class="btn-download">Download</button>
+          </a>
+        </div>
+      </div>
+
+      <div class="paper-row">
+        <div class="paper-info">
+          <span class="paper-title">SPM Mathematics 2022 Paper 1</span>
+          <span class="paper-details">Objective | 40 marks | Easy difficulty</span>
+        </div>
+        <div class="paper-actions">
+          <button class="btn-view" onclick="window.open('resources/SPM_Math_2022_P1.pdf', '_blank')">View</button>
+          <a href="resources/SPM_Math_2022_P1.pdf" download>
+            <button class="btn-download">Download</button>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+
+  </div>
+
+  <script>
+    const selects = document.querySelectorAll("select");
+    selects.forEach(select => {
+      select.addEventListener("change", () => {
+        console.log("Filters updated:", {
+          year: document.getElementById("year").value,
+          paper: document.getElementById("paper").value,
+          topic: document.getElementById("topic").value
+        });
+      });
+    });
+  </script>
+</body>
+</html>

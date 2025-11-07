@@ -1,0 +1,96 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MathPath - Learner Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/learner.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="images/logo.png" alt="Smart Cat Logo">
+      </div>
+
+      <div class="profile">
+        <div class="username">Aina</div>
+        <div class="avatar"></div>
+        <small class="streak">🔥 7-day streak</small>
+        <div class="xp-bar"><span style="width:65%"></span></div>
+        <small>Level 3 - 1200 XP</small>
+      </div>
+
+      <nav class="nav">
+        <a class="active" href="learner-dashboard.html"> Dashboard</a>
+        <a href="learner-progress.html"> Progress</a>
+        <a href="learner-pastyears.html"> Past Papers</a>
+        <a href="learner-classes.html"> Classes</a>
+        <a href="learner-profile.html"> Profile</a>
+      </nav>
+    </aside>
+
+    <!-- Main Dashboard -->
+    <main class="main">
+      <header class="topbar">
+        <h1>Welcome back, <span id="username">Aina</span> </h1>
+        <p>Let’s continue where you left off!</p>
+      </header>
+
+      <!-- Daily Goal -->
+      <section class="daily-goal">
+        <h2> Today's Goal</h2>
+        <p>Finish one topic from Algebra to earn +50 XP!</p>
+        <div class="goal-bar"><span style="width:45%"></span></div>
+      </section>
+
+      <!-- Courses Section (uses cat cards) -->
+      <section class="courses">
+        <h2>Your Courses</h2>
+        <div class="course-grid">
+          <div class="course-card">
+            <h3>Algebra Basics</h3>
+            <img src="images/cat card 1.png" alt="Algebra Cat" />
+            <div class="progress-bar"><span style="width:60%"></span></div>
+            <button onclick="location.href='course-algebra.html'">Continue</button>
+          </div>
+
+          <div class="course-card">
+            <h3>Geometry</h3>
+            <img src="images/cat card 2.png" alt="Geometry Cat" />
+            <div class="progress-bar"><span style="width:30%"></span></div>
+            <button onclick="location.href='course-geometry.html'">Continue</button>
+          </div>
+
+          <div class="course-card">
+            <h3>Statistics</h3>
+            <img src="images/cat card 3.png" alt="Statistics Cat" />
+            <div class="progress-bar"><span style="width:85%"></span></div>
+            <button onclick="location.href='course-statistics.html'">Continue</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Fun Fact -->
+      <section class="fun-fact">
+        <h2> Math Fact of the Day</h2>
+        <p id="fact"></p>
+      </section>
+    </main>
+  </div>
+
+  <!-- JS -->
+  <script>
+    const facts = [
+      "A circle has 360 degrees because the Babylonians used base 60 counting.",
+      "Zero is the only number that cannot be represented in Roman numerals.",
+      "The equals sign (=) was invented in 1557 by Robert Recorde.",
+      "The Fibonacci sequence appears in pinecones and sunflower seeds!"
+    ];
+    document.getElementById("fact").textContent = facts[Math.floor(Math.random() * facts.length)];
+  </script>
+</body>
+</html>
