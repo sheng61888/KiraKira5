@@ -1,152 +1,147 @@
 // Admin Dashboard Styles
 const adminStyles = `
-.admin-layout {
+.search-section {
     display: flex;
-    min-height: 100vh;
+    gap: var(--gap);
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.sidebar {
-    width: 250px;
-    background-color: var(--color-surface);
-    border-right: 1px solid var(--color-border);
-    padding: 1.5rem 0;
-    height: 100vh;
-    overflow-y: auto;
+.search-section input, .search-section select {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    min-width: 200px;
 }
 
-.sidebar-header {
-    padding: 0 1.5rem 1.5rem;
-    border-bottom: 1px solid var(--color-border);
+.users-table {
+    overflow-x: auto;
+}
+
+.users-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table th, .users-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.users-table th {
+    background: var(--surface-alt);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.users-table td {
+    color: var(--text);
+}
+
+.users-table button {
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.users-table button:first-child {
+    background: var(--success);
+    color: #0c0f1c;
+}
+
+.users-table button:last-child {
+    background: var(--danger);
+    color: #0c0f1c;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+    background: var(--surface);
+    margin: 10% auto;
+    padding: 2rem;
+    border: 1px solid var(--border);
+    width: 400px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.close {
+    color: var(--muted);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.close:hover {
+    color: var(--text);
+}
+
+.modal-content h2 {
+    color: var(--accent);
     margin-bottom: 1.5rem;
 }
 
-.sidebar-nav {
-    padding: 0 1rem;
+.modal-content label {
+    display: block;
+    margin: 1rem 0 0.5rem;
+    color: var(--muted);
+    font-weight: 600;
 }
 
-.nav-item {
-    margin-bottom: 0.5rem;
-}
-
-.nav-link {
-    display: flex;
-    align-items: center;
+.modal-content input, .modal-content select {
+    width: 100%;
     padding: 0.75rem 1rem;
-    color: var(--color-text-secondary);
-    text-decoration: none;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    box-sizing: border-box;
 }
 
-.nav-link:hover {
-    background-color: var(--color-surface-muted);
-    color: var(--color-text);
-}
-
-.nav-link.active {
-    background-color: var(--color-accent);
-    color: var(--color-on-accent);
-}
-
-.nav-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: 0.75rem;
-}
-
-.main-content {
-    flex: 1;
-}
-
-.top-bar {
-    background-color: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
-    padding: 1rem 1.5rem;
+.modal-actions {
+    margin-top: 2rem;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: 0.75rem;
+    justify-content: flex-end;
 }
 
-.dashboard-content {
-    padding: 2rem;
+.modal-actions button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+.modal-actions button[type="submit"] {
+    background: linear-gradient(120deg, var(--accent), var(--text2));
+    color: #0c0f1c;
 }
 
-.stat-card {
-    background: var(--color-surface);
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--color-border);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--color-text);
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    color: var(--color-text-secondary);
-    font-size: 0.875rem;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.feature-card {
-    background: var(--color-surface);
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--color-border);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.feature-icon-wrapper {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-}
-
-.icon-indigo {
-    background-color: #e0e7ff;
-    color: #4f46e5;
-}
-
-.icon-green {
-    background-color: #dcfce7;
-    color: #16a34a;
-}
-
-.icon-purple {
-    background-color: #f3e8ff;
-    color: #9333ea;
-}
-
-.feature-card h3 {
-    margin-bottom: 0.5rem;
-    color: var(--color-text);
-}
-
-.feature-card p {
-    color: var(--color-text-secondary);
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
+.modal-actions button[type="button"] {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
 }
 `;
 
@@ -155,17 +150,118 @@ const styleSheet = document.createElement('style');
 styleSheet.textContent = adminStyles;
 document.head.appendChild(styleSheet);
 
+// User Management JavaScript
+let users = [
+    {id: 1, name: 'Aina Suzuki', email: 'aina@kirakira.edu', role: 'learner'},
+    {id: 2, name: 'Mr. Tan Wei Ming', email: 'tan@kirakira.edu', role: 'teacher'},
+    {id: 3, name: 'Sarah Chen', email: 'sarah@kirakira.edu', role: 'learner'},
+    {id: 4, name: 'Dr. Lim Hui Ling', email: 'lim@kirakira.edu', role: 'teacher'}
+];
+
+function loadUsers() {
+    const tbody = document.getElementById('usersTableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    users.forEach(user => {
+        const row = `
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.role}</td>
+                <td>
+                    <button onclick="editUser(${user.id})">Edit</button>
+                    <button onclick="deleteUser(${user.id})">Delete</button>
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}
+
+function searchUsers() {
+    const searchId = document.getElementById('searchUserId').value;
+    const roleFilter = document.getElementById('roleFilter').value;
+    
+    let filtered = users;
+    if (searchId) {
+        filtered = filtered.filter(user => user.id.toString().includes(searchId));
+    }
+    if (roleFilter) {
+        filtered = filtered.filter(user => user.role === roleFilter);
+    }
+    
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '';
+    filtered.forEach(user => {
+        const row = `
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.role}</td>
+                <td>
+                    <button onclick="editUser(${user.id})">Edit</button>
+                    <button onclick="deleteUser(${user.id})">Delete</button>
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}
+
+function showAddModal() {
+    document.getElementById('modalTitle').textContent = 'Add User';
+    document.getElementById('userForm').reset();
+    document.getElementById('userId').value = '';
+    document.getElementById('userModal').style.display = 'block';
+}
+
+function editUser(id) {
+    const user = users.find(u => u.id === id);
+    document.getElementById('modalTitle').textContent = 'Edit User';
+    document.getElementById('userId').value = user.id;
+    document.getElementById('userName').value = user.name;
+    document.getElementById('userEmail').value = user.email;
+    document.getElementById('userRole').value = user.role;
+    document.getElementById('userModal').style.display = 'block';
+}
+
+function deleteUser(id) {
+    if (confirm('Are you sure you want to delete this user?')) {
+        users = users.filter(user => user.id !== id);
+        loadUsers();
+    }
+}
+
+function closeModal() {
+    document.getElementById('userModal').style.display = 'none';
+}
+
 // Admin Dashboard JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    // Theme switcher
-    const themeButtons = document.querySelectorAll('.theme-button');
-    themeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const theme = button.dataset.theme;
-            document.body.className = theme === 'dark' ? 'theme-dark' : '';
+    // Initialize user management if on that page
+    if (document.getElementById('usersTable')) {
+        loadUsers();
+        
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('userId').value;
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const role = document.getElementById('userRole').value;
+
+            if (id) {
+                const userIndex = users.findIndex(u => u.id == id);
+                users[userIndex] = {id: parseInt(id), name, email, role};
+            } else {
+                const newId = Math.max(...users.map(u => u.id)) + 1;
+                users.push({id: newId, name, email, role});
+            }
             
-            themeButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
+            closeModal();
+            loadUsers();
         });
-    });
+    }
 });
