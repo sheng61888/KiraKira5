@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KiraKira5")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c2b6c107f809ba1a76a1d056b31d1a2d39e90da1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7b853de97f6a8d697e59e6fb0a5220b3a5cc513b")]
 [assembly: System.Reflection.AssemblyProductAttribute("KiraKira5")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KiraKira5")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
