@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KiraKira Class Catalogue | SPM Math</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <header class="header">
+        <nav class="container nav-container">
+            <a href="home.html" class="brand-logo">KiraKira</a>
+            <div class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="login_signup.html" class="btn btn-primary">Get Started</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section catalogue-hero">
+            <div class="container hero-container">
+                <p class="eyebrow">Class Catalogue</p>
+                <h1>SPM Form 4 & Form 5 Mathematics</h1>
+                <p class="subtitle">
+                    Explore every topic offered on KiraKira. Choose a path, unlock lessons, and collect streaks as you work toward SPM.
+                </p>
+                <a class="btn btn-primary btn-large" href="login_signup.html">Join a Class</a>
+            </div>
+        </section>
+
+        <section class="catalogue-intro">
+            <div class="container">
+                <h2 class="section-title">What You Get In Each Class</h2>
+                <div class="catalogue-intro-grid">
+                    <article>
+                        <h3>Structured Modules</h3>
+                        <p>Each module lists the main SPM learning outcomes and the bite-sized lessons waiting inside your dashboard.</p>
+                    </article>
+                    <article>
+                        <h3>Practice-Ready Lessons</h3>
+                        <p>Lessons combine animated notes, worked examples, and quizzes so you can earn XP and keep streaks alive.</p>
+                    </article>
+                    <article>
+                        <h3>Downloadables</h3>
+                        <p>Every topic is paired with printable reference sheets and, where available, past year question sets.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="catalogue-section">
+            <div class="container">
+                <div class="section-header">
+                    <p class="eyebrow">Browse Modules</p>
+                    <h2 class="section-title">Form 4 & Form 5 KSSM Paths</h2>
+                    <p>Pick the form you are in now or peek ahead. Your dashboard will unlock the same structure once you enroll.</p>
+                </div>
+                <div id="classCatalogue" class="catalogue-grid" aria-live="polite"></div>
+                <noscript>
+                    <p>Please enable JavaScript to view the class catalogue.</p>
+                </noscript>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <p>&copy; <span id="current-year"></span> KiraKira. Built in Malaysia for Malaysian learners.</p>
+            <p><a href="mailto:hello@kirakira.my">hello@kirakira.my</a></p>
+        </div>
+    </footer>
+
+    <script src="../js/catalogue-classes.js"></script>
+    <script>
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
