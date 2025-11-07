@@ -13,20 +13,20 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="images/logo.png" alt="Smart Cat Logo">
+        <img src="images/logo.png" alt="MathPath Smart Cat logo">
       </div>
 
       <div class="profile">
         <div class="username">Aina</div>
-        <div class="avatar"></div>
-        <small class="streak">🔥 7-day streak</small>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak">🔥 7-day streak</div>
         <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 - 1200 XP</small>
+        <small>Level 3 • 1200 XP</small>
       </div>
 
-      <nav class="nav">
+      <nav class="nav" aria-label="Learner navigation">
         <a href="learner-home.html">Dashboard</a>
-        <a class="active" href="learner-progress.html">Progress</a>
+        <a href="learner-progress.html" aria-current="page">Progress</a>
         <a href="learner-pastyears.html">Past Papers</a>
         <a href="learner-classes.html">Classes</a>
         <a href="learner-profile.html">Profile</a>
@@ -35,60 +35,103 @@
 
     <!-- Main -->
     <main class="main">
-      <header class="topbar">
-        <h1>Your Progress</h1>
-        <p>See how far you’ve come in your learning journey! 🌟</p>
+      <header class="page-heading">
+        <div>
+          <p class="eyebrow">Progress report</p>
+          <h1>You're 75% through Form 5 Math</h1>
+          <p>Keep your streak alive—2 more focused sessions this week will unlock the Geometry badge.</p>
+        </div>
+        <div class="heading-actions">
+          <button class="btn btn--ghost" type="button">Download report</button>
+          <button class="btn btn--primary" type="button">Share with coach</button>
+        </div>
       </header>
 
       <!-- Overall Progress -->
-      <section class="overall-progress">
-        <h2>Overall Completion</h2>
-        <div class="big-progress">
-          <div class="big-progress-bar"><span style="width: 75%;"></span></div>
+      <section class="card overall-progress">
+        <div class="section-head">
+          <h2>Overall completion</h2>
+          <span class="chip chip--success">+8% this week</span>
+        </div>
+        <div class="big-progress" aria-label="Overall completion 75%">
+          <div class="meter big-progress-bar"><span style="width:75%"></span></div>
           <p><strong>75%</strong> of your class materials completed!</p>
         </div>
       </section>
 
       <!-- Topic Progress -->
-      <section class="topic-progress">
-        <h2>Topic Progress</h2>
-
-        <div class="topic">
-          <span>Algebra Basics</span>
-          <div class="progress-bar"><span style="width: 100%;"></span></div>
-          <small><strong>100%</strong> — Completed 🎉</small>
+      <section class="card topic-progress" aria-labelledby="topics-title">
+        <div class="section-head">
+          <h2 id="topics-title">Topic progress</h2>
+          <span class="chip">4 topics in progress</span>
         </div>
 
         <div class="topic">
-          <span>Quadratic Equations</span>
-          <div class="progress-bar"><span style="width: 65%;"></span></div>
-          <small><strong>65%</strong> — In Progress</small>
+          <span>Algebra Basics <strong>100%</strong></span>
+          <div class="meter progress-bar"><span style="width:100%"></span></div>
+          <small>Completed 🎉 — ready for mastery quiz.</small>
         </div>
 
         <div class="topic">
-          <span>Coordinate Geometry</span>
-          <div class="progress-bar"><span style="width: 45%;"></span></div>
-          <small><strong>45%</strong> — In Progress</small>
+          <span>Quadratic Equations <strong>65%</strong></span>
+          <div class="meter progress-bar"><span style="width:65%"></span></div>
+          <small>In progress — review mistakes from last drill.</small>
         </div>
 
         <div class="topic">
-          <span>Statistics</span>
-          <div class="progress-bar"><span style="width: 25%;"></span></div>
-          <small><strong>25%</strong> — Just Started</small>
+          <span>Coordinate Geometry <strong>45%</strong></span>
+          <div class="meter progress-bar"><span style="width:45%"></span></div>
+          <small>In progress — live class today will push this to 60%.</small>
+        </div>
+
+        <div class="topic">
+          <span>Statistics <strong>25%</strong></span>
+          <div class="meter progress-bar"><span style="width:25%"></span></div>
+          <small>Just started — plan a catch-up session this weekend.</small>
         </div>
       </section>
 
-
       <!-- Completion Message -->
-      <section class="motivation" id="motivation">
-        <h2>You're doing amazing! 🐾</h2>
-        <p>Keep going — every problem solved brings you closer to mastery!</p>
+      <section class="grid grid--two">
+        <article class="card motivation" id="motivation">
+          <h2>You're doing amazing! 🐾</h2>
+          <p>Keep going — every problem solved brings you closer to mastery!</p>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <h2>Next checkpoints</h2>
+            <span class="chip chip--info">Coach review Friday</span>
+          </div>
+          <ul class="recommended-list">
+            <li>
+              <div>
+                <strong>Finish Quadratics drill</strong>
+                <small>Score ≥ 80% to stay on track.</small>
+              </div>
+              <button class="btn btn--ghost" type="button">Open</button>
+            </li>
+            <li>
+              <div>
+                <strong>Upload Geometry notes</strong>
+                <small>Coach Tan leaves feedback in 24h.</small>
+              </div>
+              <button class="btn btn--ghost" type="button">Upload</button>
+            </li>
+            <li>
+              <div>
+                <strong>Schedule Statistics catch-up</strong>
+                <small>Pick a weekend slot.</small>
+              </div>
+              <button class="btn btn--primary" type="button">Book</button>
+            </li>
+          </ul>
+        </article>
       </section>
     </main>
   </div>
 
   <script>
-    // Optional: Dynamic motivational message
     const percent = 75;
     const msg = document.getElementById("motivation");
     if (percent >= 100) {

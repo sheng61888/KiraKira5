@@ -13,88 +13,130 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="images/logo.png" alt="Smart Cat Logo">
+        <img src="images/logo.png" alt="MathPath Smart Cat logo">
       </div>
 
       <div class="profile">
         <div class="username">Aina</div>
-        <div class="avatar"></div>
-        <small class="streak">🔥 7-day streak</small>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak">🔥 7-day streak</div>
         <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 - 1200 XP</small>
+        <small>Level 3 • 1200 XP</small>
       </div>
 
-      <nav class="nav">
+      <nav class="nav" aria-label="Learner navigation">
         <a href="learner-home.html">Dashboard</a>
         <a href="learner-progress.html">Progress</a>
         <a href="learner-pastyears.html">Past Papers</a>
-        <a class="active" href="learner-classes.html">Classes</a>
+        <a href="learner-classes.html" aria-current="page">Classes</a>
         <a href="learner-profile.html">Profile</a>
       </nav>
     </aside>
 
     <!-- Main -->
     <main class="main">
-      <header class="topbar">
-        <h1>Class Dashboard</h1>
-        <p>Access your class materials, assignments, and progress here.</p>
+      <header class="page-heading">
+        <div>
+          <p class="eyebrow">Classroom hub</p>
+          <h1>Stay synced with your teacher</h1>
+          <p>Join a class with a code or check reminders, assignments, and topics in flight.</p>
+        </div>
+        <div class="heading-actions">
+          <button class="btn btn--ghost" type="button">Message coach</button>
+          <button class="btn btn--primary" type="button">Add to calendar</button>
+        </div>
       </header>
 
-      <!-- Join a Class (hidden if already joined) -->
-      <section class="join-class" id="joinClassSection">
-        <h2>Join a Class</h2>
-        <form id="joinClassForm">
-          <input type="text" id="classCode" placeholder="Enter class code (e.g., MATH2025-A1)" required>
-          <button type="submit">Join</button>
-        </form>
+      <section class="grid grid--two">
+        <article class="card join-class" id="joinClassSection">
+          <div class="section-head">
+            <h2>Join a class</h2>
+            <span class="chip chip--info">Code required</span>
+          </div>
+          <p class="muted">Enter the class code shared by your coach to unlock shared assignments, announcements, and streak boosts.</p>
+          <form id="joinClassForm">
+            <input type="text" id="classCode" placeholder="Enter class code (e.g., MATH2025-A1)" required>
+            <button class="btn btn--primary" type="submit">Join</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <h2>Announcements</h2>
+            <span class="chip">Updated today</span>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div>
+                <strong>Mock exam review uploaded</strong>
+                <p>Check the shared drive for official answers.</p>
+              </div>
+              <span>1h ago</span>
+            </div>
+            <div class="activity-item">
+              <div>
+                <strong>Bring geometry sets tomorrow</strong>
+                <p>We’re constructing loci in class.</p>
+              </div>
+              <span>4h ago</span>
+            </div>
+            <div class="activity-item">
+              <div>
+                <strong>Clinic slots open</strong>
+                <p>Book a 1:1 for tricky probability questions.</p>
+              </div>
+              <span>Yesterday</span>
+            </div>
+          </div>
+        </article>
       </section>
 
-      <!-- Class Overview -->
-      <section class="class-dashboard" id="classDashboard" style="display:none;">
+      <section class="card class-dashboard" id="classDashboard" style="display:none;">
         <div class="class-info">
+          <p class="eyebrow">Enrolled class</p>
           <h2 id="classTitle">Form 5 Mathematics - Mr. Tan</h2>
           <p id="classCodeDisplay">Code: MATH2025-A1</p>
         </div>
 
-        <!-- Tasks Section -->
-        <div class="tasks-section">
-          <h3>📘 Ongoing Topics</h3>
-          <div class="task">
-            <span>1. Linear Functions</span>
-            <div class="progress-bar"><span style="width: 80%"></span></div>
-          </div>
-          <div class="task">
-            <span>2. Quadratic Equations</span>
-            <div class="progress-bar"><span style="width: 40%"></span></div>
-          </div>
-          <div class="task">
-            <span>3. Coordinate Geometry</span>
-            <div class="progress-bar"><span style="width: 10%"></span></div>
-          </div>
-        </div>
-
-        <!-- Assignments Section -->
-        <div class="assignments-section">
-          <h3>📝 Assignments</h3>
-          <div class="assignment">
-            <div class="assignment-info">
-              <span class="assignment-title">Algebra Practice Set</span>
-              <span class="assignment-date">Due: Oct 20, 2025</span>
+        <div class="grid grid--two">
+          <div class="tasks-section">
+            <h3>📘 Ongoing topics</h3>
+            <div class="task">
+              <span>1. Linear Functions <strong>80%</strong></span>
+              <div class="meter progress-bar"><span style="width:80%"></span></div>
             </div>
-            <div class="completion">
-              <div class="completion-bar"><span style="width: 100%"></span></div>
-              <small>Completed</small>
+            <div class="task">
+              <span>2. Quadratic Equations <strong>40%</strong></span>
+              <div class="meter progress-bar"><span style="width:40%"></span></div>
+            </div>
+            <div class="task">
+              <span>3. Coordinate Geometry <strong>10%</strong></span>
+              <div class="meter progress-bar"><span style="width:10%"></span></div>
             </div>
           </div>
 
-          <div class="assignment">
-            <div class="assignment-info">
-              <span class="assignment-title">Quadratic Quiz</span>
-              <span class="assignment-date">Due: Oct 25, 2025</span>
+          <div class="assignments-section">
+            <h3>📝 Assignments</h3>
+            <div class="assignment">
+              <div class="assignment-info">
+                <span class="assignment-title">Algebra Practice Set</span>
+                <span class="assignment-date">Due: Oct 20, 2025</span>
+              </div>
+              <div class="completion">
+                <div class="meter completion-bar"><span style="width:100%"></span></div>
+                <small>Completed</small>
+              </div>
             </div>
-            <div class="completion">
-              <div class="completion-bar"><span style="width: 60%"></span></div>
-              <small>In Progress</small>
+
+            <div class="assignment">
+              <div class="assignment-info">
+                <span class="assignment-title">Quadratic Quiz</span>
+                <span class="assignment-date">Due: Oct 25, 2025</span>
+              </div>
+              <div class="completion">
+                <div class="meter completion-bar"><span style="width:60%"></span></div>
+                <small>In progress</small>
+              </div>
             </div>
           </div>
         </div>

@@ -13,83 +13,155 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="images/logo.png" alt="Smart Cat Logo">
+        <img src="images/logo.png" alt="MathPath Smart Cat logo">
       </div>
 
       <div class="profile">
         <div class="username">Aina</div>
-        <div class="avatar"></div>
-        <small class="streak">🔥 7-day streak</small>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak">🔥 7-day streak</div>
         <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 - 1200 XP</small>
+        <small>Level 3 • 1200 XP</small>
       </div>
 
-      <nav class="nav">
-        <a href="learner-home.html"> Dashboard</a>
-        <a href="learner-progress.html"> Progress</a>
-        <a class="active" href="learner-pastyears.html"> Past Papers</a>
-        <a href="learner-classes.html"> Classes</a>
-        <a href="learner-profile.html"> Profile</a>
+      <nav class="nav" aria-label="Learner navigation">
+        <a href="learner-home.html">Dashboard</a>
+        <a href="learner-progress.html">Progress</a>
+        <a href="learner-pastyears.html" aria-current="page">Past Papers</a>
+        <a href="learner-classes.html">Classes</a>
+        <a href="learner-profile.html">Profile</a>
       </nav>
     </aside>
 
-      <!-- Main Content -->
-  <main class="main">
-    <header class="topbar">
-      <h1>Past Year Papers</h1>
-      <p>Browse SPM exam papers from previous years and practice your skills.</p>
-    </header>
-
-    <section class="filters">
-      <div class="filter-group">
-        <label for="subject">Type</label>
-        <select id="subject">
-          <option>Trial papers</option>
-          <option>Actual papers</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label for="year">Year</label>
-        <select id="year">
-          <option>2024</option>
-          <option>2023</option>
-          <option>2022</option>
-          <option>2021</option>
-        </select>
-      </div>
-    </section>
-
-    <section class="papers-list">
-      <div class="paper-row">
-        <div class="paper-info">
-          <span class="paper-title">SPM Mathematics 2023 Paper 2</span>
-          <span class="paper-details">Structured | 45 marks | Moderate difficulty</span>
+    <!-- Main Content -->
+    <main class="main">
+      <header class="page-heading">
+        <div>
+          <p class="eyebrow">Exam mode</p>
+          <h1>Past year papers</h1>
+          <p>Filter by paper type, year, or topic. Save favourites so they reappear on your dashboard.</p>
         </div>
-        <div class="paper-actions">
-          <button class="btn-view" onclick="window.open('resources/SPM_Math_2023_P2.pdf', '_blank')">View</button>
-          <a href="resources/SPM_Math_2023_P2.pdf" download>
-            <button class="btn-download">Download</button>
-          </a>
+        <div class="heading-actions">
+          <button class="btn btn--ghost" type="button">Import PDF</button>
+          <button class="btn btn--primary" type="button">Start timer</button>
         </div>
-      </div>
+      </header>
 
-      <div class="paper-row">
-        <div class="paper-info">
-          <span class="paper-title">SPM Mathematics 2022 Paper 1</span>
-          <span class="paper-details">Objective | 40 marks | Easy difficulty</span>
+      <section class="card" aria-labelledby="filters-title">
+        <div class="section-head">
+          <h2 id="filters-title">Filters</h2>
+          <span class="chip">Personalised for SPM</span>
         </div>
-        <div class="paper-actions">
-          <button class="btn-view" onclick="window.open('resources/SPM_Math_2022_P1.pdf', '_blank')">View</button>
-          <a href="resources/SPM_Math_2022_P1.pdf" download>
-            <button class="btn-download">Download</button>
-          </a>
+        <div class="filters">
+          <div class="filter-group">
+            <label for="subject">Type</label>
+            <select id="subject">
+              <option>Trial papers</option>
+              <option>Actual papers</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="year">Year</label>
+            <select id="year">
+              <option>2024</option>
+              <option>2023</option>
+              <option>2022</option>
+              <option>2021</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="topic">Topic</label>
+            <select id="topic">
+              <option>All topics</option>
+              <option>Algebra</option>
+              <option>Geometry</option>
+              <option>Statistics</option>
+            </select>
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
 
+      <section class="card papers-list" aria-live="polite">
+        <div class="paper-row">
+          <div class="paper-info">
+            <span class="paper-title">SPM Mathematics 2023 Paper 2</span>
+            <span class="paper-details">Structured · 45 marks · Moderate difficulty</span>
+          </div>
+          <div class="paper-actions">
+            <button class="btn-view" type="button" onclick="window.open('resources/SPM_Math_2023_P2.pdf', '_blank')">View</button>
+            <a href="resources/SPM_Math_2023_P2.pdf" download>
+              <button class="btn-download" type="button">Download</button>
+            </a>
+          </div>
+        </div>
 
+        <div class="paper-row">
+          <div class="paper-info">
+            <span class="paper-title">SPM Mathematics 2022 Paper 1</span>
+            <span class="paper-details">Objective · 40 marks · Easy difficulty</span>
+          </div>
+          <div class="paper-actions">
+            <button class="btn-view" type="button" onclick="window.open('resources/SPM_Math_2022_P1.pdf', '_blank')">View</button>
+            <a href="resources/SPM_Math_2022_P1.pdf" download>
+              <button class="btn-download" type="button">Download</button>
+            </a>
+          </div>
+        </div>
+
+        <div class="paper-row">
+          <div class="paper-info">
+            <span class="paper-title">SPM Mathematics 2021 Paper 2</span>
+            <span class="paper-details">Structured · 45 marks · Hard difficulty</span>
+          </div>
+          <div class="paper-actions">
+            <button class="btn-view" type="button">View</button>
+            <button class="btn-download" type="button">Download</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid--two">
+        <article class="card">
+          <div class="section-head">
+            <h2>Exam checklist</h2>
+            <span class="chip chip--info">Auto-summary</span>
+          </div>
+          <ul class="recommended-list">
+            <li>
+              <div>
+                <strong>Complete 2 timed papers</strong>
+                <small>Recommended pace: 1 per week</small>
+              </div>
+              <button class="btn btn--ghost" type="button">Add</button>
+            </li>
+            <li>
+              <div>
+                <strong>Review marking scheme</strong>
+                <small>Highlight careless mistakes</small>
+              </div>
+              <button class="btn btn--ghost" type="button">Open</button>
+            </li>
+            <li>
+              <div>
+                <strong>Log reflections</strong>
+                <small>Capture what to improve next time</small>
+              </div>
+              <button class="btn btn--primary" type="button">Start</button>
+            </li>
+          </ul>
+        </article>
+
+        <article class="card fun-fact">
+          <div class="section-head">
+            <h2>Streak tip</h2>
+            <span class="chip">After each paper</span>
+          </div>
+          <p>Snap a photo of one “aha!” solution and drop it into your learning journal—reflection boosts retention by 30%.</p>
+        </article>
+      </section>
+    </main>
   </div>
 
   <script>
@@ -98,7 +170,7 @@
       select.addEventListener("change", () => {
         console.log("Filters updated:", {
           year: document.getElementById("year").value,
-          paper: document.getElementById("paper").value,
+          paper: document.getElementById("subject").value,
           topic: document.getElementById("topic").value
         });
       });

@@ -13,87 +13,133 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="images/logo.png" alt="Smart Cat Logo">
+        <img src="images/logo.png" alt="MathPath Smart Cat logo">
       </div>
 
       <div class="profile">
         <div class="username">Aina</div>
-        <div class="avatar"></div>
-        <small class="streak">🔥 7-day streak</small>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak">🔥 7-day streak</div>
         <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 - 1200 XP</small>
+        <small>Level 3 • 1200 XP</small>
       </div>
 
-      <nav class="nav">
+      <nav class="nav" aria-label="Learner navigation">
         <a href="learner-home.html">Dashboard</a>
         <a href="learner-progress.html">Progress</a>
         <a href="learner-pastyears.html">Past Papers</a>
         <a href="learner-classes.html">Classes</a>
-        <a class="active" href="learner-profile.html">Profile</a>
+        <a href="learner-profile.html" aria-current="page">Profile</a>
       </nav>
     </aside>
 
     <!-- Main Content -->
     <main class="main">
-      <header class="topbar">
-        <h1>Your Profile</h1>
-        <p>Manage your personal details, achievements, and preferences.</p>
+      <header class="page-heading">
+        <div>
+          <p class="eyebrow">Profile & preferences</p>
+          <h1>Your learner identity</h1>
+          <p>Review your info, track badges, and control what reminders hit your inbox.</p>
+        </div>
+        <div class="heading-actions">
+          <button class="btn btn--ghost" type="button">Edit motto</button>
+          <button class="btn btn--primary" type="button">Update photo</button>
+        </div>
       </header>
 
-      <section class="profile-summary">
+      <section class="profile-summary card">
         <div class="profile-card">
-          <img src="images/profile-cat.png" alt="Profile Cat" class="profile-img">
+          <img src="images/profile-cat.png" alt="Illustrated profile avatar" class="profile-img">
           <h2>Aina</h2>
-          <p>“Learning one formula at a time”</p>
+          <p>“Learning one formula at a time.”</p>
           <div class="xp-summary">
             <span><strong>Level:</strong> 3</span>
             <span><strong>XP:</strong> 1200</span>
             <span><strong>Rank:</strong> Gold Learner</span>
           </div>
+          <div class="chip chip--success">Next badge: Geometry Guru</div>
         </div>
       </section>
 
-      <section class="personal-info">
-        <h2>Personal Information</h2>
+      <section class="card personal-info">
+        <div class="section-head">
+          <h2>Personal information</h2>
+          <button class="btn btn--ghost" type="button">Edit</button>
+        </div>
         <form class="info-form">
           <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" value="Aina" readonly>
+            <label for="name">Full Name</label>
+            <input id="name" type="text" value="Aina" readonly>
           </div>
 
           <div class="form-group">
-            <label>Email</label>
-            <input type="email" value="aina123@gmail.com" readonly>
+            <label for="email">Email</label>
+            <input id="email" type="email" value="aina123@gmail.com" readonly>
           </div>
 
           <div class="form-group">
-            <label>School</label>
-            <input type="text" value="SMK Taman Melati" readonly>
+            <label for="school">School</label>
+            <input id="school" type="text" value="SMK Taman Melati" readonly>
           </div>
 
           <div class="form-group">
-            <label>Year</label>
-            <input type="text" value="Form 5" readonly>
+            <label for="year">Year</label>
+            <input id="year" type="text" value="Form 5" readonly>
           </div>
         </form>
       </section>
 
-      <section class="achievements">
-        <h2>Achievements 🏆</h2>
-        <div class="badge-grid">
-          <div class="badge">
-            <img src="images/badge-streak.png" alt="Streak Badge">
-            <p>7-Day Streak</p>
+      <section class="grid grid--two">
+        <article class="card achievements">
+          <div class="section-head">
+            <h2>Achievements 🏆</h2>
+            <span class="chip chip--success">3 new this term</span>
           </div>
-          <div class="badge">
-            <img src="images/badge-topscore.png" alt="Top Score">
-            <p>Top Scorer in Algebra</p>
+          <div class="badge-grid">
+            <div class="badge">
+              <img src="images/badge-streak.png" alt="Streak badge">
+              <p>7-Day Streak</p>
+            </div>
+            <div class="badge">
+              <img src="images/badge-topscore.png" alt="Top score badge">
+              <p>Top Scorer in Algebra</p>
+            </div>
+            <div class="badge">
+              <img src="images/badge-quiz.png" alt="Quiz master badge">
+              <p>Completed 50 Quizzes</p>
+            </div>
           </div>
-          <div class="badge">
-            <img src="images/badge-quiz.png" alt="Quiz Master">
-            <p>Completed 50 Quizzes</p>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <h2>Notification preferences</h2>
+            <span class="chip chip--info">Auto-saved</span>
           </div>
-        </div>
+          <ul class="recommended-list">
+            <li>
+              <div>
+                <strong>Daily streak nudges</strong>
+                <small>Sent at 8:00 PM GMT+8</small>
+              </div>
+              <button class="btn btn--ghost" type="button">Toggle</button>
+            </li>
+            <li>
+              <div>
+                <strong>Coach feedback alerts</strong>
+                <small>Push + email</small>
+              </div>
+              <button class="btn btn--ghost" type="button">Manage</button>
+            </li>
+            <li>
+              <div>
+                <strong>Exam countdown</strong>
+                <small>Weekly digest on Fridays</small>
+              </div>
+              <button class="btn btn--primary" type="button">Edit</button>
+            </li>
+          </ul>
+        </article>
       </section>
     </main>
   </div>
