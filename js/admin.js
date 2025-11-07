@@ -152,24 +152,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } else {
                 // Add new user
-                $.ajax({
-                    type: "POST",
-                    url: "../code/user_management.cs/AddUser",
-                    data: JSON.stringify({ username: username, name: name, email: email, password: password, role: role }),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.d) {
-                            closeModal();
-                            loadUsers();
-                        } else {
-                            alert('Failed to add user');
-                        }
-                    },
-                    error: function() {
-                        alert('Error adding user');
-                    }
-                });
+                if (UserManagement.AddUser(username, name, email, password, role)) {
+                    closeModal();
+                    loadUsers();
+                    alert('User added successfully');
+                } else {
+                    alert('Failed to add user');
+                }
             }
         });
     }
