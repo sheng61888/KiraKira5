@@ -13,7 +13,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="images/logo.png" alt="KiraKira logo">
+        <img src="/images/logo transparent.png" alt="KiraKira logo">
       </div>
 
       <div class="profile">
@@ -98,28 +98,12 @@
           <button class="btn btn--ghost" type="button">See course map</button>
         </div>
 
-        <div class="course-grid">
-          <article class="course-card">
-            <h3>Algebra Basics</h3>
-            <img src="images/cat card 1.png" alt="Illustration of algebra cat holding numbers">
-            <div class="meter progress-bar"><span style="width:60%"></span></div>
-            <button type="button" onclick="location.href='course-algebra.html'">Continue lesson</button>
-          </article>
-
-          <article class="course-card">
-            <h3>Geometry</h3>
-            <img src="images/cat card 2.png" alt="Geometry cat surrounded by shapes">
-            <div class="meter progress-bar"><span style="width:30%"></span></div>
-            <button type="button" onclick="location.href='course-geometry.html'">Resume practice</button>
-          </article>
-
-          <article class="course-card">
-            <h3>Statistics</h3>
-            <img src="images/cat card 3.png" alt="Statistics cat with charts">
-            <div class="meter progress-bar"><span style="width:85%"></span></div>
-            <button type="button" onclick="location.href='course-statistics.html'">Review notes</button>
-          </article>
+        <div class="course-grid" data-role="course-grid" data-grade="Form 4" data-limit="3">
+          <p class="muted">Loading your modules…</p>
         </div>
+        <noscript>
+          <p class="muted">JavaScript is required to see your current modules.</p>
+        </noscript>
       </section>
 
       <!-- Schedule & Recommendations -->
@@ -264,6 +248,8 @@
   </div>
 
   <!-- JS -->
+  <script src="../js/modules-data.js"></script>
+  <script src="../js/learner-modules.js"></script>
   <script>
     const facts = [
       "A circle has 360 degrees because the Babylonians used base 60 counting.",

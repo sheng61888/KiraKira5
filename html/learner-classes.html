@@ -13,7 +13,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="images/logo.png" alt="MathPath Smart Cat logo">
+        <img src="/images/logo transparent.png" alt="KiraKira logo">
       </div>
 
       <div class="profile">
@@ -91,6 +91,22 @@
         </article>
       </section>
 
+      <section class="card module-catalogue" aria-labelledby="modules-heading">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">SPM modules</p>
+            <h2 id="modules-heading">Form 4 & Form 5 paths</h2>
+          </div>
+          <span class="chip chip--info">Synced with public catalogue</span>
+        </div>
+        <div id="modulesByGrade" aria-live="polite">
+          <p class="muted">Loading module list…</p>
+        </div>
+        <noscript>
+          <p class="muted">Enable JavaScript to view your module list.</p>
+        </noscript>
+      </section>
+
       <section class="card class-dashboard" id="classDashboard" style="display:none;">
         <div class="class-info">
           <p class="eyebrow">Enrolled class</p>
@@ -145,6 +161,8 @@
   </div>
 
   <!-- JS -->
+  <script src="../js/modules-data.js"></script>
+  <script src="../js/learner-modules.js"></script>
   <script>
     const joinSection = document.getElementById("joinClassSection");
     const classDashboard = document.getElementById("classDashboard");

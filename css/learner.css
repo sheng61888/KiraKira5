@@ -468,6 +468,117 @@ ul {
   color: #0c0f1c;
 }
 
+.module-card {
+  gap: 0.8rem;
+  position: relative;
+}
+
+.module-number {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.lesson-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0;
+  list-style: none;
+}
+
+.lesson-pill-list li {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.85rem;
+}
+
+.lesson-pill-list--compact li {
+  font-size: 0.8rem;
+}
+
+.module-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.btn--ghost-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.module-catalogue {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.module-stack {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.module-stack + .module-stack {
+  margin-top: 1rem;
+}
+
+.module-stack-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.module-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.module-list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  flex-wrap: wrap;
+}
+
+.module-info {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+}
+
+.module-info .module-number {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.module-info small {
+  color: var(--muted);
+}
+
+.module-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  text-align: right;
+}
+
 .schedule-card ul {
   display: flex;
   flex-direction: column;
