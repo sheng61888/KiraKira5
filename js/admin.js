@@ -10,16 +10,8 @@ const adminStyles = `
     background-color: var(--color-surface);
     border-right: 1px solid var(--color-border);
     padding: 1.5rem 0;
-    position: fixed;
     height: 100vh;
     overflow-y: auto;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index: 100;
-}
-
-.sidebar.open {
-    transform: translateX(0);
 }
 
 .sidebar-header {
@@ -64,12 +56,6 @@ const adminStyles = `
 
 .main-content {
     flex: 1;
-    margin-left: 0;
-    transition: margin-left 0.3s ease;
-}
-
-.main-content.sidebar-open {
-    margin-left: 250px;
 }
 
 .top-bar {
@@ -79,19 +65,6 @@ const adminStyles = `
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.menu-toggle {
-    background: none;
-    border: none;
-    color: var(--color-text);
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-}
-
-.menu-toggle:hover {
-    background-color: var(--color-surface-muted);
 }
 
 .dashboard-content {
@@ -125,41 +98,55 @@ const adminStyles = `
     font-size: 0.875rem;
 }
 
-.overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 50;
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
 }
 
-.overlay.show {
-    display: block;
+.feature-card {
+    background: var(--color-surface);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
-@media (min-width: 768px) {
-    .sidebar {
-        position: static;
-        transform: translateX(0);
-    }
-
-    .main-content {
-        margin-left: 0;
-    }
-
-    .menu-toggle {
-        display: none;
-    }
-
-    .overlay {
-        display: none !important;
-    }
+.feature-icon-wrapper {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
 }
 
-@media (max-width: 767px) {
-    .main-content.sidebar-open {
-        margin-left: 0;
-    }
+.icon-indigo {
+    background-color: #e0e7ff;
+    color: #4f46e5;
+}
+
+.icon-green {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.icon-purple {
+    background-color: #f3e8ff;
+    color: #9333ea;
+}
+
+.feature-card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+}
+
+.feature-card p {
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
 }
 `;
 
@@ -170,25 +157,6 @@ document.head.appendChild(styleSheet);
 
 // Admin Dashboard JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const overlay = document.getElementById('overlay');
-
-    if (menuToggle && sidebar && mainContent && overlay) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            mainContent.classList.toggle('sidebar-open');
-            overlay.classList.toggle('show');
-        });
-
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            mainContent.classList.remove('sidebar-open');
-            overlay.classList.remove('show');
-        });
-    }
-
     // Theme switcher
     const themeButtons = document.querySelectorAll('.theme-button');
     themeButtons.forEach(button => {
