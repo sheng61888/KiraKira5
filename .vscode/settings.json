@@ -6,7 +6,7 @@
             "driver": "mysql",
             "color": "#FFB095",
             "connectionType": "host",
-            "host": "localhost",
+            "host": "192.168.0.184",
             "port": 3306,
             "ssl": false,
             "username": "root",
