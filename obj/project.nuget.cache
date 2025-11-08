@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "G0K7S+luLPA=",
+  "dgSpecHash": "+3oT+1LbKqg=",
   "success": true,
-  "projectFilePath": "c:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
+  "projectFilePath": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ggshe\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\ggshe\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",

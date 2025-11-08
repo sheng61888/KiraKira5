@@ -1,8 +1,3 @@
-// Inject styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = adminStyles;
-document.head.appendChild(styleSheet);
-
 // User Management JavaScript
 let users = [];
 
@@ -10,14 +5,13 @@ function loadUsers() {
     const tbody = document.getElementById('usersTableBody');
     if (!tbody) return;
     
-    // Call C# web method to get users
     $.ajax({
-        type: "POST",
-        url: "../code/user_management.cs/GetUsers",
+        type: "GET",
+        url: "/api/user/list",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function(response) {
-            users = JSON.parse(response.d);
+            users = response;
             displayUsers(users);
         },
         error: function() {
@@ -52,14 +46,12 @@ function searchUsers() {
     const roleFilter = document.getElementById('roleFilter').value;
     
     $.ajax({
-        type: "POST",
-        url: "../code/user_management.cs/SearchUsers",
-        data: JSON.stringify({ searchId: searchId, roleFilter: roleFilter }),
+        type: "GET",
+        url: `/api/user/search?searchId=${searchId}&roleFilter=${roleFilter}`,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function(response) {
-            const filteredUsers = JSON.parse(response.d);
-            displayUsers(filteredUsers);
+            displayUsers(response);
         },
         error: function() {
             console.error('Failed to search users');
@@ -92,14 +84,14 @@ function editUser(id) {
 function deleteUser(id) {
     if (confirm('Are you sure you want to delete this user?')) {
         $.ajax({
-            type: "POST",
-            url: "../code/user_management.cs/DeleteUser",
-            data: JSON.stringify({ id: id }),
+            type: "DELETE",
+            url: `/api/user/delete/${id}`,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function(response) {
-                if (response.d) {
+                if (response.success) {
                     loadUsers();
+                    alert('User deleted successfully');
                 } else {
                     alert('Failed to delete user');
                 }
@@ -133,15 +125,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (id) {
                 // Update existing user
                 $.ajax({
-                    type: "POST",
-                    url: "../code/user_management.cs/UpdateUser",
+                    type: "PUT",
+                    url: "/api/user/update",
                     data: JSON.stringify({ id: id, username: username, name: name, email: email, role: role }),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function(response) {
-                        if (response.d) {
+                        if (response.success) {
                             closeModal();
                             loadUsers();
+                            alert('User updated successfully');
                         } else {
                             alert('Failed to update user');
                         }
