@@ -13,6 +13,8 @@
     "Form 5": [45, 20, 15, 10, 0]
   };
 
+  const stickerPool = ["✨", "📐", "🎯", "🌀", "🧠", "🚀", "💡", "🐾"];
+
   const getProgressValue = (module, grade, index) => {
     if (module.link && typeof moduleProgressMap[module.link] === "number") {
       return moduleProgressMap[module.link];
@@ -78,6 +80,8 @@
     section.modules.slice(0, limit).forEach((module, index) => {
       const card = document.createElement("article");
       card.className = "course-card module-card";
+      const stickerIndex = (index + grade.length) % stickerPool.length;
+      card.dataset.sticker = stickerPool[stickerIndex];
 
       const number = document.createElement("span");
       number.className = "module-number";

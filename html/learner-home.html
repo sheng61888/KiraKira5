@@ -48,6 +48,23 @@
         </div>
       </header>
 
+      <section class="card mission-card" id="missionCard" aria-live="polite">
+        <div>
+          <p class="eyebrow" id="missionBadge">Form 4 path</p>
+          <h2 id="missionTitle">Your mission briefing</h2>
+          <p class="mood" id="missionMood">Let’s stack some easy wins with Algebra drills today.</p>
+          <div class="mission-chip-stack" id="missionChips">
+            <span class="chip chip--info">Form 4</span>
+            <span class="chip">Momentum mode</span>
+          </div>
+        </div>
+        <div class="mission-actions">
+          <strong id="missionConfidence">45%</strong>
+          <small>SPM readiness</small>
+          <button class="btn btn--primary" type="button" id="missionActionBtn">Adjust plan</button>
+        </div>
+      </section>
+
       <!-- Daily Goal + Stats -->
       <section class="card card--glow daily-goal" aria-labelledby="goal-title">
         <div class="section-head">
@@ -185,19 +202,8 @@
             </div>
             <span class="chip chip--success">+120 XP this week</span>
           </div>
-          <div class="badge-grid">
-            <div class="badge">
-              <img src="images/badge-streak.png" alt="7 day streak badge">
-              <p>7-day streak</p>
-            </div>
-            <div class="badge">
-              <img src="images/badge-topscore.png" alt="Top score badge">
-              <p>Top Algebra scorer</p>
-            </div>
-            <div class="badge">
-              <img src="images/badge-quiz.png" alt="Quiz master badge">
-              <p>50 quizzes done</p>
-            </div>
+          <div class="badge-collections" data-role="badge-collections">
+            <p class="muted">Loading your badge collections…</p>
           </div>
         </article>
 
@@ -249,8 +255,67 @@
 
   <!-- JS -->
   <script src="../js/modules-data.js"></script>
+  <script src="../js/badge-library.js"></script>
   <script src="../js/learner-modules.js"></script>
+  <script src="../js/learner-badges.js"></script>
   <script>
+    (function() {
+      const card = document.getElementById("missionCard");
+      if (!card) return;
+
+      const missionData = (() => {
+        try {
+          return JSON.parse(localStorage.getItem("kiraOnboarding")) || {};
+        } catch (e) {
+          return {};
+        }
+      })();
+
+      const grade = missionData.grade || "Form 4";
+      const readiness = typeof missionData.readiness === "number" ? missionData.readiness : 45;
+      const wantsVideos =
+        missionData.wantsVideos === undefined ? true : Boolean(missionData.wantsVideos);
+
+      const missionBadge = document.getElementById("missionBadge");
+      const missionTitle = document.getElementById("missionTitle");
+      const missionMood = document.getElementById("missionMood");
+      const missionChips = document.getElementById("missionChips");
+      const missionConfidence = document.getElementById("missionConfidence");
+      const missionActionBtn = document.getElementById("missionActionBtn");
+
+      const readinessMessage = value => {
+        if (value >= 80) {
+          return "Legend status unlocked—time for mastery speed rounds.";
+        }
+        if (value >= 50) {
+          return "Solid momentum. Blend revision with stretch problems today.";
+        }
+        return "Rescue mode on. We’ll stack guided Algebra wins together.";
+      };
+
+      missionBadge.textContent = `${grade} track`;
+      missionTitle.textContent =
+        readiness < 50 ? "Rescue mission engaged" : "Keep the momentum going";
+      missionMood.textContent = readinessMessage(readiness);
+      missionConfidence.textContent = `${Math.round(readiness)}%`;
+
+      const chipMood = readiness < 50 ? "Rescue mode" : "Momentum mode";
+      missionChips.innerHTML = [
+        `<span class="chip chip--info">${grade}</span>`,
+        `<span class="chip">${chipMood}</span>`,
+        `<span class="chip${wantsVideos ? " chip--success" : ""}">${
+          wantsVideos ? "Intro videos on" : "Self-paced"
+        }</span>`
+      ].join("");
+
+      missionActionBtn.textContent = readiness < 50 ? "Review rescue plan" : "Adjust plan";
+      missionActionBtn.addEventListener("click", () => {
+        window.location.href = "learner-onboarding.html";
+      });
+
+      card.dataset.state = readiness < 50 ? "rescue" : "momentum";
+    })();
+
     const facts = [
       "A circle has 360 degrees because the Babylonians used base 60 counting.",
       "Zero is the only number that cannot be represented in Roman numerals.",
