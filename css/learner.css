@@ -766,6 +766,11 @@ ul {
   object-fit: contain;
 }
 
+.badge-card.locked img,
+.badge-card.locked .badge-glyph {
+  filter: grayscale(1) opacity(0.6);
+}
+
 .badge-glyph {
   width: 70px;
   height: 70px;
@@ -801,6 +806,15 @@ ul {
 
 .badge-collection[data-style="ghibli"] .badge-card.unlocked {
   border-color: rgba(118, 210, 255, 0.8);
+}
+
+.badge-collection[data-style="hidden"] .badge-card {
+  border-style: dashed;
+}
+
+.badge-collection[data-style="hidden"] .badge-card.unlocked {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .activity-list {
