@@ -42,21 +42,37 @@ function displayUsers(userList) {
 }
 
 function searchUsers() {
-    const searchId = document.getElementById('searchUserId').value;
+    const searchId = document.getElementById('searchUserId').value.trim();
     const roleFilter = document.getElementById('roleFilter').value;
     
-    $.ajax({
-        type: "GET",
-        url: `/api/user/search?searchId=${searchId}&roleFilter=${roleFilter}`,
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function(response) {
-            displayUsers(response);
-        },
-        error: function() {
-            console.error('Failed to search users');
-        }
-    });
+    console.log('Search ID:', searchId);
+    console.log('Role Filter:', roleFilter);
+    
+    // If both are empty, show all users
+    if (!searchId && !roleFilter) {
+        displayUsers(users);
+        return;
+    }
+    
+    // Client-side filtering
+    let filtered = users;
+    
+    if (searchId) {
+        filtered = filtered.filter(user => user.Id.toLowerCase().includes(searchId.toLowerCase()));
+    }
+    
+    if (roleFilter) {
+        filtered = filtered.filter(user => user.Role.toLowerCase() === roleFilter.toLowerCase());
+    }
+    
+    console.log('Filtered users:', filtered);
+    displayUsers(filtered);
+}
+
+function clearSearch() {
+    document.getElementById('searchUserId').value = '';
+    document.getElementById('roleFilter').value = '';
+    loadUsers();
 }
 
 function showAddModal() {
@@ -112,6 +128,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize user management if on that page
     if (document.getElementById('usersTable')) {
         loadUsers();
+        
+        // Enable search on Enter key
+        document.getElementById('searchUserId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchUsers();
+            }
+        });
+        
+        // Auto-filter when role dropdown changes
+        document.getElementById('roleFilter').addEventListener('change', function() {
+            searchUsers();
+        });
         
         document.getElementById('userForm').addEventListener('submit', function(e) {
             e.preventDefault();

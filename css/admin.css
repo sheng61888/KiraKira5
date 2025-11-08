@@ -14,6 +14,11 @@
     min-width: 200px;
 }
 
+.search-section select option {
+    background: #1a1d2e;
+    color: var(--text);
+}
+
 .users-table {
     overflow-x: auto;
 }
@@ -72,12 +77,22 @@
 
 .modal-content {
     background: var(--surface);
-    margin: 10% auto;
+    margin: 5% auto;
     padding: 2rem;
     border: 1px solid var(--border);
-    width: 400px;
+    width: 600px;
+    max-width: 90%;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-group {
+    flex: 1;
 }
 
 .close {
@@ -100,9 +115,17 @@
 
 .modal-content label {
     display: block;
-    margin: 1rem 0 0.5rem;
+    margin: 0 0 0.5rem;
     color: var(--muted);
     font-weight: 600;
+}
+
+.form-row {
+    margin-top: 1rem;
+}
+
+.form-group label {
+    margin-top: 0;
 }
 
 .modal-content input, .modal-content select {
@@ -113,6 +136,15 @@
     border: 1px solid var(--border);
     color: var(--text);
     box-sizing: border-box;
+}
+
+.modal-content select option {
+    background: #1a1d2e;
+    color: var(--text);
+}
+
+.form-group input, .form-group select {
+    width: 100%;
 }
 
 .modal-actions {

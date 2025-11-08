@@ -49,6 +49,7 @@
                         <option value="teacher">Teacher</option>
                     </select>
                     <button class="btn btn--ghost" onclick="searchUsers()">Search</button>
+                    <button class="btn btn--ghost" onclick="clearSearch()">Clear</button>
                 </div>
             </section>
 
@@ -86,19 +87,33 @@
             <h2 id="modalTitle">Add User</h2>
             <form id="userForm">
                 <input type="hidden" id="userId">
-                <label>Username:</label>
-                <input type="text" id="userUsername" required>
-                <label>Name:</label>
-                <input type="text" id="userName" required>
-                <label>Email:</label>
-                <input type="email" id="userEmail" required>
-                <label>Password:</label>
-                <input type="password" id="userPassword" required>
-                <label>Role:</label>
-                <select id="userRole" required>
-                    <option value="learner">Learner</option>
-                    <option value="teacher">Teacher</option>
-                </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" id="userUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Name:</label>
+                        <input type="text" id="userName" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="userEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role:</label>
+                        <select id="userRole" required>
+                            <option value="learner">Learner</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="userPassword" required>
+                </div>
                 <div class="modal-actions">
                     <button type="submit">Save</button>
                     <button type="button" onclick="closeModal()">Cancel</button>

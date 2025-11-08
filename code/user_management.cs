@@ -142,14 +142,17 @@ public class UserManagement
                 if (!string.IsNullOrEmpty(searchId))
                     query += " AND uid LIKE @SearchId";
                 if (!string.IsNullOrEmpty(roleFilter))
-                    query += " AND usertype = @RoleFilter";
+                    query += " AND LOWER(usertype) = LOWER(@RoleFilter)";
                 
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
                     if (!string.IsNullOrEmpty(searchId))
                         command.Parameters.AddWithValue("@SearchId", $"%{searchId}%");
                     if (!string.IsNullOrEmpty(roleFilter))
+                    {
                         command.Parameters.AddWithValue("@RoleFilter", roleFilter);
+                        Console.WriteLine($"Searching for role: {roleFilter}");
+                    }
                     
                     connection.Open();
                     using (MySqlDataReader reader = command.ExecuteReader())
@@ -166,6 +169,7 @@ public class UserManagement
                             });
                         }
                     }
+                    Console.WriteLine($"Found {users.Count} users");
                 }
             }
         }
