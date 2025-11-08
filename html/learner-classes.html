@@ -66,7 +66,7 @@
             <h2>Announcements</h2>
             <span class="chip">Updated today</span>
           </div>
-          <div class="activity-list">
+          <div class="activity-list" id="announcementList">
             <div class="activity-item">
               <div>
                 <strong>Mock exam review uploaded</strong>
@@ -118,41 +118,44 @@
         <div class="grid grid--two">
           <div class="tasks-section">
             <h3>📘 Ongoing topics</h3>
-            <div class="task">
-              <span>1. Linear Functions <strong>80%</strong></span>
-              <div class="meter progress-bar"><span style="width:80%"></span></div>
-            </div>
-            <div class="task">
-              <span>2. Quadratic Equations <strong>40%</strong></span>
-              <div class="meter progress-bar"><span style="width:40%"></span></div>
-            </div>
-            <div class="task">
-              <span>3. Coordinate Geometry <strong>10%</strong></span>
-              <div class="meter progress-bar"><span style="width:10%"></span></div>
+            <div id="ongoingTopics">
+              <div class="task">
+                <span>1. Linear Functions <strong>80%</strong></span>
+                <div class="meter progress-bar"><span style="width:80%"></span></div>
+              </div>
+              <div class="task">
+                <span>2. Quadratic Equations <strong>40%</strong></span>
+                <div class="meter progress-bar"><span style="width:40%"></span></div>
+              </div>
+              <div class="task">
+                <span>3. Coordinate Geometry <strong>10%</strong></span>
+                <div class="meter progress-bar"><span style="width:10%"></span></div>
+              </div>
             </div>
           </div>
 
           <div class="assignments-section">
             <h3>📝 Assignments</h3>
-            <div class="assignment">
-              <div class="assignment-info">
-                <span class="assignment-title">Algebra Practice Set</span>
-                <span class="assignment-date">Due: Oct 20, 2025</span>
+            <div id="assignmentList">
+              <div class="assignment">
+                <div class="assignment-info">
+                  <span class="assignment-title">Algebra Practice Set</span>
+                  <span class="assignment-date">Due: Oct 20, 2025</span>
+                </div>
+                <div class="completion">
+                  <div class="meter completion-bar"><span style="width:100%"></span></div>
+                  <small>Completed</small>
+                </div>
               </div>
-              <div class="completion">
-                <div class="meter completion-bar"><span style="width:100%"></span></div>
-                <small>Completed</small>
-              </div>
-            </div>
-
-            <div class="assignment">
-              <div class="assignment-info">
-                <span class="assignment-title">Quadratic Quiz</span>
-                <span class="assignment-date">Due: Oct 25, 2025</span>
-              </div>
-              <div class="completion">
-                <div class="meter completion-bar"><span style="width:60%"></span></div>
-                <small>In progress</small>
+              <div class="assignment">
+                <div class="assignment-info">
+                  <span class="assignment-title">Quadratic Quiz</span>
+                  <span class="assignment-date">Due: Oct 25, 2025</span>
+                </div>
+                <div class="completion">
+                  <div class="meter completion-bar"><span style="width:60%"></span></div>
+                  <small>In progress</small>
+                </div>
               </div>
             </div>
           </div>
@@ -162,33 +165,10 @@
   </div>
 
   <!-- JS -->
+  <script src="../js/learner-session.js"></script>
   <script src="../js/modules-data.js"></script>
   <script src="../js/learner-modules.js"></script>
-  <script>
-    const joinSection = document.getElementById("joinClassSection");
-    const classDashboard = document.getElementById("classDashboard");
-
-    document.getElementById("joinClassForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const code = document.getElementById("classCode").value.trim();
-
-      if (code) {
-        localStorage.setItem("enrolledClass", code);
-        updateClassDashboard(code);
-      }
-    });
-
-    function updateClassDashboard(code) {
-      document.getElementById("classCodeDisplay").textContent = "Code: " + code;
-      joinSection.style.display = "none";
-      classDashboard.style.display = "block";
-    }
-
-    // Auto-load class if already joined
-    const storedClass = localStorage.getItem("enrolledClass");
-    if (storedClass) {
-      updateClassDashboard(storedClass);
-    }
-  </script>
+  <script src="../js/catalogue-classes.js"></script>
+  <script src="../js/learner-classes-page.js"></script>
 </body>
 </html>

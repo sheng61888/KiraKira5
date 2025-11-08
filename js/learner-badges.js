@@ -1,31 +1,24 @@
 (() => {
-  const getUserStats = () => {
+  const FALLBACK_STATS = { level: 3, streak: 7, cats: 2, ghibli: 1, hidden: 0 };
+
+  const loadStats = () => {
+    if (window.kiraBadgeStats) {
+      return window.kiraBadgeStats;
+    }
+    if (window.kiraUserStats) {
+      return window.kiraUserStats;
+    }
     try {
-      const stored = localStorage.getItem('kiraUserStats');
+      const stored = localStorage.getItem("kiraUserStats");
       if (stored) {
         return JSON.parse(stored);
       }
-    } catch (err) {
-      console.warn('Unable to parse stored stats', err);
+    } catch (error) {
+      console.warn("Unable to parse stored stats", error);
     }
-    const fallback = {
-      level: 3,
-      streak: 7,
-      cats: 2,
-      ghibli: 1,
-      hidden: 0
-    };
-    localStorage.setItem('kiraUserStats', JSON.stringify(fallback));
-    return fallback;
+    localStorage.setItem("kiraUserStats", JSON.stringify(FALLBACK_STATS));
+    return FALLBACK_STATS;
   };
-
-  const collections = window.kiraBadgeCollections || [];
-  const stats = getUserStats();
-
-  const renderTarget = document.querySelectorAll('[data-role="badge-collections"]');
-  if (!renderTarget.length || !collections.length) {
-    return;
-  }
 
   const createBadgeCard = (collection, reward, unlocked) => {
     const card = document.createElement('div');
@@ -69,7 +62,7 @@
     return card;
   };
 
-  const renderCollection = parent => {
+  const renderCollection = (parent, collections, stats) => {
     parent.innerHTML = '';
     collections.forEach(collection => {
       const metricValue = stats[collection.metric] || 0;
@@ -97,5 +90,31 @@
     });
   };
 
-  renderTarget.forEach(renderCollection);
+  const renderAll = () => {
+    const collections = window.kiraBadgeCollections || [];
+    const targets = document.querySelectorAll('[data-role="badge-collections"]');
+    if (!targets.length || !collections.length) {
+      return;
+    }
+    const stats = loadStats();
+    targets.forEach(target => renderCollection(target, collections, stats));
+  };
+
+  document.addEventListener('DOMContentLoaded', renderAll);
+  document.addEventListener('kira:badges-ready', event => {
+    if (event.detail) {
+      if (event.detail.collections) {
+        window.kiraBadgeCollections = event.detail.collections;
+      }
+      if (event.detail.stats) {
+        window.kiraBadgeStats = event.detail.stats;
+        try {
+          localStorage.setItem('kiraUserStats', JSON.stringify(event.detail.stats));
+        } catch (error) {
+          console.warn('Unable to store badge stats', error);
+        }
+      }
+    }
+    renderAll();
+  });
 })();

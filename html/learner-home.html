@@ -141,68 +141,11 @@
   </div>
 
   <!-- JS -->
+  <script src="../js/learner-session.js"></script>
   <script src="../js/modules-data.js"></script>
   <script src="../js/badge-library.js"></script>
   <script src="../js/learner-modules.js"></script>
   <script src="../js/learner-badges.js"></script>
-  <script>
-    (function() {
-      const card = document.getElementById("missionCard");
-      if (!card) return;
-
-      const missionData = (() => {
-        try {
-          return JSON.parse(localStorage.getItem("kiraOnboarding")) || {};
-        } catch (e) {
-          return {};
-        }
-      })();
-
-      const grade = missionData.grade || "Form 4";
-      const readiness = typeof missionData.readiness === "number" ? missionData.readiness : 45;
-      const wantsVideos =
-        missionData.wantsVideos === undefined ? true : Boolean(missionData.wantsVideos);
-
-      const missionBadge = document.getElementById("missionBadge");
-      const missionTitle = document.getElementById("missionTitle");
-      const missionMood = document.getElementById("missionMood");
-      const missionChips = document.getElementById("missionChips");
-      const missionConfidence = document.getElementById("missionConfidence");
-      const missionActionBtn = document.getElementById("missionActionBtn");
-
-      const readinessMessage = value => {
-        if (value >= 80) {
-          return "Legend status unlocked—time for mastery speed rounds.";
-        }
-        if (value >= 50) {
-          return "Solid momentum. Blend revision with stretch problems today.";
-        }
-        return "Rescue mode on. We’ll stack guided Algebra wins together.";
-      };
-
-      missionBadge.textContent = `${grade} track`;
-      missionTitle.textContent =
-        readiness < 50 ? "Rescue mission engaged" : "Keep the momentum going";
-      missionMood.textContent = readinessMessage(readiness);
-      missionConfidence.textContent = `${Math.round(readiness)}%`;
-
-      const chipMood = readiness < 50 ? "Rescue mode" : "Momentum mode";
-      missionChips.innerHTML = [
-        `<span class="chip chip--info">${grade}</span>`,
-        `<span class="chip">${chipMood}</span>`,
-        `<span class="chip${wantsVideos ? " chip--success" : ""}">${
-          wantsVideos ? "Intro videos on" : "Self-paced"
-        }</span>`
-      ].join("");
-
-      missionActionBtn.textContent = readiness < 50 ? "Review rescue plan" : "Adjust plan";
-      missionActionBtn.addEventListener("click", () => {
-        window.location.href = "learner-onboarding.html";
-      });
-
-      card.dataset.state = readiness < 50 ? "rescue" : "momentum";
-    })();
-
-  </script>
+  <script src="../js/learner-home.js"></script>
 </body>
 </html>

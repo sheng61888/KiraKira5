@@ -84,7 +84,7 @@
         </div>
       </section>
 
-      <section class="card papers-list" aria-live="polite">
+      <section class="card papers-list" aria-live="polite" id="papersList">
         <div class="paper-row">
           <div class="paper-info">
             <span class="paper-title">SPM Mathematics 2023 Paper 2</span>
@@ -129,7 +129,7 @@
             <h2>Exam checklist</h2>
             <span class="chip chip--info">Auto-summary</span>
           </div>
-          <ul class="recommended-list">
+          <ul class="recommended-list" id="pastChecklist">
             <li>
               <div>
                 <strong>Complete 2 timed papers</strong>
@@ -159,23 +159,13 @@
             <h2>Streak tip</h2>
             <span class="chip">After each paper</span>
           </div>
-          <p>Snap a photo of one “aha!” solution and drop it into your learning journal—reflection boosts retention by 30%.</p>
+          <p id="pastTip">Snap a photo of one “aha!” solution and drop it into your learning journal—reflection boosts retention by 30%.</p>
         </article>
       </section>
     </main>
   </div>
 
-  <script>
-    const selects = document.querySelectorAll("select");
-    selects.forEach(select => {
-      select.addEventListener("change", () => {
-        console.log("Filters updated:", {
-          year: document.getElementById("year").value,
-          paper: document.getElementById("subject").value,
-          topic: document.getElementById("topic").value
-        });
-      });
-    });
-  </script>
+  <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-pastpapers.js"></script>
 </body>
 </html>

@@ -43,7 +43,7 @@
           <p>Keep your streak alive—2 more focused sessions this week will unlock the Geometry badge.</p>
         </div>
         <div class="heading-actions">
-          <button class="btn btn--ghost" type="button">Download report</button>
+          <button class="btn btn--ghost" type="button" id="downloadReportBtn">Download report</button>
           <button class="btn btn--primary" type="button">Share with coach</button>
         </div>
       </header>
@@ -67,28 +67,27 @@
           <span class="chip">4 topics in progress</span>
         </div>
 
-        <div class="topic">
-          <span>Algebra Basics <strong>100%</strong></span>
-          <div class="meter progress-bar"><span style="width:100%"></span></div>
-          <small>Completed 🎉 — ready for mastery quiz.</small>
-        </div>
-
-        <div class="topic">
-          <span>Quadratic Equations <strong>65%</strong></span>
-          <div class="meter progress-bar"><span style="width:65%"></span></div>
-          <small>In progress — review mistakes from last drill.</small>
-        </div>
-
-        <div class="topic">
-          <span>Coordinate Geometry <strong>45%</strong></span>
-          <div class="meter progress-bar"><span style="width:45%"></span></div>
-          <small>In progress — live class today will push this to 60%.</small>
-        </div>
-
-        <div class="topic">
-          <span>Statistics <strong>25%</strong></span>
-          <div class="meter progress-bar"><span style="width:25%"></span></div>
-          <small>Just started — plan a catch-up session this weekend.</small>
+        <div id="topicProgressList">
+          <div class="topic">
+            <span>Algebra Basics <strong>100%</strong></span>
+            <div class="meter progress-bar"><span style="width:100%"></span></div>
+            <small>Completed 🎉 — ready for mastery quiz.</small>
+          </div>
+          <div class="topic">
+            <span>Quadratic Equations <strong>65%</strong></span>
+            <div class="meter progress-bar"><span style="width:65%"></span></div>
+            <small>In progress — review mistakes from last drill.</small>
+          </div>
+          <div class="topic">
+            <span>Coordinate Geometry <strong>45%</strong></span>
+            <div class="meter progress-bar"><span style="width:45%"></span></div>
+            <small>In progress — live class today will push this to 60%.</small>
+          </div>
+          <div class="topic">
+            <span>Statistics <strong>25%</strong></span>
+            <div class="meter progress-bar"><span style="width:25%"></span></div>
+            <small>Just started — plan a catch-up session this weekend.</small>
+          </div>
         </div>
       </section>
 
@@ -104,7 +103,7 @@
             <h2>Next checkpoints</h2>
             <span class="chip chip--info">Coach review Friday</span>
           </div>
-          <ul class="recommended-list">
+          <ul class="recommended-list" id="checkpointList">
             <li>
               <div>
                 <strong>Finish Quadratics drill</strong>
@@ -132,12 +131,7 @@
     </main>
   </div>
 
-  <script>
-    const percent = 75;
-    const msg = document.getElementById("motivation");
-    if (percent >= 100) {
-      msg.innerHTML = "<h2>🎉 You did it!</h2><p>You’ve completed all your lessons! Take a break — you’ve earned it!</p>";
-    }
-  </script>
+  <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-progress.js"></script>
 </body>
 </html>

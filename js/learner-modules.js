@@ -211,4 +211,14 @@
     renderHomeModules();
     renderClassModules();
   });
+
+  document.addEventListener("kira:modules-ready", () => {
+    renderHomeModules();
+    renderClassModules();
+  });
+
+  window.kiraRenderModules = {
+    home: renderHomeModules,
+    classes: renderClassModules
+  };
 })();

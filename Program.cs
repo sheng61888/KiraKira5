@@ -7,6 +7,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
 });
+builder.Services.AddScoped<ILearnerService, LearnerService>();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
