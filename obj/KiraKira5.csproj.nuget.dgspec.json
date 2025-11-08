@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Arielle Lee\\Documents\\GitHub\\KiraKira5\\KiraKira5.csproj": {}
+    "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Arielle Lee\\Documents\\GitHub\\KiraKira5\\KiraKira5.csproj": {
+    "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Arielle Lee\\Documents\\GitHub\\KiraKira5\\KiraKira5.csproj",
+        "projectUniqueName": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
         "projectName": "KiraKira5",
-        "projectPath": "C:\\Users\\Arielle Lee\\Documents\\GitHub\\KiraKira5\\KiraKira5.csproj",
-        "packagesPath": "C:\\Users\\Arielle Lee\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Arielle Lee\\Documents\\GitHub\\KiraKira5\\obj\\",
+        "projectPath": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
+        "packagesPath": "C:\\Users\\ggshe\\.nuget\\packages\\",
+        "outputPath": "C:\\KiraKira5\\KiraKira5\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Arielle Lee\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ggshe\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
