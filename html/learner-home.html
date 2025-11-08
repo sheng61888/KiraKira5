@@ -29,6 +29,7 @@
         <a href="learner-progress.html">Progress</a>
         <a href="learner-pastyears.html">Past Papers</a>
         <a href="learner-classes.html">Classes</a>
+        <a href="learner-community.html">Community</a>
         <a href="learner-profile.html">Profile</a>
       </nav>
     </aside>
@@ -45,6 +46,7 @@
         <div class="heading-actions">
           <button class="btn btn--ghost" type="button">View weekly plan</button>
           <button class="btn btn--primary" type="button">Resume warm-up</button>
+          <button class="btn btn--ghost" type="button" onclick="window.location.href='login_signup.html'">Logout</button>
         </div>
       </header>
 
@@ -123,132 +125,17 @@
         </noscript>
       </section>
 
-      <!-- Schedule & Recommendations -->
-      <section class="grid grid--two" aria-label="Schedule and drills">
-        <article class="card schedule-card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Next up</p>
-              <h2>Today’s timeline</h2>
-            </div>
-            <span class="chip">GMT+8</span>
-          </div>
-          <ul>
-            <li>
-              <div>
-                <strong>Live class</strong>
-                <small>Coordinate Geometry · with Mr. Tan</small>
-              </div>
-              <span class="chip chip--info">4:30 PM</span>
-            </li>
-            <li>
-              <div>
-                <strong>Drill session</strong>
-                <small>Quadratic word problems · self-paced</small>
-              </div>
-              <span class="chip">Due 7 PM</span>
-            </li>
-            <li>
-              <div>
-                <strong>Reflection note</strong>
-                <small>Share 1 win + 1 question</small>
-              </div>
-              <span class="chip chip--success">Earn +15 XP</span>
-            </li>
-          </ul>
-        </article>
-
-        <article class="card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Skill boosts</p>
-              <h2>Recommended drills</h2>
-            </div>
-            <button class="btn btn--ghost" type="button">Shuffle</button>
-          </div>
-          <ul class="recommended-list">
-            <li>
-              <div>
-                <strong>Factorising speed round</strong>
-                <small>Target: under 4 minutes</small>
-              </div>
-              <button class="btn btn--primary" type="button">Start</button>
-            </li>
-            <li>
-              <div>
-                <strong>Graph sketch critique</strong>
-                <small>Upload 1 photo for coach review</small>
-              </div>
-              <button class="btn btn--ghost" type="button">Upload</button>
-            </li>
-            <li>
-              <div>
-                <strong>Mixed mastery quiz</strong>
-                <small>Algebra + Geometry checkpoint</small>
-              </div>
-              <button class="btn btn--ghost" type="button">Preview</button>
-            </li>
-          </ul>
-        </article>
-      </section>
-
-      <!-- Achievements & Activity -->
-      <section class="grid grid--two" aria-label="Motivation section">
-        <article class="card achievements">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Milestones</p>
-              <h2>Recent achievements</h2>
-            </div>
-            <span class="chip chip--success">+120 XP this week</span>
-          </div>
-          <div class="badge-collections" data-role="badge-collections">
-            <p class="muted">Loading your badge collections…</p>
-          </div>
-        </article>
-
-        <article class="card activity-card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Momentum</p>
-              <h2>Learning activity</h2>
-            </div>
-          </div>
-          <div class="activity-list">
-            <div class="activity-item">
-              <div>
-                <strong>Unlocked new Algebra badge</strong>
-                <p>Perfect score on “Manipulating Expressions”.</p>
-              </div>
-              <span>Just now</span>
-            </div>
-            <div class="activity-item">
-              <div>
-                <strong>Submitted Quadratics drill</strong>
-                <p>Coach feedback arriving tomorrow.</p>
-              </div>
-              <span>1 hour ago</span>
-            </div>
-            <div class="activity-item">
-              <div>
-                <strong>Booked next coaching slot</strong>
-                <p>Friday, 5:30 PM · focus on Probability.</p>
-              </div>
-              <span>Yesterday</span>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      <!-- Fun Fact -->
-      <section class="card fun-fact" aria-live="polite">
+      <section class="card achievements">
         <div class="section-head">
           <div>
-            <p class="eyebrow">Brain break</p>
-            <h2>Math fact of the day</h2>
+            <p class="eyebrow">Milestones</p>
+            <h2>Recent achievements</h2>
           </div>
+          <span class="chip chip--success">+120 XP this week</span>
         </div>
-        <p id="fact"></p>
+        <div class="badge-collections" data-role="badge-collections">
+          <p class="muted">Loading your badge collections…</p>
+        </div>
       </section>
     </main>
   </div>
@@ -316,15 +203,6 @@
       card.dataset.state = readiness < 50 ? "rescue" : "momentum";
     })();
 
-    const facts = [
-      "A circle has 360 degrees because the Babylonians used base 60 counting.",
-      "Zero is the only number that cannot be represented in Roman numerals.",
-      "The equals sign (=) was invented in 1557 by Robert Recorde.",
-      "The Fibonacci sequence appears in pinecones and sunflower seeds!",
-      "There are more possible games of chess than atoms in the observable universe."
-    ];
-    document.getElementById("fact").textContent =
-      facts[Math.floor(Math.random() * facts.length)];
   </script>
 </body>
 </html>

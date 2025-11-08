@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MathPath - Community</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/learner.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="/images/logo transparent.png" alt="KiraKira logo">
+      </div>
+
+      <div class="profile">
+        <div class="username">Aina</div>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak">🔥 7-day streak</div>
+        <div class="xp-bar"><span style="width:65%"></span></div>
+        <small>Level 3 • 1200 XP</small>
+      </div>
+
+      <nav class="nav" aria-label="Learner navigation">
+        <a href="learner-home.html">Dashboard</a>
+        <a href="learner-progress.html">Progress</a>
+        <a href="learner-pastyears.html">Past Papers</a>
+        <a href="learner-classes.html">Classes</a>
+        <a href="learner-community.html" aria-current="page">Community</a>
+        <a href="learner-profile.html">Profile</a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="page-heading">
+        <div>
+          <p class="eyebrow">Community hub</p>
+          <h1>Share wins, ask for help, build your crew</h1>
+          <p>Start or join any conversation. Coaches pop in daily, so no question goes unanswered.</p>
+        </div>
+        <div class="heading-actions">
+          <button class="btn btn--ghost" type="button">Community guidelines</button>
+          <button class="btn btn--primary" type="button">Create new thread</button>
+        </div>
+      </header>
+
+      <section class="card community-welcome">
+        <div>
+          <h2>Weekly spotlight</h2>
+          <p class="muted">“I finally understood probability trees thanks to this forum. Drop your confusions—we’ll untangle them together!” — <strong>Min</strong></p>
+        </div>
+        <div class="community-cta">
+          <strong>Need a study buddy?</strong>
+          <p>Tag your form & topic. We’ll match you in minutes.</p>
+          <button class="btn btn--primary" type="button">Find teammates</button>
+        </div>
+      </section>
+
+      <section class="community-layout">
+        <article class="card discussion-feed">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Live conversations</p>
+              <h2>Forum threads</h2>
+            </div>
+            <div class="community-filters">
+              <button class="chip chip--info" type="button">All topics</button>
+              <button class="chip" type="button">Form 4</button>
+              <button class="chip" type="button">Form 5</button>
+              <button class="chip" type="button">Help needed</button>
+            </div>
+          </div>
+
+          <ul class="thread-list" id="threadList">
+            <li class="thread-item">
+              <div>
+                <div class="thread-tags">
+                  <span class="chip chip--info">Form 5</span>
+                  <span class="chip">Trigonometry</span>
+                </div>
+                <a href="#" class="thread-title">Need intuition for sine graph transformations</a>
+                <p class="muted">“I can stretch/shift but still mix up the order. Anyone got a mental model?”</p>
+              </div>
+              <div class="thread-meta">
+                <strong>12 replies</strong>
+                <small>Last reply · 10m ago</small>
+              </div>
+            </li>
+
+            <li class="thread-item">
+              <div>
+                <div class="thread-tags">
+                  <span class="chip chip--info">Form 4</span>
+                  <span class="chip">Sets</span>
+                </div>
+                <a href="#" class="thread-title">Venn diagram challenge (with cats!)</a>
+                <p class="muted">Sharing a fun teacher-made question. Let’s see who can solve it fastest.</p>
+              </div>
+              <div class="thread-meta">
+                <strong>5 replies</strong>
+                <small>Last reply · 32m ago</small>
+              </div>
+            </li>
+
+            <li class="thread-item">
+              <div>
+                <div class="thread-tags">
+                  <span class="chip chip--info">Form 5</span>
+                  <span class="chip">Study tips</span>
+                </div>
+                <a href="#" class="thread-title">Keeping streaks during exam week</a>
+                <p class="muted">How do you balance school + KiraKira? Looking for realistic routines.</p>
+              </div>
+              <div class="thread-meta">
+                <strong>9 replies</strong>
+                <small>Last reply · 1h ago</small>
+              </div>
+            </li>
+          </ul>
+        </article>
+
+        <aside class="community-sidebar">
+          <article class="card conversation-form">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">New thread</p>
+                <h2>Start a conversation</h2>
+              </div>
+            </div>
+            <form id="conversationForm">
+              <label>
+                Topic
+                <input type="text" name="topic" placeholder="e.g., Quadratic intuition" required>
+              </label>
+              <label>
+                Category
+                <select name="category">
+                  <option>Form 4</option>
+                  <option>Form 5</option>
+                  <option>Study tips</option>
+                  <option>Motivation</option>
+                </select>
+              </label>
+              <label>
+                Message
+                <textarea name="message" rows="4" placeholder="What do you want to discuss?" required></textarea>
+              </label>
+              <button class="btn btn--primary" type="submit">Post to community</button>
+            </form>
+          </article>
+
+          <article class="card community-topics">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Trending tags</p>
+                <h2>Jump into these</h2>
+              </div>
+            </div>
+            <div class="topic-chip-grid">
+              <span class="topic-chip">#algebra-sos</span>
+              <span class="topic-chip">#probability</span>
+              <span class="topic-chip">#exam-stress</span>
+              <span class="topic-chip">#study-logs</span>
+              <span class="topic-chip">#coach-asks</span>
+              <span class="topic-chip">#math-memes</span>
+            </div>
+          </article>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const form = document.getElementById("conversationForm");
+    const list = document.getElementById("threadList");
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const li = document.createElement("li");
+      li.className = "thread-item";
+      li.innerHTML = `
+        <div>
+          <div class="thread-tags">
+            <span class="chip chip--info">${data.get("category")}</span>
+            <span class="chip">New</span>
+          </div>
+          <a href="#" class="thread-title">${data.get("topic")}</a>
+          <p class="muted">${data.get("message")}</p>
+        </div>
+        <div class="thread-meta">
+          <strong>0 replies</strong>
+          <small>Just posted</small>
+        </div>
+      `;
+      list.prepend(li);
+      form.reset();
+    });
+  </script>
+</body>
+</html>

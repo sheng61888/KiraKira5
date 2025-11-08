@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KiraKira5")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c71c5f5b9b68cbd3bf4862b87b028913310735b2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+576e7053119cdc07bed9b6a18ea016938d02373b")]
 [assembly: System.Reflection.AssemblyProductAttribute("KiraKira5")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KiraKira5")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
