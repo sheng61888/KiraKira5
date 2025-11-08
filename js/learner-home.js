@@ -169,7 +169,7 @@
     setText(selectors.missionMood, "Hang tight while we sync your latest learning stats.");
 
     try {
-      const response = await session.fetch("dashboard");
+      const response = await session.fetch("/dashboard");
       if (!response.ok) {
         throw new Error(`Dashboard request failed with status ${response.status}`);
       }
@@ -185,4 +185,10 @@
   document.addEventListener("kira:learner-missing", () => {
     showDashboardError("Please log in to view your learner dashboard.");
   });
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+  fetchDashboard();
+} else {
+  document.addEventListener("DOMContentLoaded", fetchDashboard);
+}
+
 })();

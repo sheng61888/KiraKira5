@@ -32,169 +32,154 @@ public class LearnerService : ILearnerService
         _connectionString = _configuration.GetConnectionString("KiraKiraDB") ?? string.Empty;
     }
 
+    private async Task<MySqlConnection?> OpenConnectionAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_connectionString))
+        {
+            return null;
+        }
+
+        var connection = new MySqlConnection(_connectionString);
+        await connection.OpenAsync();
+        return connection;
+    }
+
     public async Task<LearnerDashboardDto> GetDashboardAsync(string learnerId)
     {
         var learnerRecord = await FetchLearnerAsync(learnerId);
-        var profile = BuildProfile(learnerId, learnerRecord);
-        var modules = SampleModules();
-        var badgeStats = SampleBadgeStats();
+        var profile = await FetchProfileDtoAsync(learnerId, learnerRecord);
+        var mission = await FetchMissionDtoAsync(learnerId, profile);
+        var streak = await FetchStreakDtoAsync(learnerId, profile);
+        var moduleSnapshot = await BuildModuleSnapshotAsync(learnerId);
+        var badges = await BuildBadgeStatsAsync(learnerId, profile, streak, moduleSnapshot);
+        var highlightStats = BuildHighlightStats(streak, mission, moduleSnapshot);
+
         return new LearnerDashboardDto
         {
             Profile = profile,
-            Mission = new LearnerMissionDto
-            {
-                Badge = $"{profile.Name}'s path",
-                Grade = "Form 4",
-                Title = "Your mission briefing",
-                Mood = "Let’s stack some easy wins with Algebra drills today.",
-                Confidence = 45,
-                Mode = "Momentum mode",
-                WantsVideos = true
-            },
-            Streak = new LearnerStreakDto
-            {
-                Current = 7,
-                Longest = 14,
-                XpToNextLevel = 350,
-                Status = "🔥 7-day streak",
-                LevelLabel = "Level 3 • 1200 XP"
-            },
-            HighlightStats = new List<LearnerHighlightStat>
-            {
-                new LearnerHighlightStat { Label = "XP to next level", Value = "350", Detail = "Keep up the streak to level up by Friday.", ProgressPercent = 72 },
-                new LearnerHighlightStat { Label = "Weekly focus", Value = "Algebra", Detail = "3 / 5 focus sessions completed.", ProgressPercent = 60 },
-                new LearnerHighlightStat { Label = "Upcoming", Value = "4:30 PM", Detail = "Coordinate Geometry class with Mr. Tan.", Chip = "Starts in 2h 15m" }
-            },
-            Modules = new LearnerModuleSnapshot
-            {
-                ActiveModules = modules.SelectMany(m => m.Modules).Take(3).ToList(),
-                Catalogue = modules.ToList()
-            },
-            Badges = badgeStats
+            Mission = mission,
+            Streak = streak,
+            HighlightStats = highlightStats,
+            Modules = moduleSnapshot,
+            Badges = badges
         };
     }
 
-    public Task<LearnerProgressDto> GetProgressAsync(string learnerId)
+    public async Task<LearnerProgressDto> GetProgressAsync(string learnerId)
     {
-        return Task.FromResult(new LearnerProgressDto
+        var topics = await FetchTopicsAsync(learnerId);
+        var checkpoints = await FetchCheckpointsAsync(learnerId);
+        var overall = topics.Any() ? (int)Math.Round(topics.Average(topic => topic.Percent)) : 0;
+        var motivation = BuildMotivation(overall);
+
+        return new LearnerProgressDto
         {
-            OverallPercent = 75,
-            WeeklyDelta = 8,
-            Topics = new List<TopicProgressDto>
-            {
-                new TopicProgressDto("Algebra Basics", 100, "Completed 🎉 — ready for mastery quiz."),
-                new TopicProgressDto("Quadratic Equations", 65, "In progress — review mistakes from last drill."),
-                new TopicProgressDto("Coordinate Geometry", 45, "In progress — live class today will push this to 60%."),
-                new TopicProgressDto("Statistics", 25, "Just started — plan a catch-up session this weekend.")
-            },
-            Checkpoints = new List<CheckpointDto>
-            {
-                new CheckpointDto("Finish Quadratics drill", "Score ≥ 80% to stay on track.", "Open"),
-                new CheckpointDto("Upload Geometry notes", "Coach Tan leaves feedback in 24h.", "Upload"),
-                new CheckpointDto("Schedule Statistics catch-up", "Pick a weekend slot.", "Book", true)
-            },
+            OverallPercent = overall,
+            WeeklyDelta = 0,
+            Topics = topics,
+            Checkpoints = checkpoints,
             ReportUrl = "/reports/learner-progress.pdf",
-            Motivation = new MotivationDto
-            {
-                Title = "You're doing amazing! 🐾",
-                Body = "Keep going — every problem solved brings you closer to mastery!"
-            }
-        });
+            Motivation = motivation
+        };
     }
 
     public async Task<LearnerClassesDto> GetClassesAsync(string learnerId)
     {
-        var learnerRecord = await FetchLearnerAsync(learnerId);
-        var modules = SampleModules();
+        var classInfo = await FetchLearnerClassInfoAsync(learnerId);
+        var moduleSnapshot = await BuildModuleSnapshotAsync(learnerId);
+
+        if (classInfo == null)
+        {
+            return new LearnerClassesDto
+            {
+                HasEnrollment = false,
+                Catalogue = moduleSnapshot.Catalogue
+            };
+        }
+
+        var announcements = await FetchClassAnnouncementsAsync(classInfo.Code);
+        var topics = (await FetchTopicsAsync(learnerId)).Take(3).ToList();
+        if (!topics.Any())
+        {
+            topics = moduleSnapshot.Catalogue
+                .SelectMany(section => section.Modules)
+                .Take(3)
+                .Select(module => new TopicProgressDto(module.Title, module.ProgressPercent ?? 0, string.Empty))
+                .ToList();
+        }
+
+        var assignments = await FetchClassAssignmentsAsync(learnerId, classInfo.Code);
+
         return new LearnerClassesDto
         {
-            HasEnrollment = learnerRecord != null,
-            ClassInfo = new LearnerClassInfo
-            {
-                Title = "Form 5 Mathematics - Mr. Tan",
-                Code = "MATH2025-A1"
-            },
-            Announcements = new List<AnnouncementDto>
-            {
-                new AnnouncementDto("Mock exam review uploaded", "Check the shared drive for official answers.", "1h ago"),
-                new AnnouncementDto("Bring geometry sets tomorrow", "We’re constructing loci in class.", "4h ago"),
-                new AnnouncementDto("Clinic slots open", "Book a 1:1 for tricky probability questions.", "Yesterday")
-            },
-            OngoingTopics = new List<TopicProgressDto>
-            {
-                new TopicProgressDto("Linear Functions", 80),
-                new TopicProgressDto("Quadratic Equations", 40),
-                new TopicProgressDto("Coordinate Geometry", 10)
-            },
-            Assignments = new List<ClassAssignmentDto>
-            {
-                new ClassAssignmentDto("Algebra Practice Set", "Oct 20, 2025", 100, "Completed"),
-                new ClassAssignmentDto("Quadratic Quiz", "Oct 25, 2025", 60, "In progress")
-            },
-            Catalogue = modules.ToList()
+            HasEnrollment = true,
+            ClassInfo = classInfo,
+            Announcements = announcements,
+            OngoingTopics = topics,
+            Assignments = assignments,
+            Catalogue = moduleSnapshot.Catalogue
         };
     }
 
     public async Task<LearnerClassesDto> JoinClassAsync(string learnerId, string classCode)
     {
-        // Eventually persist enrollment; for now just echo back an enrolled dashboard.
-        var data = await GetClassesAsync(learnerId);
-        data.HasEnrollment = true;
-        data.ClassInfo.Code = classCode;
-        return data;
+        if (string.IsNullOrWhiteSpace(classCode))
+        {
+            return await GetClassesAsync(learnerId);
+        }
+
+        await SaveLearnerClassAsync(learnerId, classCode.Trim());
+        return await GetClassesAsync(learnerId);
     }
 
-    public Task<LearnerPastPapersDto> GetPastPapersAsync(string learnerId, string year, string type, string topic)
+    public async Task<LearnerPastPapersDto> GetPastPapersAsync(string learnerId, string year, string type, string topic)
     {
-        var papers = new List<PastPaperDto>
-        {
-            new PastPaperDto("SPM Mathematics 2023 Paper 2", "Structured · 45 marks · Moderate difficulty", "resources/SPM_Math_2023_P2.pdf"),
-            new PastPaperDto("SPM Mathematics 2022 Paper 1", "Objective · 40 marks · Easy difficulty", "resources/SPM_Math_2022_P1.pdf"),
-            new PastPaperDto("SPM Mathematics 2021 Paper 2", "Structured · 45 marks · Hard difficulty", "resources/SPM_Math_2021_P2.pdf")
-        };
+        var papers = await FetchPastPapersFromDbAsync(learnerId, year, type, topic);
+        var checklist = (await FetchCheckpointsAsync(learnerId))
+            .Take(3)
+            .Select(c => new ChecklistItemDto(c.Title, c.Note, c.Primary))
+            .ToList();
 
-        return Task.FromResult(new LearnerPastPapersDto
+        if (!checklist.Any())
+        {
+            checklist = SampleChecklist();
+        }
+
+        return new LearnerPastPapersDto
         {
             Papers = papers,
-            Checklist = new List<ChecklistItemDto>
-            {
-                new ChecklistItemDto("Complete 2 timed papers", "Recommended pace: 1 per week"),
-                new ChecklistItemDto("Review marking scheme", "Highlight careless mistakes"),
-                new ChecklistItemDto("Log reflections", "Capture what to improve next time", true)
-            },
+            Checklist = checklist,
             Tip = new TipDto
             {
                 Title = "Streak tip",
                 Badge = "After each paper",
-                Body = "Snap a photo of one “aha!” solution and drop it into your learning journal—reflection boosts retention by 30%."
+                Body = "Snap a photo of one \"aha!\" solution and drop it into your learning journal - reflection boosts retention by 30%."
             }
-        });
+        };
     }
 
     public async Task<LearnerProfilePayload> GetProfileAsync(string learnerId)
     {
-        var badgeStats = SampleBadgeStats();
         var record = await FetchLearnerAsync(learnerId);
-        var profile = BuildProfile(learnerId, record);
+        var profile = await FetchProfileDtoAsync(learnerId, record);
+        var streak = await FetchStreakDtoAsync(learnerId, profile);
+        var notifications = await FetchNotificationPreferencesAsync(learnerId);
+        var badges = await BuildBadgeStatsAsync(learnerId, profile, streak);
+
         return new LearnerProfilePayload
         {
             Profile = profile,
             Contact = new ContactInfoDto
             {
-                Email = record?.Email ?? "aina123@gmail.com"
+                Email = record?.Email ?? string.Empty
             },
             School = new SchoolInfoDto
             {
-                School = "SMK Taman Melati",
-                Year = "Form 5"
+                School = string.IsNullOrWhiteSpace(profile.School) ? "School not set" : profile.School,
+                Year = string.IsNullOrWhiteSpace(profile.GradeYear) ? "Year not set" : profile.GradeYear
             },
-            Notifications = new List<NotificationPreferenceDto>
-            {
-                new NotificationPreferenceDto("Daily streak nudges", "Sent at 8:00 PM GMT+8"),
-                new NotificationPreferenceDto("Coach feedback alerts", "Push + email"),
-                new NotificationPreferenceDto("Exam countdown", "Weekly digest on Fridays", true)
-            },
-            Badges = badgeStats
+            Notifications = notifications,
+            Badges = badges
         };
     }
 
@@ -285,18 +270,759 @@ public class LearnerService : ILearnerService
         };
     }
 
+    private static List<PastPaperDto> SamplePastPapers()
+    {
+        return new List<PastPaperDto>
+        {
+            new PastPaperDto("SPM Mathematics 2023 Paper 2", "Structured · 45 marks · Moderate difficulty", "resources/SPM_Math_2023_P2.pdf"),
+            new PastPaperDto("SPM Mathematics 2022 Paper 1", "Objective · 40 marks · Easy difficulty", "resources/SPM_Math_2022_P1.pdf"),
+            new PastPaperDto("SPM Mathematics 2021 Paper 2", "Structured · 45 marks · Hard difficulty", "resources/SPM_Math_2021_P2.pdf")
+        };
+    }
+
+    private static List<ChecklistItemDto> SampleChecklist()
+    {
+        return new List<ChecklistItemDto>
+        {
+            new ChecklistItemDto("Complete 2 timed papers", "Recommended pace: 1 per week"),
+            new ChecklistItemDto("Review marking scheme", "Highlight careless mistakes"),
+            new ChecklistItemDto("Log reflections", "Capture what to improve next time", true)
+        };
+    }
+
+    private async Task<LearnerProfileDto> FetchProfileDtoAsync(string learnerId, LearnerRecord? identity)
+    {
+        var profile = BuildProfile(learnerId, identity);
+        const string sql = @"SELECT full_name, school, grade_year, motto, avatar_url, level, xp
+                             FROM learner_profile
+                             WHERE uid = @Uid
+                             LIMIT 1";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return profile;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                profile.Name = reader["full_name"]?.ToString() ?? profile.Name;
+                profile.School = reader["school"]?.ToString() ?? profile.School;
+                profile.GradeYear = reader["grade_year"]?.ToString() ?? profile.GradeYear;
+                profile.Motto = reader["motto"]?.ToString() ?? profile.Motto;
+                profile.AvatarUrl = reader["avatar_url"]?.ToString() ?? profile.AvatarUrl;
+                profile.Level = SafeToInt(reader["level"], profile.Level);
+                profile.Xp = SafeToInt(reader["xp"], profile.Xp);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_profile for {learnerId}: {ex.Message}");
+        }
+
+        return profile;
+    }
+
     private static LearnerProfileDto BuildProfile(string learnerId, LearnerRecord? record)
     {
         return new LearnerProfileDto
         {
             LearnerId = record?.LearnerId ?? learnerId,
-            Name = record?.Name ?? "Aina",
+            Name = record?.Name ?? record?.Username ?? "Learner",
             AvatarUrl = "/images/profile-cat.png",
             Motto = "Learning one formula at a time.",
-            Level = 3,
-            Xp = 1200,
-            Rank = "Gold Learner"
+            Level = 1,
+            Xp = 0,
+            School = string.Empty,
+            GradeYear = string.Empty
         };
+    }
+
+    private static int SafeToInt(object? value, int fallback)
+    {
+        if (value == null || value == DBNull.Value)
+        {
+            return fallback;
+        }
+
+        if (int.TryParse(value.ToString(), out var parsed))
+        {
+            return parsed;
+        }
+
+        return fallback;
+    }
+
+    private async Task<LearnerMissionDto> FetchMissionDtoAsync(string learnerId, LearnerProfileDto profile)
+    {
+        var mission = new LearnerMissionDto
+        {
+            Badge = string.IsNullOrWhiteSpace(profile.GradeYear) ? "Personalised path" : $"{profile.GradeYear} track",
+            Grade = string.IsNullOrWhiteSpace(profile.GradeYear) ? "Form 4" : profile.GradeYear,
+            Title = "Keep the momentum going",
+            Mood = "Let's stack some easy wins with Algebra drills today.",
+            Confidence = 45,
+            Mode = "Momentum mode",
+            WantsVideos = true
+        };
+
+        const string sql = @"SELECT grade, readiness_percent, target_focus, wants_videos, mission_title, mission_mood, mission_mode
+                             FROM learner_mission
+                             WHERE uid = @Uid
+                             LIMIT 1";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return mission;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var grade = reader["grade"]?.ToString();
+                if (!string.IsNullOrWhiteSpace(grade))
+                {
+                    mission.Grade = grade;
+                    mission.Badge = $"{grade} track";
+                }
+
+                mission.Confidence = SafeToInt(reader["readiness_percent"], mission.Confidence);
+                mission.Title = reader["mission_title"]?.ToString() ?? mission.Title;
+                mission.Mood = reader["mission_mood"]?.ToString() ?? mission.Mood;
+                mission.Mode = reader["mission_mode"]?.ToString() ?? mission.Mode;
+                mission.WantsVideos = reader["wants_videos"] != DBNull.Value
+                    ? Convert.ToBoolean(reader["wants_videos"])
+                    : mission.WantsVideos;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_mission for {learnerId}: {ex.Message}");
+        }
+
+        return mission;
+    }
+
+    private async Task<LearnerStreakDto> FetchStreakDtoAsync(string learnerId, LearnerProfileDto profile)
+    {
+        var streak = new LearnerStreakDto
+        {
+            Current = 0,
+            Longest = 0,
+            XpToNextLevel = Math.Max(0, 1000 - profile.Xp),
+            Status = "Start your streak",
+            LevelLabel = $"Level {profile.Level} • {profile.Xp} XP"
+        };
+
+        const string sql = @"SELECT current_streak, longest_streak, xp_to_next_level
+                             FROM learner_streak
+                             WHERE uid = @Uid
+                             LIMIT 1";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return streak;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                streak.Current = SafeToInt(reader["current_streak"], streak.Current);
+                streak.Longest = SafeToInt(reader["longest_streak"], streak.Longest);
+                streak.XpToNextLevel = SafeToInt(reader["xp_to_next_level"], streak.XpToNextLevel);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_streak for {learnerId}: {ex.Message}");
+        }
+
+        streak.Status = streak.Current > 0 ? $"🔥 {streak.Current}-day streak" : "Ready to start your streak";
+        streak.LevelLabel = $"Level {profile.Level} • {profile.Xp} XP";
+
+        return streak;
+    }
+
+    private async Task<LearnerModuleSnapshot> BuildModuleSnapshotAsync(string learnerId)
+    {
+        var catalogue = SampleModules().ToList();
+        var progress = await FetchModuleProgressAsync(learnerId);
+        var allModules = new List<ModuleCardDto>();
+
+        foreach (var section in catalogue)
+        {
+            foreach (var module in section.Modules)
+            {
+                var keys = new List<string>
+                {
+                    module.Link ?? string.Empty,
+                    module.Number,
+                    $"{section.Grade?.Replace(" ", string.Empty).ToLowerInvariant()}-{module.Number}"
+                };
+
+                foreach (var key in keys.Where(k => !string.IsNullOrWhiteSpace(k)))
+                {
+                    if (progress.TryGetValue(key, out var state))
+                    {
+                        module.ProgressPercent = state.ProgressPercent;
+                        break;
+                    }
+                }
+
+                allModules.Add(module);
+            }
+        }
+
+        var activeModules = allModules
+            .Where(m => (m.ProgressPercent ?? 0) > 0)
+            .OrderByDescending(m => m.ProgressPercent)
+            .ThenBy(m => m.Number)
+            .Take(3)
+            .ToList();
+
+        if (!activeModules.Any())
+        {
+            activeModules = allModules.Take(3).ToList();
+        }
+
+        return new LearnerModuleSnapshot
+        {
+            ActiveModules = activeModules,
+            Catalogue = catalogue
+        };
+    }
+
+    private async Task<Dictionary<string, ModuleProgressState>> FetchModuleProgressAsync(string learnerId)
+    {
+        var result = new Dictionary<string, ModuleProgressState>(StringComparer.OrdinalIgnoreCase);
+        const string sql = @"SELECT module_code, progress_percent, status
+                             FROM learner_modules
+                             WHERE uid = @Uid";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return result;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var code = reader["module_code"]?.ToString();
+                if (string.IsNullOrWhiteSpace(code))
+                {
+                    continue;
+                }
+
+                result[code] = new ModuleProgressState
+                {
+                    ProgressPercent = SafeToInt(reader["progress_percent"], 0),
+                    Status = reader["status"]?.ToString() ?? string.Empty
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_modules for {learnerId}: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    private static List<LearnerHighlightStat> BuildHighlightStats(LearnerStreakDto streak, LearnerMissionDto mission, LearnerModuleSnapshot modules)
+    {
+        var stats = new List<LearnerHighlightStat>
+        {
+            new LearnerHighlightStat
+            {
+                Label = "XP to next level",
+                Value = streak.XpToNextLevel.ToString(),
+                Detail = "Keep your streak alive to level up faster.",
+                ProgressPercent = Math.Max(5, Math.Min(100, 100 - (streak.XpToNextLevel / 10)))
+            },
+            new LearnerHighlightStat
+            {
+                Label = "Weekly focus",
+                Value = mission.Badge,
+                Detail = mission.Mood,
+                Chip = mission.Mode
+            }
+        };
+
+        var nextModule = modules.ActiveModules.FirstOrDefault();
+        if (nextModule != null)
+        {
+            stats.Add(new LearnerHighlightStat
+            {
+                Label = "Next module",
+                Value = nextModule.Title,
+                Detail = $"Module {nextModule.Number}",
+                Chip = nextModule.ProgressPercent >= 95 ? "Review" : nextModule.ProgressPercent >= 35 ? "Continue" : "Preview"
+            });
+        }
+
+        return stats;
+    }
+
+    private async Task<LearnerBadgeStatsDto> BuildBadgeStatsAsync(string learnerId, LearnerProfileDto profile, LearnerStreakDto streak, LearnerModuleSnapshot? modules = null)
+    {
+        var badgeStats = SampleBadgeStats();
+
+        badgeStats.Stats["level"] = profile.Level;
+        badgeStats.Stats["streak"] = streak.Current;
+
+        if (modules != null)
+        {
+            var completed = modules.Catalogue
+                .SelectMany(section => section.Modules)
+                .Count(module => (module.ProgressPercent ?? 0) >= 95);
+            var inProgress = modules.Catalogue
+                .SelectMany(section => section.Modules)
+                .Count(module => (module.ProgressPercent ?? 0) >= 35 && (module.ProgressPercent ?? 0) < 95);
+
+            badgeStats.Stats["cats"] = completed;
+            badgeStats.Stats["ghibli"] = inProgress;
+        }
+
+        badgeStats.Stats["hidden"] = await CountLearnerBadgesAsync(learnerId);
+
+        return badgeStats;
+    }
+
+    private async Task<int> CountLearnerBadgesAsync(string learnerId)
+    {
+        const string sql = "SELECT COUNT(*) FROM learner_badges WHERE uid = @Uid";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return 0;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            var result = await command.ExecuteScalarAsync();
+            return SafeToInt(result, 0);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to count learner_badges for {learnerId}: {ex.Message}");
+        }
+
+        return 0;
+    }
+
+    private async Task<List<TopicProgressDto>> FetchTopicsAsync(string learnerId)
+    {
+        var topics = new List<TopicProgressDto>();
+        const string sql = @"SELECT topic_code, percent, coach_note
+                             FROM learner_topics_progress
+                             WHERE uid = @Uid
+                             ORDER BY COALESCE(updated_at, CURRENT_TIMESTAMP) DESC";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return topics;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var title = reader["topic_code"]?.ToString() ?? "Topic";
+                var percent = SafeToInt(reader["percent"], 0);
+                var note = reader["coach_note"]?.ToString() ?? string.Empty;
+                topics.Add(new TopicProgressDto(title, percent, note));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_topics_progress for {learnerId}: {ex.Message}");
+        }
+
+        return topics;
+    }
+
+    private async Task<List<CheckpointDto>> FetchCheckpointsAsync(string learnerId)
+    {
+        var checkpoints = new List<CheckpointDto>();
+        const string sql = @"SELECT title, note, cta_label, is_primary
+                             FROM learner_checkpoints
+                             WHERE uid = @Uid
+                             ORDER BY COALESCE(due_at, created_at) ASC";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return checkpoints;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                checkpoints.Add(new CheckpointDto(
+                    reader["title"]?.ToString() ?? "Checkpoint",
+                    reader["note"]?.ToString() ?? string.Empty,
+                    reader["cta_label"]?.ToString() ?? "Open",
+                    reader["is_primary"] != DBNull.Value && Convert.ToBoolean(reader["is_primary"])
+                ));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_checkpoints for {learnerId}: {ex.Message}");
+        }
+
+        return checkpoints;
+    }
+
+    private static MotivationDto BuildMotivation(int overallPercent)
+    {
+        if (overallPercent >= 100)
+        {
+            return new MotivationDto
+            {
+                Title = "🎉 You did it!",
+                Body = "You’ve completed all your lessons! Take a breather before the next sprint."
+            };
+        }
+
+        if (overallPercent >= 75)
+        {
+            return new MotivationDto
+            {
+                Title = "You're doing amazing! 🐾",
+                Body = "Keep going — every problem solved brings you closer to mastery!"
+            };
+        }
+
+        return new MotivationDto
+        {
+            Title = "Small steps, big gains",
+            Body = "Line up one focused session today to push your progress forward."
+        };
+    }
+
+    private async Task<LearnerClassInfo?> FetchLearnerClassInfoAsync(string learnerId)
+    {
+        const string sql = @"SELECT lc.class_code,
+                                    COALESCE(c.title, lc.class_code) AS title,
+                                    c.coach_name
+                             FROM learner_classes lc
+                             LEFT JOIN classes c ON c.class_code = lc.class_code
+                             WHERE lc.uid = @Uid
+                             ORDER BY lc.joined_at DESC
+                             LIMIT 1";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return null;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var title = reader["title"]?.ToString() ?? "Your class";
+                var coach = reader["coach_name"]?.ToString();
+                if (!string.IsNullOrWhiteSpace(coach))
+                {
+                    title = $"{title} - {coach}";
+                }
+
+                return new LearnerClassInfo
+                {
+                    Code = reader["class_code"]?.ToString() ?? string.Empty,
+                    Title = title
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_classes for {learnerId}: {ex.Message}");
+        }
+
+        return null;
+    }
+
+    private async Task<List<AnnouncementDto>> FetchClassAnnouncementsAsync(string classCode)
+    {
+        var announcements = new List<AnnouncementDto>();
+        if (string.IsNullOrWhiteSpace(classCode))
+        {
+            return announcements;
+        }
+
+        const string sql = @"SELECT title, body, posted_at
+                             FROM class_announcements
+                             WHERE class_code = @Code
+                             ORDER BY posted_at DESC
+                             LIMIT 5";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return announcements;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Code", classCode);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                announcements.Add(new AnnouncementDto(
+                    reader["title"]?.ToString() ?? "Announcement",
+                    reader["body"]?.ToString() ?? string.Empty,
+                    reader["posted_at"]?.ToString() ?? string.Empty
+                ));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load class_announcements for {classCode}: {ex.Message}");
+        }
+
+        return announcements;
+    }
+
+    private async Task<List<ClassAssignmentDto>> FetchClassAssignmentsAsync(string learnerId, string classCode)
+    {
+        var assignments = new List<ClassAssignmentDto>();
+        if (string.IsNullOrWhiteSpace(classCode))
+        {
+            return assignments;
+        }
+
+        const string sql = @"SELECT ca.assignment_id,
+                                    ca.title,
+                                    ca.due_at,
+                                    COALESCE(la.completion_percent, 0) AS completion_percent,
+                                    COALESCE(la.status, ca.status_template) AS status
+                             FROM class_assignments ca
+                             LEFT JOIN learner_assignments la
+                               ON la.assignment_id = ca.assignment_id
+                              AND la.uid = @Uid
+                             WHERE ca.class_code = @Code
+                             ORDER BY ca.due_at ASC";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return assignments;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@Code", classCode);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                assignments.Add(new ClassAssignmentDto(
+                    reader["title"]?.ToString() ?? "Assignment",
+                    reader["due_at"]?.ToString() ?? "—",
+                    SafeToInt(reader["completion_percent"], 0),
+                    reader["status"]?.ToString() ?? "Open"
+                ));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load class_assignments for {classCode}: {ex.Message}");
+        }
+
+        return assignments;
+    }
+
+    private async Task SaveLearnerClassAsync(string learnerId, string classCode)
+    {
+        const string deleteSql = "DELETE FROM learner_classes WHERE uid = @Uid";
+        const string insertSql = @"INSERT INTO learner_classes(uid, class_code, joined_at)
+                                   VALUES (@Uid, @Code, NOW())";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return;
+            }
+
+            await using var deleteCommand = new MySqlCommand(deleteSql, connection);
+            deleteCommand.Parameters.AddWithValue("@Uid", learnerId);
+            await deleteCommand.ExecuteNonQueryAsync();
+
+            await using var insertCommand = new MySqlCommand(insertSql, connection);
+            insertCommand.Parameters.AddWithValue("@Uid", learnerId);
+            insertCommand.Parameters.AddWithValue("@Code", classCode);
+            await insertCommand.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to save learner_classes for {learnerId}: {ex.Message}");
+        }
+    }
+
+    private async Task<List<PastPaperDto>> FetchPastPapersFromDbAsync(string learnerId, string year, string type, string topic)
+    {
+        var papers = new List<PastPaperDto>();
+        var conditions = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(year))
+        {
+            conditions.Add("year = @Year");
+        }
+        if (!string.IsNullOrWhiteSpace(type))
+        {
+            conditions.Add("paper_type = @Type");
+        }
+        if (!string.IsNullOrWhiteSpace(topic))
+        {
+            conditions.Add("topic = @Topic");
+        }
+
+        var whereClause = conditions.Any() ? $"WHERE {string.Join(" AND ", conditions)}" : string.Empty;
+        var sql = $@"SELECT title, details, resource_url
+                     FROM past_papers
+                     {whereClause}
+                     ORDER BY year DESC, title ASC
+                     LIMIT 25";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return SamplePastPapers();
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            if (!string.IsNullOrWhiteSpace(year))
+            {
+                command.Parameters.AddWithValue("@Year", year);
+            }
+            if (!string.IsNullOrWhiteSpace(type))
+            {
+                command.Parameters.AddWithValue("@Type", type);
+            }
+            if (!string.IsNullOrWhiteSpace(topic))
+            {
+                command.Parameters.AddWithValue("@Topic", topic);
+            }
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                papers.Add(new PastPaperDto(
+                    reader["title"]?.ToString() ?? "Past paper",
+                    reader["details"]?.ToString() ?? string.Empty,
+                    reader["resource_url"]?.ToString() ?? string.Empty
+                ));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load past_papers for {learnerId}: {ex.Message}");
+        }
+
+        return papers.Any() ? papers : SamplePastPapers();
+    }
+
+    private async Task<List<NotificationPreferenceDto>> FetchNotificationPreferencesAsync(string learnerId)
+    {
+        var preferences = new List<NotificationPreferenceDto>();
+        const string sql = @"SELECT pref_key, pref_value
+                             FROM learner_preferences
+                             WHERE uid = @Uid";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return preferences;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var key = reader["pref_key"]?.ToString() ?? "preference";
+                var value = reader["pref_value"]?.ToString() ?? string.Empty;
+                var mapped = key switch
+                {
+                    "daily_nudge" => new NotificationPreferenceDto("Daily streak nudges", value, false),
+                    "coach_feedback" => new NotificationPreferenceDto("Coach feedback alerts", value, false),
+                    "exam_countdown" => new NotificationPreferenceDto("Exam countdown", value, true),
+                    _ => new NotificationPreferenceDto(key, value)
+                };
+                preferences.Add(mapped);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_preferences for {learnerId}: {ex.Message}");
+        }
+
+        if (!preferences.Any())
+        {
+            preferences.AddRange(new[]
+            {
+                new NotificationPreferenceDto("Daily streak nudges", "Sent at 8:00 PM GMT+8"),
+                new NotificationPreferenceDto("Coach feedback alerts", "Push + email"),
+                new NotificationPreferenceDto("Exam countdown", "Weekly digest on Fridays", true)
+            });
+        }
+
+        return preferences;
     }
 
     private async Task<LearnerRecord?> FetchLearnerAsync(string learnerId)
@@ -342,6 +1068,12 @@ public class LearnerService : ILearnerService
         public string Email { get; set; } = string.Empty;
         public string UserType { get; set; } = string.Empty;
     }
+
+    private sealed class ModuleProgressState
+    {
+        public int ProgressPercent { get; set; }
+        public string Status { get; set; } = string.Empty;
+    }
 }
 
 #region DTOs
@@ -364,7 +1096,8 @@ public class LearnerProfileDto
     public string Motto { get; set; } = string.Empty;
     public int Level { get; set; }
     public int Xp { get; set; }
-    public string Rank { get; set; } = string.Empty;
+    public string School { get; set; } = string.Empty;
+    public string GradeYear { get; set; } = string.Empty;
 }
 
 public class LearnerMissionDto
