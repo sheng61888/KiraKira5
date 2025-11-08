@@ -124,7 +124,34 @@ function closeModal() {
 }
 
 // Admin Dashboard JavaScript
+function loadDashboardStats() {
+    $.ajax({
+        type: "GET",
+        url: "/api/admin/total-users",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(response) {
+            console.log('Data received:', response);
+            document.getElementById('totalUsers').textContent = response.totalUsers.toLocaleString();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading stats:', status, error);
+            document.getElementById('totalUsers').textContent = 'Error';
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded');
+    const totalUsersElement = document.getElementById('totalUsers');
+    console.log('totalUsers element:', totalUsersElement);
+    
+    // Load dashboard stats if on dashboard page
+    if (totalUsersElement) {
+        console.log('Calling loadDashboardStats');
+        loadDashboardStats();
+    }
+    
     // Initialize user management if on that page
     if (document.getElementById('usersTable')) {
         loadUsers();

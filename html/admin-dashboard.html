@@ -16,8 +16,8 @@
             <nav class="nav">
                 <a href="admin-dashboard.html" aria-current="page">Dashboard</a>
                 <a href="admin-UserManagement.html">User Management</a>
-                <a href="admin-ContentManagement.html">Content Management</a>
-                <a href="admin-Reporting.html">Reporting</a>
+                <a href="admin-CourseManagement.html">Course Management</a>
+                <a href="admin-Reporting.html">Reports</a>
                 <a href="../html/login_signup.html">Sign Out</a>
             </nav>
         </aside>
@@ -34,7 +34,7 @@
             <section class="grid stats-grid">
                 <article class="card stat-block">
                     <h3>Total Users</h3>
-                    <strong>1,247</strong>
+                    <strong id="totalUsers">Loading...</strong>
                     <p class="muted">Active learners and teachers</p>
                 </article>
                 <article class="card stat-block">
@@ -83,6 +83,7 @@
     </div>
 
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="../js/admin.js"></script>
 </body>
 </html>
