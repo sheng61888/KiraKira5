@@ -85,6 +85,54 @@ public class LearnerController : ControllerBase
         var payload = await _learnerService.UpdateProfileDetailsAsync(learnerId, request);
         return Ok(payload);
     }
+
+    [HttpGet("{learnerId}/community/threads")]
+    public async Task<IActionResult> GetCommunityThreads(string learnerId, [FromQuery] CommunityThreadQuery query)
+    {
+        var payload = await _learnerService.GetCommunityThreadsAsync(learnerId, query ?? new CommunityThreadQuery());
+        return Ok(payload);
+    }
+
+    [HttpPost("{learnerId}/community/threads")]
+    public async Task<IActionResult> CreateCommunityThread(string learnerId, [FromBody] CommunityThreadCreateRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.Topic) || string.IsNullOrWhiteSpace(request.Message))
+        {
+            return BadRequest(new { error = "Topic and message are required." });
+        }
+
+        var thread = await _learnerService.CreateCommunityThreadAsync(learnerId, request);
+        return Ok(thread);
+    }
+
+    [HttpPost("{learnerId}/community/threads/{threadId}/replies")]
+    public async Task<IActionResult> CreateCommunityReply(string learnerId, long threadId, [FromBody] CommunityReplyCreateRequest request)
+    {
+        if (threadId <= 0)
+        {
+            return BadRequest(new { error = "A valid threadId is required." });
+        }
+
+        if (request == null || string.IsNullOrWhiteSpace(request.Message))
+        {
+            return BadRequest(new { error = "Message is required." });
+        }
+
+        var reply = await _learnerService.CreateCommunityReplyAsync(learnerId, threadId, request);
+        return Ok(reply);
+    }
+
+    [HttpGet("{learnerId}/community/threads/{threadId}")]
+    public async Task<IActionResult> GetCommunityThreadDetail(string learnerId, long threadId, [FromQuery] CommunityThreadDetailQuery query)
+    {
+        if (threadId <= 0)
+        {
+            return BadRequest(new { error = "A valid threadId is required." });
+        }
+
+        var payload = await _learnerService.GetCommunityThreadDetailAsync(learnerId, threadId, query ?? new CommunityThreadDetailQuery());
+        return Ok(payload);
+    }
 }
 
 public class JoinClassRequest
@@ -104,4 +152,32 @@ public class ProfileDetailsUpdateRequest
     public string Motto { get; set; } = string.Empty;
     public string School { get; set; } = string.Empty;
     public string Year { get; set; } = string.Empty;
+}
+
+public class CommunityThreadQuery
+{
+    public string Category { get; set; } = string.Empty;
+    public string Tag { get; set; } = string.Empty;
+    public string Cursor { get; set; } = string.Empty;
+    public int Limit { get; set; } = 10;
+}
+
+public class CommunityThreadCreateRequest
+{
+    public string Topic { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
+    public string FormLevel { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
+    public string Tag { get; set; } = string.Empty;
+}
+
+public class CommunityReplyCreateRequest
+{
+    public string Message { get; set; } = string.Empty;
+}
+
+public class CommunityThreadDetailQuery
+{
+    public string Cursor { get; set; } = string.Empty;
+    public int Limit { get; set; } = 20;
 }

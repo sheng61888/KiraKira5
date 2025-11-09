@@ -44,7 +44,7 @@
         </div>
         <div class="heading-actions">
           <button class="btn btn--ghost" type="button">Community guidelines</button>
-          <button class="btn btn--primary" type="button">Create new thread</button>
+          <button class="btn btn--primary" type="button" data-scroll="#conversationForm">Create new thread</button>
         </div>
       </header>
 
@@ -67,60 +67,24 @@
               <p class="eyebrow">Live conversations</p>
               <h2>Forum threads</h2>
             </div>
-            <div class="community-filters">
-              <button class="chip chip--info" type="button">All topics</button>
-              <button class="chip" type="button">Form 4</button>
-              <button class="chip" type="button">Form 5</button>
-              <button class="chip" type="button">Help needed</button>
+            <div class="community-filters" id="communityFilters">
+              <button class="chip chip--info" type="button" data-category="">All topics</button>
+              <button class="chip" type="button" data-category="Form 4">Form 4</button>
+              <button class="chip" type="button" data-category="Form 5">Form 5</button>
+              <button class="chip" type="button" data-category="Study tips">Study tips</button>
+              <button class="chip" type="button" data-category="Help needed">Help needed</button>
             </div>
           </div>
 
-          <ul class="thread-list" id="threadList">
+          <ul class="thread-list" id="threadList" aria-live="polite">
             <li class="thread-item">
               <div>
-                <div class="thread-tags">
-                  <span class="chip chip--info">Form 5</span>
-                  <span class="chip">Trigonometry</span>
-                </div>
-                <a href="#" class="thread-title">Need intuition for sine graph transformations</a>
-                <p class="muted">"I can stretch/shift but still mix up the order. Anyone got a mental model?"</p>
-              </div>
-              <div class="thread-meta">
-                <strong>12 replies</strong>
-                <small>Last reply · 10m ago</small>
-              </div>
-            </li>
-
-            <li class="thread-item">
-              <div>
-                <div class="thread-tags">
-                  <span class="chip chip--info">Form 4</span>
-                  <span class="chip">Sets</span>
-                </div>
-                <a href="#" class="thread-title">Venn diagram challenge (with cats!)</a>
-                <p class="muted">Sharing a fun teacher-made question. Let's see who can solve it fastest.</p>
-              </div>
-              <div class="thread-meta">
-                <strong>5 replies</strong>
-                <small>Last reply · 32m ago</small>
-              </div>
-            </li>
-
-            <li class="thread-item">
-              <div>
-                <div class="thread-tags">
-                  <span class="chip chip--info">Form 5</span>
-                  <span class="chip">Study tips</span>
-                </div>
-                <a href="#" class="thread-title">Keeping streaks during exam week</a>
-                <p class="muted">How do you balance school + KiraKira? Looking for realistic routines.</p>
-              </div>
-              <div class="thread-meta">
-                <strong>9 replies</strong>
-                <small>Last reply · 1h ago</small>
+                <p class="muted">Loading conversations...</p>
               </div>
             </li>
           </ul>
+          <div class="thread-status" id="threadStatus" role="status"></div>
+          <button class="btn btn--ghost" type="button" id="loadMoreThreads" hidden>Load more</button>
         </article>
 
         <aside class="community-sidebar">
@@ -143,7 +107,12 @@
                   <option>Form 5</option>
                   <option>Study tips</option>
                   <option>Motivation</option>
+                  <option>Help needed</option>
                 </select>
+              </label>
+              <label>
+                Tag (optional)
+                <input type="text" name="tag" placeholder="#algebra-sos">
               </label>
               <label>
                 Message
@@ -160,13 +129,8 @@
                 <h2>Jump into these</h2>
               </div>
             </div>
-            <div class="topic-chip-grid">
-              <span class="topic-chip">#algebra-sos</span>
-              <span class="topic-chip">#probability</span>
-              <span class="topic-chip">#exam-stress</span>
-              <span class="topic-chip">#study-logs</span>
-              <span class="topic-chip">#coach-asks</span>
-              <span class="topic-chip">#math-memes</span>
+            <div class="topic-chip-grid" id="trendingTags" aria-live="polite">
+              <span class="topic-chip">#loading</span>
             </div>
           </article>
         </aside>
@@ -176,32 +140,8 @@
 
   <script src="../js/learner-session.js"></script>
   <script src="../js/learner-shell.js"></script>
-  <script>
-    const form = document.getElementById("conversationForm");
-    const list = document.getElementById("threadList");
-
-    form.addEventListener("submit", event => {
-      event.preventDefault();
-      const data = new FormData(form);
-      const li = document.createElement("li");
-      li.className = "thread-item";
-      li.innerHTML = `
-        <div>
-          <div class="thread-tags">
-            <span class="chip chip--info">${data.get("category")}</span>
-            <span class="chip">New</span>
-          </div>
-          <a href="#" class="thread-title">${data.get("topic")}</a>
-          <p class="muted">${data.get("message")}</p>
-        </div>
-        <div class="thread-meta">
-          <strong>0 replies</strong>
-          <small>Just posted</small>
-        </div>
-      `;
-      list.prepend(li);
-      form.reset();
-    });
-  </script>
+  <script src="../js/learner-community.js"></script>
 </body>
 </html>
+
+

@@ -38,78 +38,86 @@
     <main class="main">
       <header class="page-heading">
         <div>
-          <p class="eyebrow">Classroom hub</p>
-          <h1>Stay synced with your teacher</h1>
-          <p>Join a class with a code or check reminders, assignments, and topics once they load.</p>
-        </div>
-        <div class="heading-actions">
-          <button class="btn btn--ghost" type="button">Message coach</button>
-          <button class="btn btn--primary" type="button">Add to calendar</button>
+          <p class="eyebrow">Optional classes</p>
+          <h1>Keep self-studying, join when ready</h1>
+          <p>Everything in KiraKira works for solo practice. Use a class code only if your teacher or school invited you.</p>
         </div>
       </header>
 
-      <section class="grid grid--two">
-        <article class="card join-class" id="joinClassSection">
+      <section class="card join-class" id="joinClassSection">
+        <div class="section-head">
+          <h2>Join a class</h2>
+          <span class="chip chip--info">Code required</span>
+        </div>
+        <p class="muted">Enter the class code shared by your coach to unlock shared assignments, announcements, and streak boosts. Until then, feel free to continue self-study.</p>
+        <form id="joinClassForm">
+          <input type="text" id="classCode" placeholder="Enter class code (e.g., MATH2025-A1)" required>
+          <button class="btn btn--primary" type="submit">Join</button>
+        </form>
+        <p class="muted">No code? You can keep exploring lessons without a class.</p>
+      </section>
+
+      <section class="class-dashboard" id="classDashboard" style="display:none;">
+        <article class="card class-details-card">
           <div class="section-head">
-            <h2>Join a class</h2>
-            <span class="chip chip--info">Code required</span>
+            <div>
+              <p class="eyebrow" id="classGrade">Class space unlocked</p>
+              <h2 id="classTitle">Your enrolled class</h2>
+              <p class="muted" id="classTeacher">Teacher: -</p>
+              <p id="classCodeDisplay">Code: -</p>
+            </div>
+            <div class="heading-actions">
+              <button class="btn btn--ghost" type="button">Message coach</button>
+              <button class="btn btn--primary" type="button">Add to calendar</button>
+            </div>
           </div>
-          <p class="muted">Enter the class code shared by your coach to unlock shared assignments, announcements, and streak boosts.</p>
-          <form id="joinClassForm">
-            <input type="text" id="classCode" placeholder="Enter class code (e.g., MATH2025-A1)" required>
-            <button class="btn btn--primary" type="submit">Join</button>
-          </form>
+          <p class="muted" id="classDescription">Your teacher can drop announcements, assignments, and focus topics here once you join.</p>
+        </article>
+
+        <div class="grid grid--two">
+          <article class="card">
+            <div class="section-head">
+              <h3>Announcements</h3>
+              <span class="chip" aria-live="polite">Awaiting updates</span>
+            </div>
+            <div class="activity-list" id="announcementList">
+              <p class="muted">Announcements will appear here after we sync with your class.</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="section-head">
+              <h3>Assignments</h3>
+              <span class="chip chip--info">Coach updates</span>
+            </div>
+            <div id="assignmentList">
+              <p class="muted">Assignments will load once your class syncs.</p>
+            </div>
+          </article>
+        </div>
+
+        <article class="card class-modules-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Assigned modules</p>
+              <h3>Coach-scheduled practice</h3>
+            </div>
+            <span class="chip chip--info" id="classModulesChip">Waiting for coach</span>
+          </div>
+          <div id="classModulesList">
+            <p class="muted">Modules and due dates will unlock once your teacher uses a class code.</p>
+          </div>
         </article>
 
         <article class="card">
           <div class="section-head">
-            <h2>Announcements</h2>
-            <span class="chip" aria-live="polite">Awaiting updates</span>
+            <h3>Ongoing topics</h3>
+            <span class="chip chip--info">Guided practice</span>
           </div>
-          <div class="activity-list" id="announcementList">
-            <p class="muted">Announcements will appear here after we sync with your class.</p>
+          <div id="ongoingTopics">
+            <p class="muted">Coach topics will appear here after enrollment.</p>
           </div>
         </article>
-      </section>
-
-      <section class="card module-catalogue" aria-labelledby="modules-heading">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">SPM modules</p>
-            <h2 id="modules-heading">Form 4 & Form 5 paths</h2>
-          </div>
-          <span class="chip chip--info">Synced with public catalogue</span>
-        </div>
-        <div id="modulesByGrade" aria-live="polite">
-          <p class="muted">Loading module list...</p>
-        </div>
-        <noscript>
-          <p class="muted">Enable JavaScript to view your module list.</p>
-        </noscript>
-      </section>
-
-      <section class="card class-dashboard" id="classDashboard" style="display:none;">
-        <div class="class-info">
-          <p class="eyebrow">Enrolled class</p>
-          <h2 id="classTitle">Your enrolled class</h2>
-          <p id="classCodeDisplay">Code: —</p>
-        </div>
-
-        <div class="grid grid--two">
-          <div class="tasks-section">
-            <h3>Ongoing topics</h3>
-            <div id="ongoingTopics">
-              <p class="muted">Coach topics will appear here after enrollment.</p>
-            </div>
-          </div>
-
-          <div class="assignments-section">
-            <h3>Assignments</h3>
-            <div id="assignmentList">
-              <p class="muted">Assignments will load once your class syncs.</p>
-            </div>
-          </div>
-        </div>
       </section>
     </main>
   </div>
@@ -117,9 +125,6 @@
   <!-- JS -->
   <script src="../js/learner-session.js"></script>
   <script src="../js/learner-shell.js"></script>
-  <script src="../js/modules-data.js"></script>
-  <script src="../js/learner-modules.js"></script>
-  <script src="../js/catalogue-classes.js"></script>
   <script src="../js/learner-classes-page.js"></script>
 </body>
 </html>
