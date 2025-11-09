@@ -718,6 +718,16 @@ ul {
   gap: 1rem;
 }
 
+.thread-status {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  min-height: 1.2rem;
+}
+
+.thread-status.error {
+  color: var(--danger);
+}
+
 .thread-item {
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-md);
@@ -727,6 +737,71 @@ ul {
   gap: 1rem;
   flex-wrap: wrap;
   background: rgba(255, 255, 255, 0.02);
+}
+
+.thread-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.thread-detail h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2vw + 1rem, 2.4rem);
+  color: var(--text);
+}
+
+.thread-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.replies-card .reply-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.reply-item {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.reply-item p {
+  margin: 0.4rem 0 0;
+}
+
+.reply-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.reply-form-card textarea {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  padding: 1rem;
+  resize: vertical;
+}
+
+.reply-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.8rem;
 }
 
 .thread-tags {
@@ -794,6 +869,14 @@ ul {
   padding: 0.35rem 0.85rem;
   background: rgba(255, 255, 255, 0.06);
   font-size: 0.85rem;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.topic-chip--active {
+  background: var(--accent);
+  color: #0c0f1c;
 }
 
 /* Lesson Workspace -------------------------------------------- */
@@ -1115,6 +1198,7 @@ ul {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: clamp(1.5rem, 2vw, 2.8rem);
 }
 
 .join-class form {
@@ -1140,7 +1224,8 @@ ul {
 .class-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: clamp(1.5rem, 2vw, 2.6rem);
+  margin-top: clamp(1.5rem, 2vw, 3rem);
 }
 
 .class-info h2 {

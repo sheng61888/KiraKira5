@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MathPath - Thread</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/learner.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="/images/logo transparent.png" alt="KiraKira logo">
+      </div>
+
+      <div class="profile">
+        <div class="username" aria-live="polite">Loading learner...</div>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak" aria-live="polite">Syncing streak...</div>
+        <div class="xp-bar"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level updating - 0 XP</small>
+      </div>
+
+      <nav class="nav" aria-label="Learner navigation">
+        <a href="learner-home.html">Dashboard</a>
+        <a href="learner-progress.html">Progress</a>
+        <a href="learner-pastyears.html">Past Papers</a>
+        <a href="learner-classes.html">Classes</a>
+        <a href="learner-community.html" aria-current="page">Community</a>
+        <a href="learner-profile.html">Profile</a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <nav class="breadcrumbs">
+        <a href="learner-community.html" class="btn btn--ghost">&larr; Back to community</a>
+      </nav>
+
+      <article class="card thread-detail" id="threadDetail">
+        <div class="thread-tags" id="threadTags">
+          <span class="chip chip--info">Community</span>
+        </div>
+        <h1 id="threadTitle">Loading thread...</h1>
+        <p class="muted" id="threadBody">Fetching thread details. Hang tight.</p>
+        <div class="thread-meta" id="threadMeta"></div>
+      </article>
+
+      <section class="card replies-card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Replies</p>
+            <h2>What the crew is saying</h2>
+          </div>
+          <button class="btn btn--ghost" type="button" id="refreshThread">Refresh</button>
+        </div>
+        <ul class="reply-list" id="replyList" aria-live="polite">
+          <li class="reply-item">
+            <p class="muted">Loading replies...</p>
+          </li>
+        </ul>
+        <div class="thread-status" id="replyStatus" role="status"></div>
+        <button class="btn btn--ghost" type="button" id="loadMoreReplies" hidden>Load older replies</button>
+      </section>
+
+      <section class="card reply-form-card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Add your voice</p>
+            <h2>Share a tip or encouragement</h2>
+          </div>
+        </div>
+        <form id="replyForm">
+          <label class="sr-only" for="replyMessage">Your reply</label>
+          <textarea id="replyMessage" name="message" rows="4" placeholder="Drop your strategy, question, or cheer." required></textarea>
+          <div class="reply-actions">
+            <button class="btn btn--primary" type="submit">Post reply</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-shell.js"></script>
+  <script src="../js/learner-thread.js"></script>
+</body>
+</html>

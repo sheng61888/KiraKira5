@@ -4,17 +4,34 @@
     dashboard: "#classDashboard",
     classTitle: "#classTitle",
     classCode: "#classCodeDisplay",
+    classTeacher: "#classTeacher",
+    classGrade: "#classGrade",
+    classDescription: "#classDescription",
     announcements: "#announcementList",
     topics: "#ongoingTopics",
     assignments: "#assignmentList",
-    catalogueContainer: "#modulesByGrade",
+    classModules: "#classModulesList",
+    classModulesChip: "#classModulesChip",
     joinForm: "#joinClassForm",
     classCodeInput: "#classCode"
   };
 
+  const copy = {
+    defaultClassDescription: "Your teacher can drop announcements, assignments, and focus topics here once you join."
+  };
+
+  const getElement = selector => document.querySelector(selector);
+
+  const setText = (selector, text) => {
+    const el = getElement(selector);
+    if (el) {
+      el.textContent = text;
+    }
+  };
+
   const setVisibility = hasEnrollment => {
-    const joinSection = document.querySelector(selectors.joinSection);
-    const dashboard = document.querySelector(selectors.dashboard);
+    const joinSection = getElement(selectors.joinSection);
+    const dashboard = getElement(selectors.dashboard);
     if (joinSection) {
       joinSection.style.display = hasEnrollment ? "none" : "block";
     }
@@ -30,14 +47,14 @@
     }
     setVisibility(true);
     if (info) {
-      const titleEl = document.querySelector(selectors.classTitle);
-      if (titleEl) {
-        titleEl.textContent = info.title || "Your enrolled class";
-      }
-      const codeEl = document.querySelector(selectors.classCode);
-      if (codeEl) {
-        codeEl.textContent = `Code: ${info.code || "-"}`;
-      }
+      setText(selectors.classTitle, info.title || "Your enrolled class");
+      setText(selectors.classCode, `Code: ${info.code || "-"}`);
+      const teacherName = info.teacherName ? `Teacher: ${info.teacherName}` : "Teacher: To be assigned";
+      setText(selectors.classTeacher, teacherName);
+      const gradeLabel = info.gradeLevel ? `${info.gradeLevel} class` : "Class space unlocked";
+      setText(selectors.classGrade, gradeLabel);
+      const description = info.description || copy.defaultClassDescription;
+      setText(selectors.classDescription, description);
     }
   };
 
@@ -85,7 +102,7 @@
   };
 
   const renderAssignments = assignments => {
-    const container = document.querySelector(selectors.assignments);
+    const container = getElement(selectors.assignments);
     if (!container) {
       return;
     }
@@ -110,12 +127,110 @@
       .join("");
   };
 
-  const broadcastModules = catalogue => {
-    if (!Array.isArray(catalogue)) {
+  const buildLessonList = lessons => {
+    const safeLessons = Array.isArray(lessons) ? lessons : [];
+    const list = document.createElement("ul");
+    list.className = "lesson-pill-list";
+
+    if (!safeLessons.length) {
+      const emptyItem = document.createElement("li");
+      emptyItem.textContent = "Coach will add lesson focus soon.";
+      list.appendChild(emptyItem);
+      return list;
+    }
+
+    safeLessons.slice(0, 3).forEach(lesson => {
+      const item = document.createElement("li");
+      item.textContent = lesson;
+      list.appendChild(item);
+    });
+
+    if (safeLessons.length > 3) {
+      const more = document.createElement("li");
+      more.textContent = `+${safeLessons.length - 3} more`;
+      list.appendChild(more);
+    }
+
+    return list;
+  };
+
+  const renderClassModules = modules => {
+    const container = getElement(selectors.classModules);
+    const chip = getElement(selectors.classModulesChip);
+    if (!container) {
       return;
     }
-    window.kiraModules = catalogue;
-    document.dispatchEvent(new CustomEvent("kira:modules-ready", { detail: catalogue }));
+
+    if (!Array.isArray(modules) || !modules.length) {
+      container.innerHTML = "<p class=\"muted\">Your coach hasn't assigned modules yet.</p>";
+      if (chip) {
+        chip.textContent = "Waiting for coach";
+        chip.className = "chip";
+      }
+      return;
+    }
+
+    container.innerHTML = "";
+    modules.forEach(module => {
+      const row = document.createElement("div");
+      row.className = "class-module-row";
+
+      const info = document.createElement("div");
+      info.className = "class-module-info";
+
+      const title = document.createElement("p");
+      title.className = "class-module-title";
+      title.textContent = module.title || module.moduleId || "Module";
+
+      const meta = document.createElement("p");
+      meta.className = "muted";
+      const metaParts = [];
+      if (module.grade) {
+        metaParts.push(module.grade);
+      }
+      if (module.number) {
+        metaParts.push(`Module ${module.number}`);
+      }
+      meta.textContent = metaParts.join(" | ");
+
+      info.appendChild(title);
+      if (meta.textContent) {
+        info.appendChild(meta);
+      }
+      info.appendChild(buildLessonList(module.lessons));
+
+      const details = document.createElement("div");
+      details.className = "class-module-meta";
+
+      const dueChip = document.createElement("span");
+      dueChip.className = module.dueDate ? "chip chip--info" : "chip";
+      dueChip.textContent = module.dueDate ? `Due ${module.dueDate}` : "No due date";
+      details.appendChild(dueChip);
+
+      if (module.assignedAt) {
+        const assigned = document.createElement("small");
+        assigned.className = "muted";
+        assigned.textContent = `Assigned ${module.assignedAt}`;
+        details.appendChild(assigned);
+      }
+
+      if (module.link) {
+        const action = document.createElement("a");
+        action.href = module.link;
+        action.className = "btn btn--ghost";
+        action.textContent = "Open module";
+        details.appendChild(action);
+      }
+
+      row.appendChild(info);
+      row.appendChild(details);
+      container.appendChild(row);
+    });
+
+    if (chip) {
+      chip.textContent = modules.length === 1 ? "1 module" : `${modules.length} modules`;
+      chip.className = "chip chip--info";
+    }
   };
 
   const hydrateClassPage = data => {
@@ -127,7 +242,7 @@
     renderAnnouncements(data.announcements);
     renderTopics(data.ongoingTopics);
     renderAssignments(data.assignments);
-    broadcastModules(data.catalogue);
+    renderClassModules(data.classModules);
   };
 
   const fetchClasses = async () => {

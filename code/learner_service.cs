@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,6 +20,10 @@ public interface ILearnerService
     Task<LearnerProfilePayload> GetProfileAsync(string learnerId);
     Task<LearnerProfileDto> UpdateAvatarAsync(string learnerId, string avatarUrl);
     Task<LearnerProfilePayload> UpdateProfileDetailsAsync(string learnerId, ProfileDetailsUpdateRequest request);
+    Task<CommunityFeedDto> GetCommunityThreadsAsync(string learnerId, CommunityThreadQuery query);
+    Task<CommunityThreadDto> CreateCommunityThreadAsync(string learnerId, CommunityThreadCreateRequest request);
+    Task<CommunityReplyDto> CreateCommunityReplyAsync(string learnerId, long threadId, CommunityReplyCreateRequest request);
+    Task<CommunityThreadDetailDto> GetCommunityThreadDetailAsync(string learnerId, long threadId, CommunityThreadDetailQuery query);
 }
 
 /// <summary>
@@ -129,6 +134,7 @@ public class LearnerService : ILearnerService
         }
 
         var assignments = await FetchClassAssignmentsAsync(learnerId, classInfo.Code);
+        var classModules = await FetchClassModulesAsync(classInfo.Code, moduleSnapshot.Catalogue);
 
         return new LearnerClassesDto
         {
@@ -137,6 +143,7 @@ public class LearnerService : ILearnerService
             Announcements = announcements,
             OngoingTopics = topics,
             Assignments = assignments,
+            ClassModules = classModules,
             Catalogue = moduleSnapshot.Catalogue
         };
     }
@@ -232,6 +239,175 @@ public class LearnerService : ILearnerService
         await UpdateLearnerAccountAsync(learnerId, request.Name, request.Email);
 
         return await GetProfileAsync(learnerId);
+    }
+
+    public async Task<CommunityFeedDto> GetCommunityThreadsAsync(string learnerId, CommunityThreadQuery query)
+    {
+        var normalized = query ?? new CommunityThreadQuery();
+        normalized.Limit = normalized.Limit <= 0 ? 10 : Math.Min(25, normalized.Limit);
+        normalized.Category = normalized.Category?.Trim() ?? string.Empty;
+        normalized.Tag = normalized.Tag?.Trim() ?? string.Empty;
+        normalized.Cursor = normalized.Cursor?.Trim() ?? string.Empty;
+
+        var threads = await FetchCommunityThreadsAsync(normalized);
+        var tags = await FetchCommunityTagsAsync();
+
+        return new CommunityFeedDto
+        {
+            Threads = threads,
+            TrendingTags = tags,
+            NextCursor = threads.Count == normalized.Limit && threads.Any()
+                ? threads.Last().ThreadId.ToString()
+                : null,
+            Filters = new CommunityThreadFiltersDto
+            {
+                AvailableCategories = new List<string> { "Form 4", "Form 5", "Study tips", "Motivation", "Help needed" },
+                ActiveCategory = normalized.Category,
+                ActiveTag = normalized.Tag
+            }
+        };
+    }
+
+    public async Task<CommunityThreadDto> CreateCommunityThreadAsync(string learnerId, CommunityThreadCreateRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(learnerId) || request == null)
+        {
+            return new CommunityThreadDto();
+        }
+
+        var topic = string.IsNullOrWhiteSpace(request.Topic) ? "Untitled conversation" : request.Topic.Trim();
+        var body = string.IsNullOrWhiteSpace(request.Message) ? string.Empty : request.Message.Trim();
+        var category = string.IsNullOrWhiteSpace(request.Category) ? "General" : request.Category.Trim();
+        var formLevel = string.IsNullOrWhiteSpace(request.FormLevel) ? category : request.FormLevel.Trim();
+        var tag = NormalizeTag(request.Tag);
+
+        const string insertSql = @"INSERT INTO community_threads
+                                      (uid, title, body, category, form_level, primary_tag, reply_count, last_reply_at, created_at)
+                                   VALUES
+                                      (@Uid, @Title, @Body, @Category, @FormLevel, @Tag, 0, NOW(), NOW())";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return BuildSampleThread(topic, body, category, tag);
+            }
+
+            await using var command = new MySqlCommand(insertSql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@Title", topic);
+            command.Parameters.AddWithValue("@Body", body);
+            command.Parameters.AddWithValue("@Category", category);
+            command.Parameters.AddWithValue("@FormLevel", formLevel);
+            command.Parameters.AddWithValue("@Tag", tag);
+
+            await command.ExecuteNonQueryAsync();
+            var threadId = command.LastInsertedId;
+            if (threadId <= 0)
+            {
+                return BuildSampleThread(topic, body, category, tag);
+            }
+
+            var thread = await FetchCommunityThreadByIdAsync((long)threadId);
+            return thread ?? BuildSampleThread(topic, body, category, tag);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to create community thread for {learnerId}: {ex.Message}");
+            return BuildSampleThread(topic, body, category, tag);
+        }
+    }
+
+    public async Task<CommunityReplyDto> CreateCommunityReplyAsync(string learnerId, long threadId, CommunityReplyCreateRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(learnerId) || request == null || threadId <= 0)
+        {
+            return new CommunityReplyDto();
+        }
+
+        var message = request.Message?.Trim();
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return new CommunityReplyDto();
+        }
+
+        const string insertSql = @"INSERT INTO community_replies(thread_id, uid, body, created_at)
+                                   VALUES (@ThreadId, @Uid, @Body, NOW())";
+        const string updateSql = @"UPDATE community_threads
+                                   SET reply_count = reply_count + 1,
+                                       last_reply_at = NOW()
+                                   WHERE thread_id = @ThreadId";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return BuildSampleReply(message);
+            }
+
+            await using MySqlTransaction transaction = await connection.BeginTransactionAsync();
+            try
+            {
+                await using (var insertCommand = new MySqlCommand(insertSql, connection, transaction))
+                {
+                    insertCommand.Parameters.AddWithValue("@ThreadId", threadId);
+                    insertCommand.Parameters.AddWithValue("@Uid", learnerId);
+                    insertCommand.Parameters.AddWithValue("@Body", message);
+                    await insertCommand.ExecuteNonQueryAsync();
+                    var replyId = insertCommand.LastInsertedId;
+
+                    await using var updateCommand = new MySqlCommand(updateSql, connection, transaction);
+                    updateCommand.Parameters.AddWithValue("@ThreadId", threadId);
+                    await updateCommand.ExecuteNonQueryAsync();
+
+                    await transaction.CommitAsync();
+
+                    var reply = await FetchCommunityReplyByIdAsync((long)replyId);
+                    return reply ?? BuildSampleReply(message);
+                }
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to create community reply for {learnerId} thread {threadId}: {ex.Message}");
+            return BuildSampleReply(message);
+        }
+    }
+
+    public async Task<CommunityThreadDetailDto> GetCommunityThreadDetailAsync(string learnerId, long threadId, CommunityThreadDetailQuery query)
+    {
+        var normalized = query ?? new CommunityThreadDetailQuery();
+        normalized.Limit = normalized.Limit <= 0 ? 10 : Math.Min(50, normalized.Limit);
+        normalized.Cursor = normalized.Cursor?.Trim() ?? string.Empty;
+
+        if (threadId <= 0)
+        {
+            return new CommunityThreadDetailDto
+            {
+                Thread = BuildSampleThread("Thread unavailable", "We could not find that conversation.", "Community", "general")
+            };
+        }
+
+        var thread = await FetchCommunityThreadByIdAsync(threadId) ??
+            BuildSampleThread("Thread unavailable", "We could not find that conversation.", "Community", "general");
+
+        var replies = await FetchCommunityRepliesAsync(threadId, normalized);
+
+        return new CommunityThreadDetailDto
+        {
+            Thread = thread,
+            Replies = replies,
+            NextCursor = replies.Count == normalized.Limit && replies.Any()
+                ? replies.Last().ReplyId.ToString()
+                : null
+        };
     }
 
     private static LearnerBadgeStatsDto SampleBadgeStats()
@@ -338,6 +514,86 @@ public class LearnerService : ILearnerService
             new ChecklistItemDto("Complete 2 timed papers", "Recommended pace: 1 per week"),
             new ChecklistItemDto("Review marking scheme", "Highlight careless mistakes"),
             new ChecklistItemDto("Log reflections", "Capture what to improve next time", true)
+        };
+    }
+
+    private static List<CommunityThreadDto> SampleCommunityThreads()
+    {
+        return new List<CommunityThreadDto>
+        {
+            new CommunityThreadDto
+            {
+                ThreadId = 101,
+                Title = "Need intuition for sine graph transformations",
+                Body = "I can stretch/shift but still mix up the order. Anyone got a mental model?",
+                Category = "Form 5",
+                FormLevel = "Form 5",
+                PrimaryTag = "trigonometry",
+                ReplyCount = 12,
+                LastReplyLabel = "10m ago",
+                CreatedLabel = "1h ago",
+                Author = new CommunityAuthorDto { Name = "Min", Username = "min-cat" }
+            },
+            new CommunityThreadDto
+            {
+                ThreadId = 92,
+                Title = "Venn diagram challenge (with cats!)",
+                Body = "Sharing a fun teacher-made question. Let's see who can solve it fastest.",
+                Category = "Form 4",
+                FormLevel = "Form 4",
+                PrimaryTag = "sets",
+                ReplyCount = 5,
+                LastReplyLabel = "32m ago",
+                CreatedLabel = "2h ago",
+                Author = new CommunityAuthorDto { Name = "Akira", Username = "akira" }
+            },
+            new CommunityThreadDto
+            {
+                ThreadId = 87,
+                Title = "Keeping streaks during exam week",
+                Body = "How do you balance school + KiraKira? Looking for realistic routines.",
+                Category = "Study tips",
+                FormLevel = "Study tips",
+                PrimaryTag = "habits",
+                ReplyCount = 9,
+                LastReplyLabel = "1h ago",
+                CreatedLabel = "4h ago",
+                Author = new CommunityAuthorDto { Name = "Zara", Username = "zara" }
+            }
+        };
+    }
+
+    private static List<CommunityTagDto> SampleCommunityTags()
+    {
+        return new List<CommunityTagDto>
+        {
+            new CommunityTagDto { Slug = "algebra-sos", Label = "algebra-sos", UsageCount = 42 },
+            new CommunityTagDto { Slug = "probability", Label = "probability", UsageCount = 35 },
+            new CommunityTagDto { Slug = "exam-stress", Label = "exam-stress", UsageCount = 28 },
+            new CommunityTagDto { Slug = "study-logs", Label = "study-logs", UsageCount = 21 },
+            new CommunityTagDto { Slug = "coach-asks", Label = "coach-asks", UsageCount = 14 },
+            new CommunityTagDto { Slug = "math-memes", Label = "math-memes", UsageCount = 10 }
+        };
+    }
+
+    private static List<CommunityReplyDto> SampleCommunityReplies()
+    {
+        return new List<CommunityReplyDto>
+        {
+            new CommunityReplyDto
+            {
+                ReplyId = 501,
+                Body = "I break the questions into smaller steps and double-check units. Helps calm the panic.",
+                CreatedLabel = "2h ago",
+                Author = new CommunityAuthorDto { Name = "Coach Min", Username = "coachmin" }
+            },
+            new CommunityReplyDto
+            {
+                ReplyId = 492,
+                Body = "Try a 20-minute timer with one focused topic. Momentum builds fast.",
+                CreatedLabel = "3h ago",
+                Author = new CommunityAuthorDto { Name = "Dina", Username = "dinamath" }
+            }
         };
     }
 
@@ -530,6 +786,150 @@ public class LearnerService : ILearnerService
         }
 
         return fallback;
+    }
+
+    private static long SafeToLong(object? value, long fallback)
+    {
+        if (value == null || value == DBNull.Value)
+        {
+            return fallback;
+        }
+
+        if (long.TryParse(value.ToString(), out var parsed))
+        {
+            return parsed;
+        }
+
+        return fallback;
+    }
+
+    private static string NormalizeTag(string? tag)
+    {
+        if (string.IsNullOrWhiteSpace(tag))
+        {
+            return "discussion";
+        }
+
+        var cleaned = tag.Trim().TrimStart('#');
+        if (cleaned.Length > 32)
+        {
+            cleaned = cleaned[..32];
+        }
+
+        return cleaned.ToLowerInvariant();
+    }
+
+    private static string FormatRelativeTime(DateTime? dateTime)
+    {
+        if (!dateTime.HasValue)
+        {
+            return "Just now";
+        }
+
+        var utc = DateTime.SpecifyKind(dateTime.Value, DateTimeKind.Local).ToUniversalTime();
+        var delta = DateTime.UtcNow - utc;
+
+        if (delta.TotalSeconds < 60)
+        {
+            return "Just now";
+        }
+
+        if (delta.TotalMinutes < 60)
+        {
+            return $"{Math.Max(1, (int)delta.TotalMinutes)}m ago";
+        }
+
+        if (delta.TotalHours < 24)
+        {
+            return $"{Math.Max(1, (int)delta.TotalHours)}h ago";
+        }
+
+        if (delta.TotalDays < 7)
+        {
+            return $"{Math.Max(1, (int)delta.TotalDays)}d ago";
+        }
+
+        return utc.ToString("dd MMM", CultureInfo.InvariantCulture);
+    }
+
+    private static DateTime? ReadNullableDateTime(DbDataReader reader, string columnName)
+    {
+        try
+        {
+            var value = reader[columnName];
+            if (value == null || value == DBNull.Value)
+            {
+                return null;
+            }
+
+            if (value is DateTime dt)
+            {
+                return dt;
+            }
+
+            if (DateTime.TryParse(value.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var parsed))
+            {
+                return parsed;
+            }
+        }
+        catch
+        {
+            // Intentionally ignored; fallback to null.
+        }
+
+        return null;
+    }
+
+    private static string FormatDateLabel(DateTime? value)
+    {
+        return value?.ToString("dd MMM yyyy", CultureInfo.InvariantCulture) ?? string.Empty;
+    }
+
+    private static (ModuleCardDto Module, string Grade)? ResolveModuleFromCatalogue(string moduleId, IEnumerable<ModuleCatalogueSectionDto> catalogue)
+    {
+        if (string.IsNullOrWhiteSpace(moduleId))
+        {
+            return null;
+        }
+
+        foreach (var section in catalogue ?? Enumerable.Empty<ModuleCatalogueSectionDto>())
+        {
+            foreach (var module in section.Modules ?? Enumerable.Empty<ModuleCardDto>())
+            {
+                foreach (var key in BuildModuleIdentifiers(section, module))
+                {
+                    if (string.Equals(key, moduleId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return (module, section.Grade ?? string.Empty);
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<string> BuildModuleIdentifiers(ModuleCatalogueSectionDto section, ModuleCardDto module)
+    {
+        if (!string.IsNullOrWhiteSpace(module.Number))
+        {
+            yield return module.Number;
+        }
+
+        if (!string.IsNullOrWhiteSpace(module.Link))
+        {
+            yield return module.Link;
+        }
+
+        if (!string.IsNullOrWhiteSpace(section.Grade) && !string.IsNullOrWhiteSpace(module.Number))
+        {
+            yield return $"{section.Grade.Replace(" ", string.Empty).ToLowerInvariant()}-{module.Number}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(module.Title))
+        {
+            yield return module.Title;
+        }
     }
 
     private async Task<LearnerMissionDto> FetchMissionDtoAsync(string learnerId, LearnerProfileDto profile)
@@ -1064,9 +1464,13 @@ public class LearnerService : ILearnerService
     {
         const string sql = @"SELECT lc.class_code,
                                     COALESCE(c.title, lc.class_code) AS title,
-                                    c.coach_name
+                                    c.description,
+                                    c.grade_level,
+                                    t.name AS teacher_name,
+                                    t.username AS teacher_username
                              FROM learner_classes lc
                              LEFT JOIN classes c ON c.class_code = lc.class_code
+                             LEFT JOIN usertable t ON t.uid = c.teacher_id
                              WHERE lc.uid = @Uid
                              ORDER BY lc.joined_at DESC
                              LIMIT 1";
@@ -1085,17 +1489,19 @@ public class LearnerService : ILearnerService
             await using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
-                var title = reader["title"]?.ToString() ?? "Your class";
-                var coach = reader["coach_name"]?.ToString();
-                if (!string.IsNullOrWhiteSpace(coach))
+                var teacher = reader["teacher_name"]?.ToString();
+                if (string.IsNullOrWhiteSpace(teacher))
                 {
-                    title = $"{title} - {coach}";
+                    teacher = reader["teacher_username"]?.ToString();
                 }
 
                 return new LearnerClassInfo
                 {
                     Code = reader["class_code"]?.ToString() ?? string.Empty,
-                    Title = title
+                    Title = reader["title"]?.ToString() ?? "Your class",
+                    TeacherName = teacher ?? string.Empty,
+                    Description = reader["description"]?.ToString() ?? string.Empty,
+                    GradeLevel = reader["grade_level"]?.ToString() ?? string.Empty
                 };
             }
         }
@@ -1199,6 +1605,383 @@ public class LearnerService : ILearnerService
         }
 
         return assignments;
+    }
+
+    private async Task<List<ClassModuleAssignmentDto>> FetchClassModulesAsync(string classCode, IEnumerable<ModuleCatalogueSectionDto> catalogue)
+    {
+        var modules = new List<ClassModuleAssignmentDto>();
+        if (string.IsNullOrWhiteSpace(classCode))
+        {
+            return modules;
+        }
+
+        const string sql = @"SELECT module_id,
+                                    assigned_at,
+                                    due_date
+                             FROM class_courses
+                             WHERE class_code = @Code
+                             ORDER BY COALESCE(due_date, assigned_at) ASC";
+
+        var lookupCatalogue = catalogue ?? Enumerable.Empty<ModuleCatalogueSectionDto>();
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return modules;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Code", classCode);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var moduleId = reader["module_id"]?.ToString() ?? string.Empty;
+                var assignedAt = ReadNullableDateTime(reader, "assigned_at");
+                var dueDate = ReadNullableDateTime(reader, "due_date");
+                var moduleMeta = ResolveModuleFromCatalogue(moduleId, lookupCatalogue);
+
+                modules.Add(new ClassModuleAssignmentDto
+                {
+                    ModuleId = moduleId,
+                    Number = moduleMeta?.Module.Number ?? moduleId,
+                    Title = moduleMeta?.Module.Title ?? moduleId,
+                    Grade = moduleMeta?.Grade ?? string.Empty,
+                    Lessons = moduleMeta?.Module.Lessons?.ToList() ?? new List<string>(),
+                    Link = moduleMeta?.Module.Link ?? string.Empty,
+                    AssignedAt = FormatDateLabel(assignedAt),
+                    DueDate = FormatDateLabel(dueDate)
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load class_courses for {classCode}: {ex.Message}");
+        }
+
+        return modules;
+    }
+
+    private async Task<List<CommunityThreadDto>> FetchCommunityThreadsAsync(CommunityThreadQuery query)
+    {
+        var threads = new List<CommunityThreadDto>();
+        const string sql = @"SELECT t.thread_id,
+                                    t.title,
+                                    t.body,
+                                    t.category,
+                                    t.form_level,
+                                    t.primary_tag,
+                                    t.reply_count,
+                                    t.last_reply_at,
+                                    t.created_at,
+                                    u.name AS author_name,
+                                    u.username AS author_username
+                             FROM community_threads t
+                             LEFT JOIN usertable u ON u.uid = t.uid
+                             WHERE (@Category IS NULL OR t.category = @Category)
+                               AND (@Tag IS NULL OR t.primary_tag = @Tag)
+                               AND (@Cursor IS NULL OR t.thread_id < @Cursor)
+                             ORDER BY t.thread_id DESC
+                             LIMIT @Limit";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return SampleCommunityThreads();
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Category", string.IsNullOrWhiteSpace(query.Category) ? (object)DBNull.Value : query.Category);
+            command.Parameters.AddWithValue("@Tag", string.IsNullOrWhiteSpace(query.Tag) ? (object)DBNull.Value : query.Tag);
+
+            if (long.TryParse(query.Cursor, out var cursorId) && cursorId > 0)
+            {
+                command.Parameters.AddWithValue("@Cursor", cursorId);
+            }
+            else
+            {
+                command.Parameters.AddWithValue("@Cursor", DBNull.Value);
+            }
+
+            command.Parameters.AddWithValue("@Limit", query.Limit);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var thread = MapCommunityThread(reader);
+                threads.Add(thread);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load community_threads: {ex.Message}");
+            return SampleCommunityThreads();
+        }
+
+        return threads;
+    }
+
+    private async Task<CommunityThreadDto?> FetchCommunityThreadByIdAsync(long threadId)
+    {
+        const string sql = @"SELECT t.thread_id,
+                                    t.title,
+                                    t.body,
+                                    t.category,
+                                    t.form_level,
+                                    t.primary_tag,
+                                    t.reply_count,
+                                    t.last_reply_at,
+                                    t.created_at,
+                                    u.name AS author_name,
+                                    u.username AS author_username
+                             FROM community_threads t
+                             LEFT JOIN usertable u ON u.uid = t.uid
+                             WHERE t.thread_id = @Id
+                             LIMIT 1";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return null;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Id", threadId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return MapCommunityThread(reader);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load community_thread {threadId}: {ex.Message}");
+        }
+
+        return null;
+    }
+
+    private async Task<CommunityReplyDto?> FetchCommunityReplyByIdAsync(long replyId)
+    {
+        const string sql = @"SELECT r.reply_id,
+                                    r.body,
+                                    r.created_at,
+                                    u.name AS author_name,
+                                    u.username AS author_username
+                             FROM community_replies r
+                             LEFT JOIN usertable u ON u.uid = r.uid
+                             WHERE r.reply_id = @Id
+                             LIMIT 1";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return null;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Id", replyId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var createdAt = ReadNullableDateTime(reader, "created_at");
+                return new CommunityReplyDto
+                {
+                    ReplyId = SafeToLong(reader["reply_id"], 0),
+                    Body = reader["body"]?.ToString() ?? string.Empty,
+                    CreatedLabel = FormatRelativeTime(createdAt),
+                    Author = new CommunityAuthorDto
+                    {
+                        Name = reader["author_name"]?.ToString() ?? "Learner",
+                        Username = reader["author_username"]?.ToString() ?? string.Empty
+                    }
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load community_reply {replyId}: {ex.Message}");
+        }
+
+        return null;
+    }
+
+    private async Task<List<CommunityTagDto>> FetchCommunityTagsAsync()
+    {
+        var tags = new List<CommunityTagDto>();
+        const string sql = @"SELECT slug, label, usage_count
+                             FROM community_tags
+                             ORDER BY usage_count DESC
+                             LIMIT 8";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return SampleCommunityTags();
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                tags.Add(new CommunityTagDto
+                {
+                    Slug = reader["slug"]?.ToString() ?? string.Empty,
+                    Label = reader["label"]?.ToString() ?? string.Empty,
+                    UsageCount = SafeToInt(reader["usage_count"], 0)
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load community_tags: {ex.Message}");
+            return SampleCommunityTags();
+        }
+
+        return tags;
+    }
+
+    private async Task<List<CommunityReplyDto>> FetchCommunityRepliesAsync(long threadId, CommunityThreadDetailQuery query)
+    {
+        var replies = new List<CommunityReplyDto>();
+        if (threadId <= 0)
+        {
+            return replies;
+        }
+
+        var options = query ?? new CommunityThreadDetailQuery();
+
+        const string sql = @"SELECT r.reply_id,
+                                    r.body,
+                                    r.created_at,
+                                    u.name AS author_name,
+                                    u.username AS author_username
+                             FROM community_replies r
+                             LEFT JOIN usertable u ON u.uid = r.uid
+                             WHERE r.thread_id = @ThreadId
+                               AND (@Cursor IS NULL OR r.reply_id < @Cursor)
+                             ORDER BY r.reply_id DESC
+                             LIMIT @Limit";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return SampleCommunityReplies();
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@ThreadId", threadId);
+
+            if (long.TryParse(options.Cursor, out var cursorId) && cursorId > 0)
+            {
+                command.Parameters.AddWithValue("@Cursor", cursorId);
+            }
+            else
+            {
+                command.Parameters.AddWithValue("@Cursor", DBNull.Value);
+            }
+
+            command.Parameters.AddWithValue("@Limit", options.Limit);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var createdAt = ReadNullableDateTime(reader, "created_at");
+                replies.Add(new CommunityReplyDto
+                {
+                    ReplyId = SafeToLong(reader["reply_id"], 0),
+                    Body = reader["body"]?.ToString() ?? string.Empty,
+                    CreatedLabel = FormatRelativeTime(createdAt),
+                    Author = new CommunityAuthorDto
+                    {
+                        Name = reader["author_name"]?.ToString() ?? "Learner",
+                        Username = reader["author_username"]?.ToString() ?? string.Empty
+                    }
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load community_replies for thread {threadId}: {ex.Message}");
+            return SampleCommunityReplies();
+        }
+
+        return replies;
+    }
+
+    private static CommunityThreadDto MapCommunityThread(DbDataReader reader)
+    {
+        var createdAt = ReadNullableDateTime(reader, "created_at");
+        var lastReplyAt = ReadNullableDateTime(reader, "last_reply_at") ?? createdAt;
+
+        return new CommunityThreadDto
+        {
+            ThreadId = SafeToLong(reader["thread_id"], 0),
+            Title = reader["title"]?.ToString() ?? "Community thread",
+            Body = reader["body"]?.ToString() ?? string.Empty,
+            Category = reader["category"]?.ToString() ?? string.Empty,
+            FormLevel = reader["form_level"]?.ToString() ?? string.Empty,
+            PrimaryTag = reader["primary_tag"]?.ToString() ?? string.Empty,
+            ReplyCount = SafeToInt(reader["reply_count"], 0),
+            LastReplyLabel = FormatRelativeTime(lastReplyAt),
+            CreatedLabel = FormatRelativeTime(createdAt),
+            Author = new CommunityAuthorDto
+            {
+                Name = reader["author_name"]?.ToString() ?? "Learner",
+                Username = reader["author_username"]?.ToString() ?? string.Empty
+            }
+        };
+    }
+
+    private static CommunityThreadDto BuildSampleThread(string title, string body, string category, string tag)
+    {
+        return new CommunityThreadDto
+        {
+            ThreadId = Math.Abs(title.GetHashCode()) + DateTime.UtcNow.Millisecond,
+            Title = title,
+            Body = string.IsNullOrWhiteSpace(body) ? "Thread posted while offline." : body,
+            Category = category,
+            FormLevel = category,
+            PrimaryTag = tag,
+            ReplyCount = 0,
+            LastReplyLabel = "Just now",
+            CreatedLabel = "Just now",
+            Author = new CommunityAuthorDto
+            {
+                Name = "You",
+                Username = "learner"
+            }
+        };
+    }
+
+    private static CommunityReplyDto BuildSampleReply(string message)
+    {
+        return new CommunityReplyDto
+        {
+            ReplyId = DateTime.UtcNow.Ticks,
+            Body = message,
+            CreatedLabel = "Just now",
+            Author = new CommunityAuthorDto
+            {
+                Name = "You",
+                Username = "learner"
+            }
+        };
     }
 
     private async Task SaveLearnerClassAsync(string learnerId, string classCode)
@@ -1579,13 +2362,74 @@ public class LearnerClassesDto
     public IEnumerable<AnnouncementDto> Announcements { get; set; } = new List<AnnouncementDto>();
     public IEnumerable<TopicProgressDto> OngoingTopics { get; set; } = new List<TopicProgressDto>();
     public IEnumerable<ClassAssignmentDto> Assignments { get; set; } = new List<ClassAssignmentDto>();
+    public IEnumerable<ClassModuleAssignmentDto> ClassModules { get; set; } = new List<ClassModuleAssignmentDto>();
     public IEnumerable<ModuleCatalogueSectionDto> Catalogue { get; set; } = new List<ModuleCatalogueSectionDto>();
+}
+
+public class CommunityFeedDto
+{
+    public IEnumerable<CommunityThreadDto> Threads { get; set; } = new List<CommunityThreadDto>();
+    public IEnumerable<CommunityTagDto> TrendingTags { get; set; } = new List<CommunityTagDto>();
+    public CommunityThreadFiltersDto Filters { get; set; } = new();
+    public string? NextCursor { get; set; }
+}
+
+public class CommunityThreadDetailDto
+{
+    public CommunityThreadDto Thread { get; set; } = new();
+    public IEnumerable<CommunityReplyDto> Replies { get; set; } = new List<CommunityReplyDto>();
+    public string? NextCursor { get; set; }
+}
+
+public class CommunityThreadDto
+{
+    public long ThreadId { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Body { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
+    public string FormLevel { get; set; } = string.Empty;
+    public string PrimaryTag { get; set; } = string.Empty;
+    public int ReplyCount { get; set; }
+    public string LastReplyLabel { get; set; } = string.Empty;
+    public string CreatedLabel { get; set; } = string.Empty;
+    public CommunityAuthorDto Author { get; set; } = new();
+}
+
+public class CommunityThreadFiltersDto
+{
+    public IEnumerable<string> AvailableCategories { get; set; } = new List<string>();
+    public string ActiveCategory { get; set; } = string.Empty;
+    public string ActiveTag { get; set; } = string.Empty;
+}
+
+public class CommunityAuthorDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+}
+
+public class CommunityTagDto
+{
+    public string Slug { get; set; } = string.Empty;
+    public string Label { get; set; } = string.Empty;
+    public int UsageCount { get; set; }
+}
+
+public class CommunityReplyDto
+{
+    public long ReplyId { get; set; }
+    public string Body { get; set; } = string.Empty;
+    public string CreatedLabel { get; set; } = string.Empty;
+    public CommunityAuthorDto Author { get; set; } = new();
 }
 
 public class LearnerClassInfo
 {
     public string Title { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
+    public string TeacherName { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string GradeLevel { get; set; } = string.Empty;
 }
 
 public class AnnouncementDto
@@ -1620,6 +2464,18 @@ public class ClassAssignmentDto
     public string DueDate { get; set; } = string.Empty;
     public int CompletionPercent { get; set; }
     public string Status { get; set; } = string.Empty;
+}
+
+public class ClassModuleAssignmentDto
+{
+    public string ModuleId { get; set; } = string.Empty;
+    public string Number { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Grade { get; set; } = string.Empty;
+    public IEnumerable<string> Lessons { get; set; } = new List<string>();
+    public string Link { get; set; } = string.Empty;
+    public string AssignedAt { get; set; } = string.Empty;
+    public string DueDate { get; set; } = string.Empty;
 }
 
 public class LearnerPastPapersDto
