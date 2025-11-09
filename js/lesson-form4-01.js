@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const answerKeyContent = document.getElementById("answerKeyContent");
 
     const quizzes = {
-        quiz1: {
+        quizA: {
             description: "Here are 10 SPM Form 4 MCQs on Quadratic Functions & Equations. Answers at the end.",
             answerKey: ["B", "B", "A", "C", "B", "B", "B", "A", "D", "B"],
             questions: [
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             ]
         },
-        quiz2: {
+        quizB: {
             description: "Here are 10 tougher Form 4 quadratic MCQs. Answers at the end.",
             answerKey: ["D", "C", "A", "C", "B", "C", "B", "C", "B", "B"],
             questions: [
@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    let activeQuiz = "quiz1";
+    let activeQuiz = "quizA";
 
     const buildAnswerKeyList = answers => {
         const list = document.createElement("ol");
