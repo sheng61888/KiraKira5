@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -607,35 +608,183 @@ public class LearnerService : ILearnerService
             badgeStats.Stats["ghibli"] = inProgress;
         }
 
-        badgeStats.Stats["hidden"] = await CountLearnerBadgesAsync(learnerId);
+        var earnedBadgeMetrics = await FetchLearnerBadgeMetricsAsync(learnerId);
+        foreach (var kvp in earnedBadgeMetrics)
+        {
+            var key = kvp.Key?.Trim().ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                continue;
+            }
+
+            badgeStats.Stats[key] = kvp.Value;
+        }
 
         return badgeStats;
     }
 
-    private async Task<int> CountLearnerBadgesAsync(string learnerId)
+    private async Task<Dictionary<string, int>> FetchLearnerBadgeMetricsAsync(string learnerId)
     {
-        const string sql = "SELECT COUNT(*) FROM learner_badges WHERE uid = @Uid";
+        const string sql = @"SELECT *
+                             FROM learner_badges
+                             WHERE uid = @Uid";
+        var metrics = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
         try
         {
             await using var connection = await OpenConnectionAsync();
             if (connection == null)
             {
-                return 0;
+                return metrics;
             }
 
             await using var command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@Uid", learnerId);
 
-            var result = await command.ExecuteScalarAsync();
-            return SafeToInt(result, 0);
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var badgeId = ReadBadgeIdentifier(reader);
+                if (!TryParseBadgeMetric(badgeId, out var metric, out var value) &&
+                    !TryReadMetricColumns(reader, out metric, out value))
+                {
+                    continue;
+                }
+
+                if (metrics.TryGetValue(metric, out var current))
+                {
+                    metrics[metric] = Math.Max(current, value);
+                }
+                else
+                {
+                    metrics[metric] = value;
+                }
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[LearnerService] Failed to count learner_badges for {learnerId}: {ex.Message}");
+            Console.WriteLine($"[LearnerService] Failed to load learner_badges for {learnerId}: {ex.Message}");
         }
 
-        return 0;
+        return metrics;
+    }
+
+    private static string? ReadBadgeIdentifier(DbDataReader reader)
+    {
+        var preferredColumns = new[]
+        {
+            "badge_id",
+            "badgeid",
+            "badge",
+            "badge_code",
+            "badgecode",
+            "badge_slug",
+            "badgeslug"
+        };
+
+        foreach (var column in preferredColumns)
+        {
+            var value = ReadColumnValue(reader, name => string.Equals(name, column, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+        }
+
+        return ReadColumnValue(reader, name => name.IndexOf("badge", StringComparison.OrdinalIgnoreCase) >= 0);
+    }
+
+    private static bool TryReadMetricColumns(DbDataReader reader, out string metric, out int value)
+    {
+        metric = string.Empty;
+        value = 0;
+
+        var metricValue = ReadColumnValue(reader, name =>
+            name.IndexOf("metric", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            name.IndexOf("stat", StringComparison.OrdinalIgnoreCase) >= 0);
+        var amountValue = ReadColumnValue(reader, name =>
+            name.IndexOf("value", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            name.IndexOf("level", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            name.IndexOf("count", StringComparison.OrdinalIgnoreCase) >= 0);
+
+        if (string.IsNullOrWhiteSpace(metricValue) || string.IsNullOrWhiteSpace(amountValue))
+        {
+            return false;
+        }
+
+        metric = metricValue.Trim().ToLowerInvariant();
+        if (int.TryParse(amountValue, out value))
+        {
+            return true;
+        }
+
+        var digits = new string(amountValue.Where(char.IsDigit).ToArray());
+        if (!string.IsNullOrEmpty(digits) && int.TryParse(digits, out value))
+        {
+            return true;
+        }
+
+        metric = string.Empty;
+        return false;
+    }
+
+    private static string? ReadColumnValue(DbDataReader reader, Func<string, bool> predicate)
+    {
+        for (var i = 0; i < reader.FieldCount; i++)
+        {
+            var columnName = reader.GetName(i);
+            if (string.IsNullOrWhiteSpace(columnName) || !predicate(columnName))
+            {
+                continue;
+            }
+
+            if (reader.IsDBNull(i))
+            {
+                continue;
+            }
+
+            var value = reader.GetValue(i)?.ToString();
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool TryParseBadgeMetric(string? badgeId, out string metric, out int value)
+    {
+        metric = string.Empty;
+        value = 0;
+
+        if (string.IsNullOrWhiteSpace(badgeId))
+        {
+            return false;
+        }
+
+        var parts = badgeId.Split('-', 2, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length != 2)
+        {
+            return false;
+        }
+
+        metric = parts[0].Trim().ToLowerInvariant();
+        var numberPart = parts[1].Trim();
+
+        if (int.TryParse(numberPart, out value))
+        {
+            return true;
+        }
+
+        var digits = new string(numberPart.Where(char.IsDigit).ToArray());
+        if (!string.IsNullOrEmpty(digits) && int.TryParse(digits, out value))
+        {
+            return true;
+        }
+
+        metric = string.Empty;
+        return false;
     }
 
     private async Task<List<TopicProgressDto>> FetchTopicsAsync(string learnerId)

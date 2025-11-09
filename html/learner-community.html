@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -17,11 +17,11 @@
       </div>
 
       <div class="profile">
-        <div class="username">Aina</div>
+        <div class="username" aria-live="polite">Loading learner...</div>
         <div class="avatar" aria-hidden="true"></div>
-        <div class="streak">🔥 7-day streak</div>
-        <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 • 1200 XP</small>
+        <div class="streak" aria-live="polite">Syncing streak...</div>
+        <div class="xp-bar"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level updating - 0 XP</small>
       </div>
 
       <nav class="nav" aria-label="Learner navigation">
@@ -51,11 +51,11 @@
       <section class="card community-welcome">
         <div>
           <h2>Weekly spotlight</h2>
-          <p class="muted">“I finally understood probability trees thanks to this forum. Drop your confusions—we’ll untangle them together!” — <strong>Min</strong></p>
+          <p class="muted">"I finally understood probability trees thanks to this forum. Drop your confusions—we'll untangle them together!" — <strong>Min</strong></p>
         </div>
         <div class="community-cta">
           <strong>Need a study buddy?</strong>
-          <p>Tag your form & topic. We’ll match you in minutes.</p>
+          <p>Tag your form & topic. We'll match you in minutes.</p>
           <button class="btn btn--primary" type="button">Find teammates</button>
         </div>
       </section>
@@ -83,7 +83,7 @@
                   <span class="chip">Trigonometry</span>
                 </div>
                 <a href="#" class="thread-title">Need intuition for sine graph transformations</a>
-                <p class="muted">“I can stretch/shift but still mix up the order. Anyone got a mental model?”</p>
+                <p class="muted">"I can stretch/shift but still mix up the order. Anyone got a mental model?"</p>
               </div>
               <div class="thread-meta">
                 <strong>12 replies</strong>
@@ -98,7 +98,7 @@
                   <span class="chip">Sets</span>
                 </div>
                 <a href="#" class="thread-title">Venn diagram challenge (with cats!)</a>
-                <p class="muted">Sharing a fun teacher-made question. Let’s see who can solve it fastest.</p>
+                <p class="muted">Sharing a fun teacher-made question. Let's see who can solve it fastest.</p>
               </div>
               <div class="thread-meta">
                 <strong>5 replies</strong>
@@ -174,6 +174,8 @@
     </main>
   </div>
 
+  <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-shell.js"></script>
   <script>
     const form = document.getElementById("conversationForm");
     const list = document.getElementById("threadList");
