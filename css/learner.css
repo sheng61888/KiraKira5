@@ -728,6 +728,17 @@ ul {
   color: var(--danger);
 }
 
+.breadcrumbs {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.breadcrumbs a {
+  text-decoration: none;
+}
+
 .thread-item {
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-md);
