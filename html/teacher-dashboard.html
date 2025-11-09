@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Dashboard | KiraKira</title>
+    <link rel="stylesheet" href="../css/style.css" /> 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        /* Simple styles for the dashboard list */
+        body { font-family: 'Inter', sans-serif; background: #f9f9f9; }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
+        .header { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .lesson-list {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 1.5rem 2rem;
+        }
+        .lesson-list h1 { margin-top: 0; }
+        .lesson-group { margin-bottom: 2rem; }
+        .lesson-group h2 {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 0.5rem;
+        }
+        .lesson-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .lesson-item:last-child { border-bottom: none; }
+        .lesson-item span { font-weight: 500; color: #333; }
+        .btn-edit {
+            text-decoration: none;
+            background-color: #4e54c8;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .btn-edit:hover { background-color: #3b409a; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="container nav-container">
+            <a href="home.html" class="brand-logo">KiraKira</a>
+            <div class="nav-links">
+                <a href="teacher-dashboard.html">My Dashboard</a>
+                <a href="catalogue-classes.html">Catalogue</a>
+                <a href="logout.html">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="lesson-list">
+                <h1>Manage Lessons</h1>
+                
+                <div class="lesson-group">
+                    <h2>Form 4</h2>
+                    <div class="lesson-item">
+                        <span>Lesson 01: Functions</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-01" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 02: Number Bases</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-02" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 03: Logical Reasoning</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-03" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 04: Operations on Sets</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-04" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 05: Network in Graph Theory</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-05" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 06: Linear Inequalities</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-06" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 07: Graphs of Motion</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-07" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 08: Measures of Dispersion</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-08" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 09: Probability of Combined Events</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-09" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 10: Consumer Mathematics</span>
+                        <a href="teacher-lesson-edit.html?lesson=form4-10" class="btn-edit">Edit</a>
+                    </div>
+                </div>
+
+                <div class="lesson-group">
+                    <h2>Form 5</h2>
+                    <div class="lesson-item">
+                        <span>Lesson 01: Variation</span>
+                        <a href="teacher-lesson-edit.html?lesson=form5-01" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 02: Matrices</span>
+                        <a href="teacher-lesson-edit.html?lesson=form5-02" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 03: Consumer Mathematics</span>
+                        <a href="teacher-lesson-edit.html?lesson=form5-03" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 04: Taxation</span>
+                        <a href="teacher-lesson-edit.html?lesson=form5-04" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 05: Congruency, Enlargement</span>
+                        <a href="teacher-lesson-edit.html?lesson=form5-05" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 06: Ratios of Trigonometric</span>
+                        <a href="teacher-lesson-edit.html?lesson=form5-06" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 07: Plans and Elevations</span>
+                        <a href="teacher-lesson-edit.html?lesson=form5-07" class="btn-edit">Edit</a>
+                    </div>
+                    <div class="lesson-item">
+                        <span>Lesson 08: Loci in Two Dimensions</span>
+                        <a href="teacher-lesson-edit.html?lesson=form5-08" class="btn-edit">Edit</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

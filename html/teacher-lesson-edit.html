@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Lesson | KiraKira Teacher</title>
+    
+    <link rel="stylesheet" href="../css/style.css" /> 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+
+    <style>
+        /* --- Form & Editor Styles --- */
+        .editor-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            background: #fff; /* Assuming light theme default */
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .editor-form h2 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #444;
+        }
+        .form-group input[type="text"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box; /* Important for padding */
+        }
+        
+        /* Styles for the main lesson Quill Editors */
+        .form-group .editor-container {
+            height: 250px;
+            background: #fff;
+            color: #000;
+        }
+        
+        /* Styles for the MCQ editor */
+        .form-group .editor-container-mcq {
+            height: 120px; /* Shorter height for question/explanation */
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-danger {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-danger:hover {
+            background-color: #c9302c;
+        }
+
+        /* --- Quiz Management UI --- */
+        .quiz-manager-header {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        #addQuestionForm {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        #addQuestionForm h3 {
+            margin-top: 0;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .quiz-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .quiz-tab {
+            padding: 0.75rem 1.25rem;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .quiz-tab.active {
+            background: #fff;
+            border-bottom: 1px solid #fff;
+            color: #4e54c8; /* Example color from previous HTML */
+        }
+        
+        .quiz-question-management-list {
+            border: 1px solid #ccc;
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 8px;
+        }
+        
+        .admin-question-card {
+            background: #fdfdfd;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .admin-question-card:last-child {
+            margin-bottom: 0;
+        }
+        .admin-question-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Align top for long questions */
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* This div will render the HTML of the question */
+        .admin-question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            flex: 1; /* Allows text to wrap */
+        }
+        /* Fix for Quill paragraph margins */
+        .admin-question-text p, .explanation p {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .admin-question-card ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0.5rem 0;
+        }
+        .admin-question-card ul li {
+            padding: 0.25rem 0;
+            color: #555;
+        }
+        .admin-question-card ul li.correct {
+            font-weight: 700;
+            color: #2a8a48; /* Green for correct answer */
+        }
+        .admin-question-card .explanation {
+            font-style: italic;
+            color: #666;
+            border-top: 1px dashed #ccc;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .is-hidden {
+            display: none;
+        }
+    </style>
+
+</head>
+<body>
+    <header class="header">
+        <nav class="container nav-container">
+            <a href="home.html" class="brand-logo">KiraKira</a>
+            <div class="nav-links">
+                <a href="teacher-dashboard.html">My Dashboard</a>
+                <a href="catalogue-classes.html">Catalogue</a>
+                <a href="logout.html">Logout</a>
+                <div class="nav-cta">
+                    <div class="theme-switcher" role="group" aria-label="Theme selection">
+                        <button type="button" class="theme-button" data-theme-select="light">Day</button>
+                        <button type="button" class="theme-button" data-theme-select="dark">Night</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section lesson-hero">
+            <div class="container hero-container">
+                <p class="eyebrow" id="heroEyebrow">Loading...</p>
+                <h1 id="heroTitle">Loading...</h1>
+                <p class="subtitle">
+                    Manage the lesson details and quiz questions for this module.
+                </p>
+                <a class="btn btn-primary btn-large" href="teacher-dashboard.html">Back to Dashboard</a>
+            </div>
+        </section>
+
+        <section class="container lesson-overview">
+            <form id="lessonDetailsForm" class="editor-form">
+                <h2>Edit Lesson Content</h2>
+                
+                <div class="form-group">
+                    <label for="lessonOverviewEditor">Lesson Overview</label>
+                    <div id="lessonOverviewEditor" class="editor-container"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lessonConceptsEditor">Key Concepts / Conversions</label>
+                    <div id="lessonConceptsEditor" class="editor-container"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lessonSource">Source Citation</label>
+                    <input type="text" id="lessonSource" name="lessonSource" value="" />
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Lesson Details</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="quiz-section" id="quiz-manager">
+            <div class="container">
+                <div class="section-header quiz-manager-header">
+                    <p class="eyebrow">Quizzes</p>
+                    <h2 class="section-title">Manage Quiz Questions</h2>
+                    <p>Add or delete questions for Quiz A (Easy) and Quiz B (Hard).</p>
+                </div>
+
+                <form id="addQuestionForm">
+                    <h3>Add a New Question</h3>
+                    
+                    <div class="form-group">
+                        <label for="quizSelect">Add to which quiz?</label>
+                        <select id="quizSelect" name="quizSelect">
+                            <option value="quizA">Quiz A (Easy)</option>
+                            <option value="quizB">Quiz B (Hard)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="questionTextEditor">Question Text</label>
+                        <div id="questionTextEditor" class="editor-container-mcq"></div>
+                    </div>
+                    
+                    <div class="options-grid">
+                        <div class="form-group">
+                            <label for="option1">Option 1 (Plain Text)</label>
+                            <input type="text" id="option1" name="option1" />
+                        </div>
+                        <div class="form-group">
+                            <label for="option2">Option 2 (Plain Text)</label>
+                            <input type="text" id="option2" name="option2" />
+                        </div>
+                        <div class="form-group">
+                            <label for="option3">Option 3 (Plain Text)</label>
+                            <input type="text" id="option3" name="option3" />
+                        </div>
+                        <div class="form-group">
+                            <label for="option4">Option 4 (Plain Text)</label>
+                            <input type="text" id="option4" name="option4" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="correctAnswer">Correct Answer</label>
+                        <select id="correctAnswer" name="correctAnswer">
+                            <option value="1">Option 1</option>
+                            <option value="2">Option 2</option>
+                            <option value="3">Option 3</option>
+                            <option value="4">Option 4</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="explanationEditor">Answer Explanation</label>
+                        <div id="explanationEditor" class="editor-container-mcq"></div>
+                    </div>
+
+                    <div class="quiz-actions">
+                        <button id="addQuestionBtn" class="btn btn-primary" type="submit">Add Question</button>
+                    </div>
+                </form>
+
+                <h3 style="margin-top: 3rem;">Existing Questions</h3>
+                <div class="quiz-tabs" role="tablist">
+                    <button class="quiz-tab active" data-quiz="quizA" type="button">Quiz A</button>
+                    <button class="quiz-tab" data-quiz="quizB" type="button">Quiz B</button>
+                </div>
+
+                <div id="quizAList" class="quiz-question-management-list">
+                    </div>
+                <div id="quizBList" class="quiz-question-management-list is-hidden">
+                    </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <p>&copy; <span id="current-year"></span> KiraKira. Built in Malaysia for Malaysian learners.</p>
+            <p><a href="mailto:hello@kirakira.my">hello@kirakira.my</a></p>
+        </div>
+    </footer>
+
+    <script src="../js/theme.js"></script> <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    
+    <script>
+        // --- START OF DUMMY DATABASE ---
+        // In a real app, this data would come from your server.
+        const DUMMY_DATABASE = new Map();
+
+        // Data for Lesson: form4-01
+        DUMMY_DATABASE.set('form4-01', {
+            eyebrow: 'Form 4 - Module 01',
+            title: 'Functions',
+            overview: 'Learn about <strong>function notation</strong>, <em>composite functions</em>, and <u>inverse functions</u>. <ul><li>This is the foundation for all algebra.</li></ul>',
+            concepts: '<ul><li>Function notation f(x).</li><li>Composite functions fg(x).</li><li>Inverse functions f⁻¹(x).</li></ul>',
+            source: 'SPM KSSM Textbook, Form 4, Chapter 1.',
+            quizzes: {
+                quizA: [
+                    { id: 'q1a', text: '<p>If f(x) = 2x + 1, find f(3).</p>', options: ['5', '6', '7', '8'], correct: 3, explanation: '<p>f(3) = 2(3) + 1 = 6 + 1 = 7.</p>' }
+                ],
+                quizB: []
+            }
+        });
+
+        // Data for Lesson: form4-02
+        DUMMY_DATABASE.set('form4-02', {
+            eyebrow: 'Form 4 - Module 02',
+            title: 'Number Bases & Conversions',
+            overview: '<p>A number base tells you which digits are allowed and how each place represents powers of that base...</p>',
+            concepts: '<ul><li>Base b to base 10: Expand using place value.</li><li>Base 10 to base b: Use repeated division.</li></ul>',
+            source: 'Pandai Chapter 2, Number Bases.',
+            quizzes: {
+                quizA: [
+                    { id: 'q2a', text: '<p>What is the place value of the digit \'2\' in <strong>213<sub>8</sub></strong>?</p>', options: ['8⁰', '8²', '8¹', '10²'], correct: 2, explanation: '<p>The \'2\' is in the 3rd position, which corresponds to <strong>8<sup>2</sup></strong>.</p>' },
+                    { id: 'q2b', text: '<p>Convert <strong>1101<sub>2</sub></strong> to base 10.</p>', options: ['11', '12', '13', '14'], correct: 3, explanation: '<p>(1×2³) + (1×2²) + (0×2¹) + (1×2⁰) = 8 + 4 + 0 + 1 = 13.</p>' }
+                ],
+                quizB: [
+                    { id: 'q2c', text: '<p>Calculate <strong>101<sub>2</sub> + 11<sub>2</sub></strong>.</p>', options: ['1000₂', '1010₂', '1100₂', '1111₂'], correct: 1, explanation: '<p>101 + 11 = 1000 in binary addition.</p>' }
+                ]
+            }
+        });
+        
+        // --- Add ALL OTHER LESSONS as empty stubs ---
+        // This ensures the page won't crash if you click an "empty" lesson.
+        const allLessonIds = [
+            'form4-03', 'form4-04', 'form4-05', 'form4-06', 'form4-07', 'form4-08', 'form4-09', 'form4-10',
+            'form5-01', 'form5-02', 'form5-03', 'form5-04', 'form5-05', 'form5-06', 'form5-07', 'form5-08'
+        ];
+        
+        allLessonIds.forEach((id, index) => {
+            const form = id.substring(0, 6) === 'form4-' ? '4' : '5';
+            const lessonNum = parseInt(id.split('-')[1]);
+            
+            if (!DUMMY_DATABASE.has(id)) {
+                DUMMY_DATABASE.set(id, {
+                    eyebrow: `Form ${form} - Module ${lessonNum < 10 ? '0' : ''}${lessonNum}`,
+                    title: `Lesson ${lessonNum} Title (Not Set)`,
+                    overview: '<p>No content has been added for this lesson yet.</p>',
+                    concepts: '<ul><li>Click "Save Lesson Details" to create this lesson.</li></ul>',
+                    source: '',
+                    quizzes: { quizA: [], quizB: [] }
+                });
+            }
+        });
+        // --- END OF DUMMY DATABASE ---
+
+
+        // --- GLOBAL VARIABLES ---
+        let currentLessonId = null;
+        let currentLessonData = null;
+        
+        // Quill Editor Variables
+        let overviewEditor, conceptsEditor, questionTextEditor, explanationEditor;
+        
+        // Toolbar options for math (bold, italic, sub, super)
+        const mathToolbarOptions = [
+            ['bold', 'italic', 'underline'],
+            ['link'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'script': 'sub'}, { 'script': 'super' }], // For subscript and superscript
+            ['clean'] // To remove formatting
+        ];
+
+
+        // --- CORE FUNCTIONS ---
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Get lesson ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            currentLessonId = urlParams.get('lesson');
+
+            if (!currentLessonId) {
+                alert('No lesson specified. Redirecting to dashboard.');
+                window.location.href = 'teacher-dashboard.html';
+                return;
+            }
+
+            // 2. Fetch data from our "database"
+            currentLessonData = DUMMY_DATABASE.get(currentLessonId);
+
+            if (!currentLessonData) {
+                alert(`Lesson "${currentLessonId}" not found. Redirecting.`);
+                window.location.href = 'teacher-dashboard.html';
+                return;
+            }
+
+            // 3. Initialize Quill Editors
+            overviewEditor = new Quill('#lessonOverviewEditor', {
+                theme: 'snow',
+                modules: { toolbar: mathToolbarOptions }
+            });
+            conceptsEditor = new Quill('#lessonConceptsEditor', {
+                theme: 'snow',
+                modules: { toolbar: mathToolbarOptions }
+            });
+            questionTextEditor = new Quill('#questionTextEditor', {
+                theme: 'snow',
+                modules: { toolbar: mathToolbarOptions },
+                placeholder: 'e.g., What is 1011₂ in base 10?'
+            });
+            explanationEditor = new Quill('#explanationEditor', {
+                theme: 'snow',
+                modules: { toolbar: mathToolbarOptions },
+                placeholder: 'Explain why the answer is correct...'
+            });
+
+
+            // 4. Populate page with data
+            loadLessonContent();
+            renderAllQuizLists();
+            
+            // 5. Set up footer year
+            document.getElementById("current-year").textContent = new Date().getFullYear();
+        });
+
+        /**
+         * Fills the hero, editors, and inputs with the loaded lesson data.
+         */
+        function loadLessonContent() {
+            document.getElementById('heroEyebrow').textContent = currentLessonData.eyebrow;
+            document.getElementById('heroTitle').textContent = currentLessonData.title;
+            
+            overviewEditor.root.innerHTML = currentLessonData.overview;
+            conceptsEditor.root.innerHTML = currentLessonData.concepts;
+            document.getElementById('lessonSource').value = currentLessonData.source;
+        }
+
+        /**
+        * Generates the HTML for all questions in both quiz lists.
+        */
+        function renderAllQuizLists() {
+            const quizAList = document.getElementById('quizAList');
+            const quizBList = document.getElementById('quizBList');
+
+            quizAList.innerHTML = '';
+            quizBList.innerHTML = '';
+
+            if (currentLessonData.quizzes.quizA) {
+                currentLessonData.quizzes.quizA.forEach(q => {
+                    quizAList.appendChild(createQuestionCard(q));
+                });
+            }
+            if (currentLessonData.quizzes.quizB) {
+                currentLessonData.quizzes.quizB.forEach(q => {
+                    quizBList.appendChild(createQuestionCard(q));
+                });
+            }
+        }
+
+        /**
+         * Helper function to create a single question card element.
+         * @param {object} question - The question data object.
+         */
+        function createQuestionCard(question) {
+            const card = document.createElement('article');
+            card.className = 'admin-question-card';
+            card.setAttribute('data-question-id', question.id);
+
+            let optionsHtml = '';
+            question.options.forEach((opt, index) => {
+                const isCorrect = (index + 1) === question.correct;
+                // Escape HTML in options to prevent rendering issues
+                const safeOpt = opt.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                optionsHtml += `<li class="${isCorrect ? 'correct' : ''}">${safeOpt}</li>`;
+            });
+
+            card.innerHTML = `
+                <div class="admin-question-card-header">
+                    <div class="admin-question-text">${question.text}</div>
+                    <button class="btn btn-danger" type="button" onclick="deleteQuestion('${question.id}')">Delete</button>
+                </div>
+                <ul>${optionsHtml}</ul>
+                <div class="explanation">${question.explanation}</div>
+            `;
+            return card;
+        }
+
+        /**
+         * Deletes a question from the 'currentLessonData' and re-renders the lists.
+         * @param {string} questionId - The ID of the question to delete.
+         */
+        function deleteQuestion(questionId) {
+            if (!confirm('Are you sure you want to delete this question?')) {
+                return;
+            }
+
+            // Find and remove from Quiz A
+            let indexA = currentLessonData.quizzes.quizA.findIndex(q => q.id === questionId);
+            if (indexA > -1) {
+                currentLessonData.quizzes.quizA.splice(indexA, 1);
+            }
+
+            // Find and remove from Quiz B
+            let indexB = currentLessonData.quizzes.quizB.findIndex(q => q.id === questionId);
+            if (indexB > -1) {
+                currentLessonData.quizzes.quizB.splice(indexB, 1);
+            }
+
+            // In a real app, you'd send this to the server
+            // DUMMY_DATABASE.set(currentLessonId, currentLessonData);
+
+            alert(`Question deleted (Demo)! This change will NOT be saved permanently.`);
+            renderAllQuizLists(); // Re-render the UI
+        }
+        
+        // --- EVENT LISTENERS for FORMS ---
+
+        // Save Lesson Details
+        document.getElementById('lessonDetailsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // 1. Get new data from forms
+            currentLessonData.overview = overviewEditor.root.innerHTML;
+            currentLessonData.concepts = conceptsEditor.root.innerHTML;
+            currentLessonData.source = document.getElementById('lessonSource').value;
+
+            // 2. Update the "database"
+            DUMMY_DATABASE.set(currentLessonId, currentLessonData);
+
+            // In a real app, you'd send this to the server.
+            console.log("Saved Data:", currentLessonData);
+            alert(`Lesson "${currentLessonId}" saved successfully! (Demo)`);
+        });
+
+        // Add New Question
+        document.getElementById('addQuestionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const form = e.target;
+            
+            // 1. Get new question data
+            const quizSelect = form.querySelector('#quizSelect').value; // 'quizA' or 'quizB'
+            
+            const newQuestion = {
+                id: 'q' + Math.random().toString(36).substr(2, 9), // Random ID
+                text: questionTextEditor.root.innerHTML,
+                explanation: explanationEditor.root.innerHTML,
+                options: [
+                    form.querySelector('#option1').value,
+                    form.querySelector('#option2').value,
+                    form.querySelector('#option3').value,
+                    form.querySelector('#option4').value
+                ],
+                correct: parseInt(form.querySelector('#correctAnswer').value)
+            };
+
+            // 2. Add to the correct quiz list in our data
+            currentLessonData.quizzes[quizSelect].push(newQuestion);
+            // In a real app, you'd save this to the server
+            // DUMMY_DATABASE.set(currentLessonId, currentLessonData);
+            
+            alert(`New question added to ${quizSelect}! (Demo)`);
+            
+            // 3. Clear the form
+            form.reset(); // Resets all <input> fields
+            questionTextEditor.setText('');
+            explanationEditor.setText('');
+            
+            // 4. Re-render the UI to show the new question
+            renderAllQuizLists();
+        });
+
+
+        // --- Tab Switching Logic ---
+        document.querySelectorAll('.quiz-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetQuiz = tab.dataset.quiz;
+                document.querySelectorAll('.quiz-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.getElementById('quizAList').classList.toggle('is-hidden', targetQuiz !== 'quizA');
+                document.getElementById('quizBList').classList.toggle('is-hidden', targetQuiz !== 'quizB');
+            });
+        });
+
+    </script>
+</body>
+</html>
