@@ -3,6 +3,7 @@ const switchToSignIn = document.getElementById('switchToSignIn');
 const signUpCard = document.querySelector('.sign-up-card');
 const signInCard = document.querySelector('.sign-in-card');
 const signupForm = document.getElementById('signupForm');
+const forgotLink = document.querySelector('.forgot-link');
 
 switchToSignUp.addEventListener('click', (e) => {
 	e.preventDefault();
@@ -92,6 +93,29 @@ signinForm.addEventListener('submit', async (e) => {
 		}
 	} catch (error) {
 		console.error('Login error:', error);
+		alert('Error: ' + error.message);
+	}
+});
+
+forgotLink.addEventListener('click', async (e) => {
+	e.preventDefault();
+	const email = prompt('Enter your email address:');
+	if (!email) return;
+	
+	try {
+		const response = await fetch('/api/passwordreset/request', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email })
+		});
+		
+		const result = await response.json();
+		if (result.success) {
+			alert('Password reset request submitted. Admin will review your request.');
+		} else {
+			alert(result.message || 'Failed to submit request');
+		}
+	} catch (error) {
 		alert('Error: ' + error.message);
 	}
 });
