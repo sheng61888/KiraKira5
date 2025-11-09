@@ -1,4 +1,18 @@
 (() => {
+  const learnerId = sessionStorage.getItem("currentLearnerId");
+  const onboarding = localStorage.getItem("kiraOnboarding");
+
+  if (!onboarding) {
+    // first-time user: redirect to onboarding page
+    window.location.href = "learner-onboarding.html";
+    return;
+  }
+
+  // optional: preload their grade/confidence into the dashboard
+  window.kiraOnboardingData = JSON.parse(onboarding);
+})();
+
+(() => {
   const selectors = {
     profileName: ".profile .username",
     profileStreak: ".profile .streak",

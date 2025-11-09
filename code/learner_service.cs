@@ -17,6 +17,8 @@ public interface ILearnerService
     Task<LearnerClassesDto> JoinClassAsync(string learnerId, string classCode);
     Task<LearnerPastPapersDto> GetPastPapersAsync(string learnerId, string year, string type, string topic);
     Task<LearnerProfilePayload> GetProfileAsync(string learnerId);
+    Task<LearnerProfileDto> UpdateAvatarAsync(string learnerId, string avatarUrl);
+    Task<LearnerProfilePayload> UpdateProfileDetailsAsync(string learnerId, ProfileDetailsUpdateRequest request);
 }
 
 /// <summary>
@@ -26,6 +28,23 @@ public class LearnerService : ILearnerService
 {
     private readonly IConfiguration _configuration;
     private readonly string _connectionString;
+    private const string DefaultAvatar = "/images/profile-cat.jpg";
+    private static readonly HashSet<string> AllowedAvatars = new(StringComparer.OrdinalIgnoreCase)
+    {
+        DefaultAvatar,
+        "/images/pfp/pfp 1.png",
+        "/images/pfp/pfp 2.png",
+        "/images/pfp/pfp 3.png",
+        "/images/pfp/pfp 4.png",
+        "/images/pfp/pfp 5.png",
+        "/images/pfp/pfp 6.png",
+        "/images/pfp/pfp 1.jpg",
+        "/images/pfp/pfp 2.jpg",
+        "/images/pfp/pfp 3.jpg",
+        "/images/pfp/pfp 4.jpg",
+        "/images/pfp/pfp 5.jpg",
+        "/images/pfp/pfp 6.jpg"
+    };
 
     public LearnerService(IConfiguration configuration)
     {
@@ -184,6 +203,37 @@ public class LearnerService : ILearnerService
         };
     }
 
+    public async Task<LearnerProfileDto> UpdateAvatarAsync(string learnerId, string avatarUrl)
+    {
+        var normalized = NormalizeAvatarPath(avatarUrl);
+        await SaveAvatarAsync(learnerId, normalized);
+        var record = await FetchLearnerAsync(learnerId);
+        var profile = await FetchProfileDtoAsync(learnerId, record);
+        profile.AvatarUrl = normalized;
+        return profile;
+    }
+
+    public async Task<LearnerProfilePayload> UpdateProfileDetailsAsync(string learnerId, ProfileDetailsUpdateRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(learnerId) || request == null)
+        {
+            return await GetProfileAsync(learnerId);
+        }
+
+        var record = await FetchLearnerAsync(learnerId);
+        var profile = await FetchProfileDtoAsync(learnerId, record);
+
+        var updatedName = CoalesceProfileValue(request.Name, profile.Name);
+        var updatedSchool = CoalesceProfileValue(request.School, profile.School);
+        var updatedYear = CoalesceProfileValue(request.Year, profile.GradeYear);
+        var updatedMotto = CoalesceProfileValue(request.Motto, profile.Motto);
+
+        await SaveProfileFieldsAsync(learnerId, updatedName, updatedSchool, updatedYear, updatedMotto);
+        await UpdateLearnerAccountAsync(learnerId, request.Name, request.Email);
+
+        return await GetProfileAsync(learnerId);
+    }
+
     private static LearnerBadgeStatsDto SampleBadgeStats()
     {
         return new LearnerBadgeStatsDto
@@ -327,6 +377,7 @@ public class LearnerService : ILearnerService
             Console.WriteLine($"[LearnerService] Failed to load learner_profile for {learnerId}: {ex.Message}");
         }
 
+        profile.AvatarUrl = NormalizeAvatarPath(profile.AvatarUrl);
         return profile;
     }
 
@@ -336,13 +387,134 @@ public class LearnerService : ILearnerService
         {
             LearnerId = record?.LearnerId ?? learnerId,
             Name = record?.Name ?? record?.Username ?? "Learner",
-            AvatarUrl = "/images/profile-cat.png",
+            AvatarUrl = DefaultAvatar,
             Motto = "Learning one formula at a time.",
             Level = 1,
             Xp = 0,
             School = string.Empty,
             GradeYear = string.Empty
         };
+    }
+
+    private static string NormalizeAvatarPath(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return DefaultAvatar;
+        }
+
+        var trimmed = value.Trim();
+        trimmed = trimmed.StartsWith("/") ? trimmed : "/" + trimmed.TrimStart('/');
+        return AllowedAvatars.Contains(trimmed) ? trimmed : DefaultAvatar;
+    }
+
+    private static string CoalesceProfileValue(string? candidate, string fallback)
+    {
+        if (!string.IsNullOrWhiteSpace(candidate))
+        {
+            return candidate.Trim();
+        }
+
+        return string.IsNullOrWhiteSpace(fallback) ? string.Empty : fallback;
+    }
+
+    private async Task SaveProfileFieldsAsync(string learnerId, string fullName, string school, string gradeYear, string motto)
+    {
+        const string sql = @"INSERT INTO learner_profile (uid, full_name, school, grade_year, motto)
+                             VALUES (@Uid, @FullName, @School, @GradeYear, @Motto)
+                             ON DUPLICATE KEY UPDATE full_name = @FullName, school = @School, grade_year = @GradeYear, motto = @Motto";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@FullName", fullName ?? string.Empty);
+            command.Parameters.AddWithValue("@School", school ?? string.Empty);
+            command.Parameters.AddWithValue("@GradeYear", gradeYear ?? string.Empty);
+            command.Parameters.AddWithValue("@Motto", motto ?? string.Empty);
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to save profile fields for {learnerId}: {ex.Message}");
+        }
+    }
+
+    private async Task UpdateLearnerAccountAsync(string learnerId, string? name, string? email)
+    {
+        var updates = new List<string>();
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            updates.Add("name = @Name");
+        }
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            updates.Add("email = @Email");
+        }
+
+        if (!updates.Any())
+        {
+            return;
+        }
+
+        var sql = $"UPDATE usertable SET {string.Join(", ", updates)} WHERE uid = @Uid";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                command.Parameters.AddWithValue("@Name", name.Trim());
+            }
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                command.Parameters.AddWithValue("@Email", email.Trim());
+            }
+
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to update learner account for {learnerId}: {ex.Message}");
+        }
+    }
+
+    private async Task SaveAvatarAsync(string learnerId, string avatarUrl)
+    {
+        const string sql = @"INSERT INTO learner_profile (uid, avatar_url)
+                             VALUES (@Uid, @AvatarUrl)
+                             ON DUPLICATE KEY UPDATE avatar_url = @AvatarUrl";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@AvatarUrl", avatarUrl);
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to save avatar for {learnerId}: {ex.Message}");
+        }
     }
 
     private static int SafeToInt(object? value, int fallback)

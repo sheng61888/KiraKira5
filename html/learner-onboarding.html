@@ -82,32 +82,32 @@
 
           <section class="card video-pref">
             <div class="section-head">
-              <h2>Intro support</h2>
+              <h2>Optional rescue videos</h2>
               <span class="chip chip--info" id="videoAccessChip">Optional</span>
             </div>
-            <p class="muted">When you’re feeling lost, we can queue short “start here” videos from our tutors.</p>
+            <p class="muted">Flip this on to include introductory clips inside whichever modules you unlock.</p>
             <label class="toggle">
               <input type="checkbox" id="videoToggle" checked>
               <span class="toggle-pill" aria-hidden="true"></span>
-              <span class="toggle-label">Send me extra-help intros when I’m below 50% confidence</span>
+              <span class="toggle-label">Send me extra-help intros!</span>
             </label>
 
             <div class="video-recommendations" id="videoRecommendations">
               <article class="video-card">
                 <div>
-                  <p class="eyebrow">Algebra SOS</p>
-                  <h3>Quadratic Crash Course</h3>
-                  <p class="muted">10 mins · Coach Aishah · Watch before your next drill.</p>
+                  <p class="eyebrow">Algebra rescue</p>
+                  <h3>Parabola warm-up</h3>
+                  <p class="muted">10 mins &middot; Appears inside Quadratics before the first drill.</p>
                 </div>
-                <button type="button" class="btn btn--ghost" disabled>Coming soon</button>
+                <button type="button" class="btn btn--ghost" disabled>Queued</button>
               </article>
               <article class="video-card">
                 <div>
                   <p class="eyebrow">Form 5 focus</p>
-                  <h3>Trigonometry Sketch Guide</h3>
-                  <p class="muted">8 mins · Coach Daniel · Unlocks after basics.</p>
+                  <h3>Circle theorems recap</h3>
+                  <p class="muted">8 mins &middot; Unlocks once you toggle Form 5 revision.</p>
                 </div>
-                <button type="button" class="btn btn--ghost" disabled>Coming soon</button>
+                <button type="button" class="btn btn--ghost" disabled>Queued</button>
               </article>
             </div>
           </section>
@@ -124,7 +124,7 @@
     </main>
   </div>
 
-  <script src="../js/modules-data.js"></script>
+    <script src="../js/modules-data.js"></script>
   <script>
     const form = document.getElementById("onboardingForm");
     const readinessRange = document.getElementById("readinessRange");
@@ -137,12 +137,12 @@
 
     const readinessMessages = value => {
       if (value >= 80) {
-        return "Legend! We’ll push mastery quizzes and speed drills.";
+        return "Legend! We'll push mastery quizzes and speed drills.";
       }
       if (value >= 50) {
-        return "Solid work—let’s balance revision with tricky problem sets.";
+        return "Solid work - let's balance revision with tricky problem sets.";
       }
-      return "We’ve got your back — let’s prioritise Algebra rescue drills.";
+      return "We've got your back - let's prioritise Algebra rescue drills.";
     };
 
     const updateSummary = () => {
@@ -152,26 +152,23 @@
       readinessScore.textContent = `${confidence}%`;
       readinessMood.textContent = readinessMessages(confidence);
 
-      let summary = `We’ll prep ${grade} modules`;
+      let summary = `We'll prep ${grade} modules`;
+      let chipState = "Optional";
       if (confidence < 50) {
         summary += " + extra rescue drills.";
-        videoRecommendations.hidden = false;
-        videoAccessChip.textContent = "Recommended";
+        chipState = "Recommended";
+        videoRecommendations.hidden = !videoToggle.checked;
       } else {
         summary += " with standard practice.";
-        if (!videoToggle.checked) {
-          videoRecommendations.hidden = true;
-        } else {
-          videoRecommendations.hidden = confidence >= 70;
-        }
-        videoAccessChip.textContent = videoToggle.checked ? "Optional" : "Off";
+        videoRecommendations.hidden = !videoToggle.checked || confidence >= 70;
       }
 
       if (!videoToggle.checked) {
+        chipState = "Off";
         videoRecommendations.hidden = true;
-        videoAccessChip.textContent = "Off";
       }
 
+      videoAccessChip.textContent = chipState;
       summaryLine.textContent = summary;
     };
 
@@ -192,7 +189,7 @@
         wantsVideos: videoToggle.checked
       };
       localStorage.setItem("kiraOnboarding", JSON.stringify(payload));
-      summaryLine.textContent = "Saved! Redirecting you to the dashboard…";
+      summaryLine.textContent = "Saved! Redirecting you to the dashboard...";
       setTimeout(() => {
         window.location.href = "learner-home.html";
       }, 1200);
@@ -200,5 +197,6 @@
 
     updateSummary();
   </script>
+
 </body>
 </html>

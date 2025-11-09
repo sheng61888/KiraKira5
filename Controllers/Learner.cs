@@ -61,9 +61,47 @@ public class LearnerController : ControllerBase
         var data = await _learnerService.GetProfileAsync(learnerId);
         return Ok(data);
     }
+
+    [HttpPost("{learnerId}/profile/avatar")]
+    public async Task<IActionResult> UpdateAvatar(string learnerId, [FromBody] AvatarUpdateRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.AvatarUrl))
+        {
+            return BadRequest(new { error = "avatarUrl is required." });
+        }
+
+        var profile = await _learnerService.UpdateAvatarAsync(learnerId, request.AvatarUrl);
+        return Ok(profile);
+    }
+
+    [HttpPost("{learnerId}/profile/details")]
+    public async Task<IActionResult> UpdateProfileDetails(string learnerId, [FromBody] ProfileDetailsUpdateRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new { error = "Profile details payload is required." });
+        }
+
+        var payload = await _learnerService.UpdateProfileDetailsAsync(learnerId, request);
+        return Ok(payload);
+    }
 }
 
 public class JoinClassRequest
 {
     public string Code { get; set; } = string.Empty;
+}
+
+public class AvatarUpdateRequest
+{
+    public string AvatarUrl { get; set; } = string.Empty;
+}
+
+public class ProfileDetailsUpdateRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Motto { get; set; } = string.Empty;
+    public string School { get; set; } = string.Empty;
+    public string Year { get; set; } = string.Empty;
 }

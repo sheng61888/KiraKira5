@@ -1,10 +1,12 @@
 (() => {
+  const DEFAULT_AVATAR = "/images/profile-cat.png";
   const selectors = {
     username: ".profile .username",
     streak: ".profile .streak",
     levelLabel: ".profile small",
     xpBar: ".profile .xp-bar span",
-    heroName: "#username"
+    heroName: "#username",
+    avatar: ".profile .avatar"
   };
 
   const getEl = selector => document.querySelector(selector);
@@ -25,9 +27,24 @@
     bar.style.width = `${percent}%`;
   };
 
+  const setAvatarImage = avatarUrl => {
+    const avatar = getEl(selectors.avatar);
+    if (!avatar) {
+      return;
+    }
+    const source = typeof avatarUrl === "string" && avatarUrl.trim().length
+      ? avatarUrl.trim()
+      : DEFAULT_AVATAR;
+    avatar.style.backgroundImage = `url('${source}')`;
+    avatar.style.backgroundSize = "cover";
+    avatar.style.backgroundPosition = "center";
+    avatar.style.backgroundColor = "transparent";
+  };
+
   const updateSidebar = (profile, streak) => {
     const name = profile?.name?.trim() || "Learner";
     setText(selectors.username, name);
+    setAvatarImage(profile?.avatarUrl);
 
     const hero = getEl(selectors.heroName);
     if (hero && (!hero.dataset.locked || hero.dataset.locked !== "true")) {

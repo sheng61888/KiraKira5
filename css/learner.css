@@ -309,6 +309,11 @@ ul {
   transition: var(--transition);
 }
 
+.btn--sm {
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+}
+
 .btn--primary {
   background: linear-gradient(120deg, var(--accent), var(--text2));
   color: #0c0f1c;
@@ -1308,6 +1313,74 @@ ul {
   border: 3px solid rgba(255, 255, 255, 0.1);
 }
 
+.motto-editor {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  width: 100%;
+}
+
+.motto-editor input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.motto-editor input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.avatar-picker .avatar-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.avatar-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.avatar-option img {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 24px rgba(12, 15, 28, 0.35);
+}
+
+.avatar-option span {
+  font-size: 0.9rem;
+}
+
+.avatar-option:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.avatar-option--selected {
+  border-color: var(--accent);
+  background: rgba(255, 214, 107, 0.1);
+  box-shadow: 0 12px 24px rgba(255, 214, 107, 0.25);
+}
+
 .xp-summary {
   display: flex;
   gap: 0.8rem;
@@ -1329,6 +1402,11 @@ ul {
   gap: 1rem;
 }
 
+.info-form.is-editing input {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -1346,6 +1424,24 @@ ul {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(173, 143, 240, 0.35);
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.form-actions[hidden] {
+  display: none;
 }
 
 .achievements h2 {

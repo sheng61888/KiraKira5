@@ -43,14 +43,14 @@
           <p>Review your info, track badges, and control reminders as soon as we load them.</p>
         </div>
         <div class="heading-actions">
-          <button class="btn btn--ghost" type="button">Edit motto</button>
+          <button class="btn btn--ghost" type="button" id="editMottoBtn">Edit motto</button>
           <button class="btn btn--primary" type="button">Update photo</button>
         </div>
       </header>
 
       <section class="profile-summary card">
         <div class="profile-card">
-          <img src="images/profile-cat.png" alt="Illustrated profile avatar" class="profile-img">
+          <img src="/images/profile-cat.png" alt="Illustrated profile avatar" class="profile-img">
           <h2 aria-live="polite">Learner</h2>
           <p>We will display your motto once it loads.</p>
           <div class="xp-summary">
@@ -62,12 +62,50 @@
         </div>
       </section>
 
+      <section class="card avatar-picker">
+        <div class="section-head">
+          <h2>Choose your avatar</h2>
+          <span class="chip chip--info" data-avatar-status>Auto-saves</span>
+        </div>
+        <p class="muted">Pick the cat that feels most like you. We will show it everywhere once you save.</p>
+        <div class="avatar-options" data-avatar-options>
+          <button class="avatar-option avatar-option--selected" type="button" data-avatar-option data-avatar="/images/profile-cat.jpg" aria-pressed="true">
+            <img src="/images/profile-cat.jpg" alt="Default cat avatar">
+            <span>Classic cat</span>
+          </button>
+          <button class="avatar-option" type="button" data-avatar-option data-avatar="/images/pfp/pfp 1.jpg" aria-pressed="false">
+            <img src="/images/pfp/pfp 1.jpg" alt="Avatar option 1">
+            <span>Crazy cat</span>
+          </button>
+          <button class="avatar-option" type="button" data-avatar-option data-avatar="/images/pfp/pfp 2.jpg" aria-pressed="false">
+            <img src="/images/pfp/pfp 2.jpg" alt="Avatar option 2">
+            <span>Delusional cat</span>
+          </button>
+          <button class="avatar-option" type="button" data-avatar-option data-avatar="/images/pfp/pfp 3.jpg" aria-pressed="false">
+            <img src="/images/pfp/pfp 3.jpg" alt="Avatar option 3">
+            <span>Enlightenment cat</span>
+          </button>
+          <button class="avatar-option" type="button" data-avatar-option data-avatar="/images/pfp/pfp 4.jpg" aria-pressed="false">
+            <img src="/images/pfp/pfp 4.jpg" alt="Avatar option 4">
+            <span>Cool cat</span>
+          </button>
+          <button class="avatar-option" type="button" data-avatar-option data-avatar="/images/pfp/pfp 5.jpg" aria-pressed="false">
+            <img src="/images/pfp/pfp 5.jpg" alt="Avatar option 5">
+            <span>Musical cat</span>
+          </button>
+          <button class="avatar-option" type="button" data-avatar-option data-avatar="/images/pfp/pfp 6.jpg" aria-pressed="false">
+            <img src="/images/pfp/pfp 6.jpg" alt="Avatar option 6">
+            <span>Confused cat</span>
+          </button>
+        </div>
+      </section>
+
       <section class="card personal-info">
         <div class="section-head">
           <h2>Personal information</h2>
-          <button class="btn btn--ghost" type="button">Edit</button>
+          <button class="btn btn--ghost" type="button" id="editInfoBtn">Edit</button>
         </div>
-        <form class="info-form">
+        <form class="info-form" id="personalInfoForm">
           <div class="form-group">
             <label for="name">Full Name</label>
             <input id="name" type="text" value="" placeholder="Loading..." readonly>
@@ -86,6 +124,11 @@
           <div class="form-group">
             <label for="year">Year</label>
             <input id="year" type="text" value="" placeholder="Loading..." readonly>
+          </div>
+
+          <div class="form-actions" data-info-actions hidden>
+            <button type="button" class="btn btn--ghost" data-info-cancel>Cancel</button>
+            <button type="submit" class="btn btn--primary" data-info-save>Save</button>
           </div>
         </form>
       </section>
@@ -126,5 +169,4 @@
   <script src="../js/learner-profile-page.js"></script>
 </body>
 </html>
-
 
