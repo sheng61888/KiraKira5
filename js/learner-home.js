@@ -47,11 +47,14 @@
   };
 
   const updateProfile = (profile, streak) => {
+    const userName = sessionStorage.getItem("userName") || "Learner";
     if (!profile) {
+      setText(selectors.profileName, userName);
+      setText(selectors.heroName, userName);
       return;
     }
-    setText(selectors.profileName, profile.name || "Learner");
-    setText(selectors.heroName, profile.name || "Learner");
+    setText(selectors.profileName, profile.name || userName);
+    setText(selectors.heroName, profile.name || userName);
     const streakLabel = streak
       ? streak.status || (streak.current ? `${streak.current}-day streak` : "Ready to study")
       : "Ready to study";

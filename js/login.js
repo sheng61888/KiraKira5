@@ -25,7 +25,7 @@ signupForm.addEventListener('submit', async (e) => {
 	const formData = new FormData(e.target);
 	const userData = {
 		username: formData.get('username'),
-		name: formData.get('username'),
+		name: formData.get('name'),
 		email: formData.get('email'),
 		password: formData.get('password'),
 		usertype: formData.get('role')
@@ -78,12 +78,14 @@ signinForm.addEventListener('submit', async (e) => {
 		if (result.success) {
 			const userRole = result.user.role || result.user.Role;
 			const userName = result.user.name || result.user.Name;
+			const userId = result.user.id || result.user.Id;
 			console.log('Login successful, user role:', userRole);
 			sessionStorage.setItem('userName', userName);
+			sessionStorage.setItem('currentLearnerId', userId);
 			if (userRole === 'admin') {
 				window.location.href = 'admin-dashboard.html';
 			} else if (userRole === 'learner') {
-				window.location.href = 'learner-dashboard.html';
+				window.location.href = 'learner-home.html';
 			} else if (userRole === 'teacher') {
 				window.location.href = 'teacher-dashboard.html';
 			}

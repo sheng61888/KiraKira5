@@ -87,7 +87,14 @@ public class UserManagement
                     command.Parameters.AddWithValue("@Password", password);
                     command.Parameters.AddWithValue("@Usertype", usertype);
                     
-                    return command.ExecuteNonQuery() > 0;
+                    bool success = command.ExecuteNonQuery() > 0;
+                    
+                    if (success && usertype.ToLower() == "learner")
+                    {
+                        LearnerInitialization.InitializeNewLearnerAsync(uid, connectionString).Wait();
+                    }
+                    
+                    return success;
                 }
             }
         }
