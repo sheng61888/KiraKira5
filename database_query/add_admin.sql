@@ -1,0 +1,2 @@
+SELECT *
+FROM usertable LIMIT 100;
