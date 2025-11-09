@@ -1,11 +1,16 @@
-﻿const signUpButton = document.getElementById('signUp');
-const signInButton = document.getElementById('signIn');
-const container = document.getElementById('container');
+﻿const switchToSignUp = document.getElementById('switchToSignUp');
+const switchToSignIn = document.getElementById('switchToSignIn');
+const signUpCard = document.querySelector('.sign-up-card');
+const signInCard = document.querySelector('.sign-in-card');
 
-signUpButton.addEventListener('click', () => {
-	container.classList.add("right-panel-active");
+switchToSignUp.addEventListener('click', (e) => {
+	e.preventDefault();
+	signInCard.classList.remove('active');
+	signUpCard.classList.add('active');
 });
 
-signInButton.addEventListener('click', () => {
-	container.classList.remove("right-panel-active");
+switchToSignIn.addEventListener('click', (e) => {
+	e.preventDefault();
+	signUpCard.classList.remove('active');
+	signInCard.classList.add('active');
 });
