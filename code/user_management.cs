@@ -19,6 +19,50 @@ public class UserManagement
     }
     
     /// <summary>
+    /// Authenticates user login
+    /// </summary>
+    public static User Login(string email, string password)
+    {
+        string connectionString = _configuration.GetConnectionString("KiraKiraDB");
+        
+        try
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                string query = "SELECT uid, username, name, email, usertype FROM usertable WHERE email = @Email AND password = @Password";
+                
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Email", email);
+                    command.Parameters.AddWithValue("@Password", password);
+                    
+                    connection.Open();
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new User
+                            {
+                                Id = reader["uid"].ToString(),
+                                Username = reader["username"].ToString(),
+                                Name = reader["name"].ToString(),
+                                Email = reader["email"].ToString(),
+                                Role = reader["usertype"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during login: {ex.Message}");
+        }
+        
+        return null;
+    }
+    
+    /// <summary>
     /// Adds a new user to the database
     /// </summary>
     public static bool AddUser(string username, string name, string email, string password, string usertype)
@@ -59,8 +103,8 @@ public class UserManagement
     /// </summary>
     private static string GenerateUserId(MySqlConnection connection, string usertype)
     {
-        string prefix = usertype.ToLower() == "learner" ? "L" : "T";
-        string pattern = usertype.ToLower() == "learner" ? "L%" : "T%";
+        string prefix = usertype.ToLower() == "learner" ? "L" : (usertype.ToLower() == "admin" ? "A" : "T");
+        string pattern = prefix + "%";
         int digitCount = usertype.ToLower() == "learner" ? 6 : 3;
         
         string query = $"SELECT uid FROM usertable WHERE uid LIKE @Pattern ORDER BY uid DESC LIMIT 1";

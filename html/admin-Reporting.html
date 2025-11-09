@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - KiraKira</title>
+    <link rel="stylesheet" href="../css/learner.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="../images/logo transparent.png" alt="KiraKira Logo">
+            </div>
+            <nav class="nav">
+                <a href="admin-dashboard.html" aria-current="page">Dashboard</a>
+                <a href="admin-UserManagement.html">User Management</a>
+                <a href="admin-CourseManagement.html">Course Management</a>
+                <a href="admin-Reporting.html">Reports</a>
+                <a href="../html/login_signup.html">Sign Out</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="page-heading">
+                <div>
+                    <p class="eyebrow">Admin Panel</p>
+                    <h1>Welcome, Admin</h1>
+                    <p>Manage your KiraKira learning platform</p>
+                </div>
+            </header>
+
+            <section class="grid stats-grid">
+                <article class="card stat-block">
+                    <h3>Total Users</h3>
+                    <strong id="totalUsers">Loading...</strong>
+                    <p class="muted">Active learners and teachers</p>
+                </article>
+                <article class="card stat-block">
+                    <h3>Active Lessons</h3>
+                    <strong>89</strong>
+                    <p class="muted">Currently available modules</p>
+                </article>
+                <article class="card stat-block">
+                    <h3>Completed Exercises</h3>
+                    <strong>3,456</strong>
+                    <p class="muted">This month</p>
+                </article>
+                <article class="card stat-block">
+                    <h3>System Uptime</h3>
+                    <strong>98.5%</strong>
+                    <p class="muted">Last 30 days</p>
+                </article>
+            </section>
+
+            <section class="card">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">Quick Actions</p>
+                        <h2>Management Tools</h2>
+                    </div>
+                </div>
+                <div class="grid grid--auto">
+                    <div class="action-card">
+                        <h3>User Management</h3>
+                        <p class="muted">Manage user accounts and permissions</p>
+                        <a href="admin-UserManagement.html" class="btn btn--primary">Manage Users</a>
+                    </div>
+                    <div class="action-card">
+                        <h3>Content Management</h3>
+                        <p class="muted">Create and organize lessons</p>
+                        <a href="admin-ContentManagement.html" class="btn btn--primary">Manage Content</a>
+                    </div>
+                    <div class="action-card">
+                        <h3>Analytics & Reports</h3>
+                        <p class="muted">View platform performance</p>
+                        <a href="admin-Reporting.html" class="btn btn--primary">View Reports</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

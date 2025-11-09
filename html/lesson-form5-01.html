@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lesson 01 - Quadratic Functions & Equations | KiraKira</title>
+    <title>Lesson 01 - Variation | KiraKira</title>
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
 </head>
 <body>
     <header class="header">
@@ -31,11 +31,11 @@
     <main>
         <section class="hero-section lesson-hero">
             <div class="container hero-container">
-                <p class="eyebrow">Form 4 - Module 01</p>
-                <h1>Quadratic Functions & Equations in One Variable</h1>
+                <p class="eyebrow">Form 5 - Module 01</p>
+                <h1>Variation (Direct, Inverse &amp; Joint)</h1>
                 <p class="subtitle">
-                    Understand how the shape of a parabola links to its algebraic form, then apply factorisation, completing the square,
-                    and the quadratic formula to solve real-world problems.
+                    Build quick intuition for how one quantity responds when another changes so you can translate exam stories into direct, inverse,
+                    or joint variation equations and solve for the constant k.
                 </p>
                 <a class="btn btn-primary btn-large" href="catalogue-classes.html">Back to Catalogue</a>
             </div>
@@ -45,23 +45,22 @@
             <article class="lesson-card">
                 <h2>Lesson Overview</h2>
                 <p>
-                    This module builds fluency with the three equivalent forms of a quadratic function:
-                    standard form <em>y = ax<sup>2</sup> + bx + c</em>, factored form, and vertex form. You will investigate how
-                    changing the values of <em>a</em>, <em>b</em>, and <em>c</em> affects the graph, and how the discriminant reveals
-                    the number of real roots a quadratic equation possesses.
+                    Variation problems always begin with a relationship statement: "y varies directly as x" becomes y = kx^n, inverse variation becomes
+                    y = k / x^n, and joint scenarios combine several variables such as y = kx^a z^b. Once the sentence becomes a proportional model,
+                    plug in the given values to find the constant k before making any prediction.
                 </p>
-                <ul>
-                    <li>Sketch parabolas by identifying axis of symmetry, roots, and vertex.</li>
-                    <li>Select a solving method (factorisation, completing the square, quadratic formula) suited to the equation.</li>
-                    <li>Interpret solutions within financial, measurement, and motion contexts.</li>
-                </ul>
+                <p>
+                    Track exponents and units because they reveal whether the change is linear, quadratic, or links multiple variables. When a variable
+                    changes by a percentage or factor, apply the same multiplier to the whole equation to determine how the dependent quantity reacts.
+                </p>
+                <p>Source: Pandai Form 5 Variation chapter.</p>
             </article>
             <article class="lesson-card">
-                <h2>Key References</h2>
+                <h2>Strategy Checklist</h2>
                 <ul>
-                    <li>Formula Booklet: Quadratic identities & discriminant definitions.</li>
-                    <li>Interactive Graph Tool: Visualise how parameter changes stretch or shift a parabola.</li>
-                    <li>Practice Pack: 20 exam-style questions arranged by difficulty.</li>
+                    <li>Underline the trigger words (direct, inversely, jointly) and write the proportional statement before turning it into an equation.</li>
+                    <li>Use the provided pair of values to solve for the constant k, then plug it back for predictions.</li>
+                    <li>When multiple variables vary together, treat any unchanged variable as a constant so only the changing variables remain.</li>
                 </ul>
             </article>
         </section>
@@ -70,8 +69,8 @@
             <div class="container">
                 <div class="section-header">
                     <p class="eyebrow">Quizzes</p>
-                    <h2 class="section-title">Choose A Challenge</h2>
-                    <p>Pick a quiz to reveal 10 SPM-style MCQs. Select answers, check your score, then reset or switch quizzes anytime.</p>
+                    <h2 class="section-title">10 MCQs on Direct, Inverse &amp; Joint Variation</h2>
+                    <p>Work through the questions, check your score, then reset the deck to retry within the same study session.</p>
                 </div>
                 <div class="quiz-tabs" role="tablist">
                     <button class="quiz-tab active" data-quiz="quizA" type="button">Quiz A</button>
@@ -100,7 +99,8 @@
     </footer>
 
     <script src="../js/theme.js"></script>
-    <script src="../js/lesson-form4-01.js"></script>
+    <script src="../js/lesson-quiz-runner.js"></script>
+    <script src="../js/lesson-form5-01.js"></script>
     <script>
         document.getElementById("current-year").textContent = new Date().getFullYear();
     </script>
