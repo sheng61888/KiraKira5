@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lesson 01 - Quadratic Functions & Equations | KiraKira</title>
+    <title>Lesson 02 - Matrices | KiraKira</title>
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
 </head>
 <body>
     <header class="header">
@@ -31,11 +31,11 @@
     <main>
         <section class="hero-section lesson-hero">
             <div class="container hero-container">
-                <p class="eyebrow">Form 4 - Module 01</p>
-                <h1>Quadratic Functions & Equations in One Variable</h1>
+                <p class="eyebrow">Form 5 - Module 02</p>
+                <h1>Matrices &amp; Operations</h1>
                 <p class="subtitle">
-                    Understand how the shape of a parabola links to its algebraic form, then apply factorisation, completing the square,
-                    and the quadratic formula to solve real-world problems.
+                    Recognise matrix order, test equality, and carry out valid addition, subtraction, and multiplication so you can model transformations
+                    and systems exactly the way SPM questions expect.
                 </p>
                 <a class="btn btn-primary btn-large" href="catalogue-classes.html">Back to Catalogue</a>
             </div>
@@ -45,23 +45,23 @@
             <article class="lesson-card">
                 <h2>Lesson Overview</h2>
                 <p>
-                    This module builds fluency with the three equivalent forms of a quadratic function:
-                    standard form <em>y = ax<sup>2</sup> + bx + c</em>, factored form, and vertex form. You will investigate how
-                    changing the values of <em>a</em>, <em>b</em>, and <em>c</em> affects the graph, and how the discriminant reveals
-                    the number of real roots a quadratic equation possesses.
+                    A matrix is simply a rectangular array with dimensions rows x columns. Two matrices are equal only when their orders
+                    and every corresponding entry match. Addition and subtraction are performed entry-wise, while multiplication AB is possible
+                    only when the number of columns in A equals the number of rows in B, resulting in a matrix whose order is determined by the
+                    outer dimensions.
                 </p>
-                <ul>
-                    <li>Sketch parabolas by identifying axis of symmetry, roots, and vertex.</li>
-                    <li>Select a solving method (factorisation, completing the square, quadratic formula) suited to the equation.</li>
-                    <li>Interpret solutions within financial, measurement, and motion contexts.</li>
-                </ul>
+                <p>
+                    Thinking about rows and columns as vectors helps when performing dot products for multiplication. You will also read contexts
+                    such as transformation matrices or tabular data, so labelling your matrices clearly prevents order mistakes.
+                </p>
+                <p>Source: Pandai Form 5 Matrices notes.</p>
             </article>
             <article class="lesson-card">
-                <h2>Key References</h2>
+                <h2>Operations to Master</h2>
                 <ul>
-                    <li>Formula Booklet: Quadratic identities & discriminant definitions.</li>
-                    <li>Interactive Graph Tool: Visualise how parameter changes stretch or shift a parabola.</li>
-                    <li>Practice Pack: 20 exam-style questions arranged by difficulty.</li>
+                    <li>State the order of every matrix before deciding what operation is possible.</li>
+                    <li>Use element-by-element addition or subtraction only when orders match exactly.</li>
+                    <li>For multiplication, write the row of the first matrix and column of the second matrix you are combining to avoid mixing indices.</li>
                 </ul>
             </article>
         </section>
@@ -70,8 +70,8 @@
             <div class="container">
                 <div class="section-header">
                     <p class="eyebrow">Quizzes</p>
-                    <h2 class="section-title">Choose A Challenge</h2>
-                    <p>Pick a quiz to reveal 10 SPM-style MCQs. Select answers, check your score, then reset or switch quizzes anytime.</p>
+                    <h2 class="section-title">10 MCQs on Matrix Operations</h2>
+                    <p>Each question targets orders, equality checks, or valid operations so you can troubleshoot careless mistakes quickly.</p>
                 </div>
                 <div class="quiz-tabs" role="tablist">
                     <button class="quiz-tab active" data-quiz="quizA" type="button">Quiz A</button>
@@ -100,7 +100,8 @@
     </footer>
 
     <script src="../js/theme.js"></script>
-    <script src="../js/lesson-form4-01.js"></script>
+    <script src="../js/lesson-quiz-runner.js"></script>
+    <script src="../js/lesson-form5-02.js"></script>
     <script>
         document.getElementById("current-year").textContent = new Date().getFullYear();
     </script>

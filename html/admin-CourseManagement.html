@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About KiraKira | SPM Math Companion</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <header class="header">
+        <nav class="container nav-container">
+            <a href="home.html" class="brand-logo">KiraKira</a>
+            <div class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="catalogue-classes.html">Browse Classes</a>
+                <a href="login_signup.html">Login</a>
+                <div class="nav-cta">
+                    <a href="login_signup.html" class="btn btn-primary">Get Started</a>
+                    <div class="theme-switcher" role="group" aria-label="Theme selection">
+                        <button type="button" class="theme-button" data-theme-select="light">Day</button>
+                        <button type="button" class="theme-button" data-theme-select="dark">Night</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section about-hero">
+            <div class="container hero-container">
+                <h1>About KiraKira</h1>
+                <p class="subtitle">
+                    We empower Malaysian students to master SPM Mathematics through guided self-study, bite-sized explanations, and endless practice opportunities.
+                </p>
+            </div>
+        </section>
+
+        <section class="container about-story">
+            <div class="section-header">
+                <p class="eyebrow">Our Story</p>
+                <h2 class="section-title">Born From Real SPM Struggles</h2>
+                <p>
+                    KiraKira started when a group of SPM graduates realized there was no single place to revise, drill past questions, and build exam confidence without expensive tuition.
+                    We teamed up with teachers, examiners, and university students to translate modern classroom strategies into an independent-learning platform that feels like a patient mentor.
+                </p>
+            </div>
+            <div class="about-grid">
+                <article class="about-card">
+                    <h3>Laser-Focused Content</h3>
+                    <p>
+                        Every lesson follows the latest KSSM syllabus for Modern & Additional Mathematics. We highlight what the examiner really wants and how to earn every method mark.
+                    </p>
+                </article>
+                <article class="about-card">
+                    <h3>Independent, Not Isolated</h3>
+                    <p>
+                        Step-by-step walkthroughs, annotated solutions, and instant feedback help you study whenever you have time, while still feeling guided.
+                    </p>
+                </article>
+                <article class="about-card">
+                    <h3>Practice That Builds Stamina</h3>
+                    <p>
+                        Auto-generated drills, topical quizzes, and full-length simulators make it easy to turn weak topics into strengths before the real paper.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <section class="spm-advantage-section">
+            <div class="container">
+                <h2 class="section-title">How We Support SPM Learners</h2>
+                <div class="features-grid">
+                    <article class="feature-card">
+                        <div class="feature-icon-wrapper icon-green">1</div>
+                        <h3>Understand</h3>
+                        <p>Visual notes, concept maps, and quick formula checks to refresh fundamentals before attempting questions.</p>
+                    </article>
+                    <article class="feature-card">
+                        <div class="feature-icon-wrapper icon-indigo">2</div>
+                        <h3>Practice</h3>
+                        <p>Topic drills, past-year problems, and exam-mode timers for both Modern Math and Add Math papers.</p>
+                    </article>
+                    <article class="feature-card">
+                        <div class="feature-icon-wrapper icon-purple">3</div>
+                        <h3>Review</h3>
+                        <p>Instant marking, worked solutions, and personalised tip sheets so every mistake becomes a lesson.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="container about-impact">
+            <div class="impact-copy">
+                <h2 class="section-title">Built For Malaysian Context</h2>
+                <ul>
+                    <li>Uses Bahasa Melayu and English terminology side by side so you can switch seamlessly between textbooks and KiraKira.</li>
+                    <li>Includes real PT3 & SPM trend questions to highlight HOTS-style reasoning.</li>
+                    <li>Shows exam tips based on common mistakes from recent marking schemes.</li>
+                    <li>Designed for laptops and computers so that students can get quality practice.</li>
+                </ul>
+            </div>
+            <div class="impact-stats">
+                <div class="stat-card">
+                    <span class="stat-value">1,200+</span>
+                    <p class="stat-label">Exam-style questions with full solutions.</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">15</span>
+                    <p class="stat-label">Complete learning paths for each SPM topic.</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">24/7</span>
+                    <p class="stat-label">Learning access, anytime revision motivation strikes.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container cta-card">
+                <div>
+                    <p class="eyebrow">Join the Movement</p>
+                    <h2 class="section-title">Ready To Feel Confident For SPM Math?</h2>
+                    <p>Explore KiraKira's learner classes, download curated notes, and track your streaks all the way to exam day.</p>
+                </div>
+                <a class="btn btn-primary btn-large" href="catalogue-classes.html">Explore Classes</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <p>&copy; <span id="current-year"></span> KiraKira. Built in Malaysia for Malaysian learners.</p>
+            <p><a href="mailto:hello@kirakira.my">hello@kirakira.my</a></p>
+        </div>
+    </footer>
+
+    <script src="../js/theme.js"></script>
+    <script>
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
+

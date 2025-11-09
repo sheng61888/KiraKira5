@@ -82,22 +82,26 @@ window.kiraModules = [
       {
         number: "01",
         title: "Variation",
-        lessons: ["Direct Variation", "Inverse Variation", "Joint Variation"]
+        lessons: ["Direct Variation", "Inverse Variation", "Joint Variation"],
+        link: "lesson-form5-01.html"
       },
       {
         number: "02",
         title: "Matrices",
-        lessons: ["Matrices", "Basic Operations on Matrices"]
+        lessons: ["Matrix Basics", "Matrix Operations"],
+        link: "lesson-form5-02.html"
       },
       {
         number: "03",
         title: "Consumer Mathematics: Insurance",
-        lessons: ["Risk and Insurance Protection"]
+        lessons: ["Risk Basics", "Coverage & Policy Features"],
+        link: "lesson-form5-03.html"
       },
       {
         number: "04",
         title: "Consumer Mathematics: Taxation",
-        lessons: ["Taxation"]
+        lessons: ["SST Fundamentals", "Personal Tax Calculations"],
+        link: "lesson-form5-04.html"
       },
       {
         number: "05",
@@ -107,7 +111,8 @@ window.kiraModules = [
           "Enlargement",
           "Combination of Transformation",
           "Tessellation"
-        ]
+        ],
+        link: "lesson-form5-05.html"
       },
       {
         number: "06",
@@ -115,12 +120,20 @@ window.kiraModules = [
         lessons: [
           "Values of sine, cosine and tangent for angles from 0 to 360 degrees",
           "Graphs of trigonometric functions for sine, cosine and tangent"
-        ]
+        ],
+        link: "lesson-form5-06.html"
       },
       {
-        number: "09",
+        number: "07",
         title: "Measures of Dispersion for Grouped Data",
-        lessons: ["Dispersion", "Measures of Dispersion"]
+        lessons: ["Grouped Data Mean & Variance", "Interquartile Range & Spread"],
+        link: "lesson-form5-07.html"
+      },
+      {
+        number: "08",
+        title: "Mathematical Modelling",
+        lessons: ["Modelling Cycle", "Applications in Context"],
+        link: "lesson-form5-08.html"
       }
     ]
   }

@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lesson 01 - Quadratic Functions & Equations | KiraKira</title>
+    <title>Lesson 07 - Measures of Dispersion for Grouped Data | KiraKira</title>
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
 </head>
 <body>
     <header class="header">
@@ -31,11 +31,11 @@
     <main>
         <section class="hero-section lesson-hero">
             <div class="container hero-container">
-                <p class="eyebrow">Form 4 - Module 01</p>
-                <h1>Quadratic Functions & Equations in One Variable</h1>
+                <p class="eyebrow">Form 5 - Module 07</p>
+                <h1>Measures of Dispersion for Grouped Data</h1>
                 <p class="subtitle">
-                    Understand how the shape of a parabola links to its algebraic form, then apply factorisation, completing the square,
-                    and the quadratic formula to solve real-world problems.
+                    Estimate range, mean, variance, standard deviation, and interquartile range for grouped distributions using class midpoints and
+                    cumulative frequencies.
                 </p>
                 <a class="btn btn-primary btn-large" href="catalogue-classes.html">Back to Catalogue</a>
             </div>
@@ -45,23 +45,22 @@
             <article class="lesson-card">
                 <h2>Lesson Overview</h2>
                 <p>
-                    This module builds fluency with the three equivalent forms of a quadratic function:
-                    standard form <em>y = ax<sup>2</sup> + bx + c</em>, factored form, and vertex form. You will investigate how
-                    changing the values of <em>a</em>, <em>b</em>, and <em>c</em> affects the graph, and how the discriminant reveals
-                    the number of real roots a quadratic equation possesses.
+                    Unlike ungrouped data, grouped data require estimating with class midpoints. Mean is computed with the ratio (sum of fx) / (sum of f),
+                    while variance uses (sum of fx^2) / (sum of f) minus (mean)^2. Interquartile range draws from a cumulative frequency (ogive) to locate
+                    Q1 and Q3 before subtracting. Remember: shifting every value by a constant leaves standard deviation unchanged, but scaling
+                    by a factor multiplies it.
                 </p>
-                <ul>
-                    <li>Sketch parabolas by identifying axis of symmetry, roots, and vertex.</li>
-                    <li>Select a solving method (factorisation, completing the square, quadratic formula) suited to the equation.</li>
-                    <li>Interpret solutions within financial, measurement, and motion contexts.</li>
-                </ul>
+                <p>
+                    You will also reason about skewness (mean vs median) and how outliers push mean and standard deviation more than medians.
+                </p>
+                <p>Source: Pandai Measures of Dispersion (Grouped Data).</p>
             </article>
             <article class="lesson-card">
-                <h2>Key References</h2>
+                <h2>Computation Reminders</h2>
                 <ul>
-                    <li>Formula Booklet: Quadratic identities & discriminant definitions.</li>
-                    <li>Interactive Graph Tool: Visualise how parameter changes stretch or shift a parabola.</li>
-                    <li>Practice Pack: 20 exam-style questions arranged by difficulty.</li>
+                    <li>Use class midpoints when estimating range or calculating the sum of fx and fx^2.</li>
+                    <li>Build a cumulative frequency table to read off quartile positions quickly.</li>
+                    <li>State the median position ((sum of f) / 2) before interpolating within the relevant class.</li>
                 </ul>
             </article>
         </section>
@@ -70,8 +69,8 @@
             <div class="container">
                 <div class="section-header">
                     <p class="eyebrow">Quizzes</p>
-                    <h2 class="section-title">Choose A Challenge</h2>
-                    <p>Pick a quiz to reveal 10 SPM-style MCQs. Select answers, check your score, then reset or switch quizzes anytime.</p>
+                    <h2 class="section-title">10 MCQs on Grouped Dispersion</h2>
+                    <p>Expect quick checks on grouped formulas, ogive reasoning, and the impact of shifts or scaling on spread.</p>
                 </div>
                 <div class="quiz-tabs" role="tablist">
                     <button class="quiz-tab active" data-quiz="quizA" type="button">Quiz A</button>
@@ -100,9 +99,11 @@
     </footer>
 
     <script src="../js/theme.js"></script>
-    <script src="../js/lesson-form4-01.js"></script>
+    <script src="../js/lesson-quiz-runner.js"></script>
+    <script src="../js/lesson-form5-07.js"></script>
     <script>
         document.getElementById("current-year").textContent = new Date().getFullYear();
     </script>
 </body>
 </html>
+
