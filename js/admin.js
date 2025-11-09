@@ -26,14 +26,14 @@ function displayUsers(userList) {
     userList.forEach(user => {
         const row = `
             <tr>
-                <td>${user.Id}</td>
-                <td>${user.Username}</td>
-                <td>${user.Name}</td>
-                <td>${user.Email}</td>
-                <td>${user.Role}</td>
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.role}</td>
                 <td>
-                    <button onclick="editUser('${user.Id}')">Edit</button>
-                    <button onclick="deleteUser('${user.Id}')">Delete</button>
+                    <button onclick="editUser('${user.id}')">Edit</button>
+                    <button onclick="deleteUser('${user.id}')">Delete</button>
                 </td>
             </tr>
         `;
@@ -58,11 +58,11 @@ function searchUsers() {
     let filtered = users;
     
     if (searchId) {
-        filtered = filtered.filter(user => user.Id.toLowerCase().includes(searchId.toLowerCase()));
+        filtered = filtered.filter(user => user.id.toLowerCase().includes(searchId.toLowerCase()));
     }
     
     if (roleFilter) {
-        filtered = filtered.filter(user => user.Role.toLowerCase() === roleFilter.toLowerCase());
+        filtered = filtered.filter(user => user.role.toLowerCase() === roleFilter.toLowerCase());
     }
     
     console.log('Filtered users:', filtered);
@@ -85,13 +85,13 @@ function showAddModal() {
 }
 
 function editUser(id) {
-    const user = users.find(u => u.Id === id);
+    const user = users.find(u => u.id === id);
     document.getElementById('modalTitle').textContent = 'Edit User';
-    document.getElementById('userId').value = user.Id;
-    document.getElementById('userUsername').value = user.Username;
-    document.getElementById('userName').value = user.Name;
-    document.getElementById('userEmail').value = user.Email;
-    document.getElementById('userRole').value = user.Role;
+    document.getElementById('userId').value = user.id;
+    document.getElementById('userUsername').value = user.username;
+    document.getElementById('userName').value = user.name;
+    document.getElementById('userEmail').value = user.email;
+    document.getElementById('userRole').value = user.role;
     document.getElementById('userPassword').style.display = 'none';
     document.getElementById('userPassword').previousElementSibling.style.display = 'none';
     document.getElementById('userModal').style.display = 'block';
