@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {}
+    "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {}
   },
   "projects": {
-    "c:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {
+    "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
+        "projectUniqueName": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
         "projectName": "KiraKira5",
-        "projectPath": "c:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
+        "projectPath": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
         "packagesPath": "C:\\Users\\ggshe\\.nuget\\packages\\",
-        "outputPath": "c:\\KiraKira5\\KiraKira5\\obj\\",
+        "outputPath": "C:\\KiraKira5\\KiraKira5\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
