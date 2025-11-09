@@ -16,6 +16,8 @@ switchToSignIn.addEventListener('click', (e) => {
 	signInCard.classList.add('active');
 });
 
+const signinForm = document.getElementById('signinForm');
+
 signupForm.addEventListener('submit', async (e) => {
 	e.preventDefault();
 	
@@ -46,6 +48,50 @@ signupForm.addEventListener('submit', async (e) => {
 			alert('Registration failed: ' + (result.error || 'Unknown error'));
 		}
 	} catch (error) {
+		alert('Error: ' + error.message);
+	}
+});
+
+signinForm.addEventListener('submit', async (e) => {
+	e.preventDefault();
+	
+	const formData = new FormData(e.target);
+	const loginData = {
+		email: formData.get('email'),
+		password: formData.get('password')
+	};
+	
+	console.log('Login attempt:', loginData);
+	
+	try {
+		const response = await fetch('/api/user/login', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(loginData)
+		});
+		
+		console.log('Response status:', response.status);
+		const result = await response.json();
+		console.log('Login result:', result);
+		
+		if (result.success) {
+			const userRole = result.user.role || result.user.Role;
+			const userName = result.user.name || result.user.Name;
+			console.log('Login successful, user role:', userRole);
+			sessionStorage.setItem('userName', userName);
+			if (userRole === 'admin') {
+				window.location.href = 'admin-dashboard.html';
+			} else if (userRole === 'learner') {
+				window.location.href = 'learner-dashboard.html';
+			} else if (userRole === 'teacher') {
+				window.location.href = 'teacher-dashboard.html';
+			}
+		} else {
+			console.log('Login failed:', result.message);
+			alert(result.message || 'Login failed');
+		}
+	} catch (error) {
+		console.error('Login error:', error);
 		alert('Error: ' + error.message);
 	}
 });

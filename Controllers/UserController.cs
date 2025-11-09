@@ -18,6 +18,29 @@ public class UserController : ControllerBase
     }
     
     /// <summary>
+    /// Authenticates user login
+    /// </summary>
+    [HttpPost("login")]
+    public IActionResult Login([FromBody] LoginRequest request)
+    {
+        try
+        {
+            var user = UserManagement.Login(request.Email, request.Password);
+            
+            if (user != null)
+            {
+                return Ok(new { success = true, user = user });
+            }
+            
+            return Ok(new { success = false, message = "Invalid email or password" });
+        }
+        catch (Exception ex)
+        {
+            return Ok(new { success = false, error = ex.Message });
+        }
+    }
+    
+    /// <summary>
     /// Adds a new user to the system
     /// </summary>
     [HttpPost("add")]
@@ -77,6 +100,12 @@ public class UserController : ControllerBase
         var result = UserManagement.DeleteUser(id);
         return Ok(new { success = result });
     }
+}
+
+public class LoginRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
 
 public class AddUserRequest
