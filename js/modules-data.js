@@ -8,7 +8,7 @@ window.kiraModules = [
         number: "01",
         title: "Quadratic Functions and Equations in One Variable",
         lessons: ["Quadratic Functions", "Quadratic Equations"],
-        link: "lesson-active.html"
+        link: "lesson-form4-01.html"
       },
       {
         number: "02",
