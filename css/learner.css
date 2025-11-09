@@ -346,6 +346,19 @@ ul {
   color: var(--muted);
 }
 
+.community-filters .chip {
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition), color var(--transition);
+}
+
+.community-filters .chip:hover,
+.community-filters .chip:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(5, 7, 28, 0.4);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.12);
+}
+
 .chip--success {
   color: #0f3228;
   background: rgba(109, 229, 202, 0.85);
@@ -670,27 +683,6 @@ ul {
   width: 100%;
 }
 
-.community-welcome {
-  display: flex;
-  justify-content: space-between;
-  gap: 1.2rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.community-cta {
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.2rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  max-width: 320px;
-}
-
-.community-cta strong {
-  display: block;
-  margin-bottom: 0.2rem;
-}
-
 .community-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
@@ -865,6 +857,16 @@ ul {
   padding: 0.65rem 0.75rem;
 }
 
+.conversation-form select {
+  color: #272b4e;
+  background: #fff;
+  border-color: rgba(39, 43, 78, 0.25);
+}
+
+.conversation-form select option {
+  color: #272b4e;
+}
+
 .conversation-form textarea {
   resize: vertical;
 }
@@ -876,18 +878,38 @@ ul {
 }
 
 .topic-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
   border-radius: 999px;
   padding: 0.35rem 0.85rem;
   background: rgba(255, 255, 255, 0.06);
   font-size: 0.85rem;
   border: none;
-  color: var(--text);
+  color: var(--muted);
   cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition), color var(--transition);
 }
 
 .topic-chip--active {
   background: var(--accent);
   color: #0c0f1c;
+}
+
+.topic-chip:hover,
+.topic-chip:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(5, 7, 28, 0.4);
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--text);
+}
+
+.profile-logout-btn {
+  display: inline-flex;
+  margin-top: 1.5rem;
+  margin-left: auto;
+  margin-right: 0;
 }
 
 /* Lesson Workspace -------------------------------------------- */

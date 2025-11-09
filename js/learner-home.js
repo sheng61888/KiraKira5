@@ -16,6 +16,7 @@
   const selectors = {
     profileName: ".profile .username",
     profileStreak: ".profile .streak",
+    dashboardStreak: ".page-heading .eyebrow strong",
     profileLevel: ".profile small",
     xpBar: ".profile .xp-bar span",
     heroName: "#username",
@@ -51,8 +52,12 @@
     }
     setText(selectors.profileName, profile.name || "Learner");
     setText(selectors.heroName, profile.name || "Learner");
+    const streakLabel = streak
+      ? streak.status || (streak.current ? `${streak.current}-day streak` : "Ready to study")
+      : "Ready to study";
+    setText(selectors.profileStreak, streakLabel);
+    setText(selectors.dashboardStreak, streakLabel);
     if (streak) {
-      setText(selectors.profileStreak, streak.status || "Ready to study");
       setText(selectors.profileLevel, streak.levelLabel || "");
       const xpBar = getEl(selectors.xpBar);
       if (xpBar) {
