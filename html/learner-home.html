@@ -17,11 +17,11 @@
       </div>
 
       <div class="profile">
-        <div class="username">Aina</div>
+        <div class="username" aria-live="polite">Loading learner...</div>
         <div class="avatar" aria-hidden="true"></div>
-        <div class="streak" aria-live="polite">🔥 7-day streak</div>
-        <div class="xp-bar" aria-label="XP progress toward level 4"><span style="width:65%"></span></div>
-        <small>Level 3 • 1200 XP</small>
+        <div class="streak" aria-live="polite">Syncing streak...</div>
+        <div class="xp-bar" aria-label="XP progress toward next level"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level updating - 0 XP</small>
       </div>
 
       <nav class="nav" aria-label="Learner navigation">
@@ -38,9 +38,9 @@
     <main class="main">
       <header class="page-heading">
         <div>
-          <p class="eyebrow">Streak: <strong>7 days 🔥</strong></p>
-          <h1>Welcome back, <span id="username">Aina</span></h1>
-          <p>Your Algebra sprint is halfway done—let’s finish strong today.</p>
+          <p class="eyebrow">Streak: <strong aria-live="polite">Syncing...</strong></p>
+          <h1>Welcome back, <span id="username">Learner</span></h1>
+          <p aria-live="polite">Connecting to your latest mission data.</p>
         </div>
 
         <div class="heading-actions">
@@ -52,18 +52,17 @@
 
       <section class="card mission-card" id="missionCard" aria-live="polite">
         <div>
-          <p class="eyebrow" id="missionBadge">Form 4 path</p>
-          <h2 id="missionTitle">Your mission briefing</h2>
-          <p class="mood" id="missionMood">Let’s stack some easy wins with Algebra drills today.</p>
+          <p class="eyebrow" id="missionBadge">Preparing your path</p>
+          <h2 id="missionTitle">Loading mission briefing...</h2>
+          <p class="mood" id="missionMood">Hang tight while we fetch the latest guidance.</p>
           <div class="mission-chip-stack" id="missionChips">
-            <span class="chip chip--info">Form 4</span>
-            <span class="chip">Momentum mode</span>
+            <span class="chip">Syncing...</span>
           </div>
         </div>
         <div class="mission-actions">
-          <strong id="missionConfidence">45%</strong>
+          <strong id="missionConfidence">0%</strong>
           <small>SPM readiness</small>
-          <button class="btn btn--primary" type="button" id="missionActionBtn">Adjust plan</button>
+          <button class="btn btn--primary" type="button" id="missionActionBtn">Loading...</button>
         </div>
       </section>
 
@@ -71,40 +70,21 @@
       <section class="card card--glow daily-goal" aria-labelledby="goal-title">
         <div class="section-head">
           <div>
-            <p class="eyebrow">Today’s goal</p>
-            <h2 id="goal-title">Complete Algebraic Proofs practice</h2>
+            <p class="eyebrow">Today's goal</p>
+            <h2 id="goal-title">Set a goal to unlock guidance</h2>
           </div>
-          <span class="chip chip--success">+50 XP</span>
+          <span class="chip chip--success" aria-live="polite">Waiting for update</span>
         </div>
-        <p>Finish 1 guided problem set plus 1 timed drill to lock in your understanding.</p>
+        <p>Goals appear here once your plan or coach sets a target.</p>
         <div class="goal-meta">
           <span>Progress</span>
-          <strong>45%</strong>
+          <strong aria-live="polite">0%</strong>
         </div>
-        <div class="meter goal-bar"><span style="width:45%"></span></div>
+        <div class="meter goal-bar"><span style="width:0%"></span></div>
       </section>
 
       <section class="grid stats-grid" aria-label="Learning stats">
-        <article class="card stat-block">
-          <h3>XP to next level</h3>
-          <strong>350</strong>
-          <p class="muted">Keep up the streak to level up by Friday.</p>
-          <div class="meter"><span style="width:72%"></span></div>
-        </article>
-
-        <article class="card stat-block">
-          <h3>Weekly focus</h3>
-          <strong>Algebra</strong>
-          <p class="muted">3 / 5 focus sessions completed.</p>
-          <div class="meter"><span style="width:60%"></span></div>
-        </article>
-
-        <article class="card stat-block">
-          <h3>Upcoming</h3>
-          <strong>4:30 PM</strong>
-          <p class="muted">Coordinate Geometry class with Mr. Tan.</p>
-          <span class="chip chip--info">Starts in 2h 15m</span>
-        </article>
+        <p class="muted">Learning stats will appear here once your dashboard loads.</p>
       </section>
 
       <!-- Courses Section -->
@@ -118,7 +98,7 @@
         </div>
 
         <div class="course-grid" data-role="course-grid" data-grade="Form 4" data-limit="3">
-          <p class="muted">Loading your modules…</p>
+          <p class="muted">Loading your modules.</p>
         </div>
         <noscript>
           <p class="muted">JavaScript is required to see your current modules.</p>
@@ -131,10 +111,10 @@
             <p class="eyebrow">Milestones</p>
             <h2>Recent achievements</h2>
           </div>
-          <span class="chip chip--success">+120 XP this week</span>
+          <span class="chip chip--success" aria-live="polite">Fetching XP...</span>
         </div>
         <div class="badge-collections" data-role="badge-collections">
-          <p class="muted">Loading your badge collections…</p>
+          <p class="muted">Loading your badge collections.</p>
         </div>
       </section>
     </main>
@@ -142,6 +122,7 @@
 
   <!-- JS -->
   <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-shell.js"></script>
   <script src="../js/modules-data.js"></script>
   <script src="../js/badge-library.js"></script>
   <script src="../js/learner-modules.js"></script>
@@ -149,3 +130,5 @@
   <script src="../js/learner-home.js"></script>
 </body>
 </html>
+
+

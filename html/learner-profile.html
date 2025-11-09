@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -17,11 +17,11 @@
       </div>
 
       <div class="profile">
-        <div class="username">Aina</div>
+        <div class="username" aria-live="polite">Loading learner...</div>
         <div class="avatar" aria-hidden="true"></div>
-        <div class="streak">🔥 7-day streak</div>
-        <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 • 1200 XP</small>
+        <div class="streak" aria-live="polite">Syncing streak...</div>
+        <div class="xp-bar"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level updating - 0 XP</small>
       </div>
 
       <nav class="nav" aria-label="Learner navigation">
@@ -29,8 +29,8 @@
         <a href="learner-progress.html">Progress</a>
         <a href="learner-pastyears.html">Past Papers</a>
         <a href="learner-classes.html">Classes</a>
-        <a href="learner-profile.html" aria-current="page">Profile</a>
         <a href="learner-community.html">Community</a>
+        <a href="learner-profile.html" aria-current="page">Profile</a>
       </nav>
     </aside>
 
@@ -40,7 +40,7 @@
         <div>
           <p class="eyebrow">Profile & preferences</p>
           <h1>Your learner identity</h1>
-          <p>Review your info, track badges, and control what reminders hit your inbox.</p>
+          <p>Review your info, track badges, and control reminders as soon as we load them.</p>
         </div>
         <div class="heading-actions">
           <button class="btn btn--ghost" type="button">Edit motto</button>
@@ -51,14 +51,14 @@
       <section class="profile-summary card">
         <div class="profile-card">
           <img src="images/profile-cat.png" alt="Illustrated profile avatar" class="profile-img">
-          <h2>Aina</h2>
-          <p>“Learning one formula at a time.”</p>
+          <h2 aria-live="polite">Learner</h2>
+          <p>We will display your motto once it loads.</p>
           <div class="xp-summary">
-            <span><strong>Level:</strong> 3</span>
-            <span><strong>XP:</strong> 1200</span>
-            <span><strong>Rank:</strong> Gold Learner</span>
+            <span><strong>Level:</strong> 0</span>
+            <span><strong>XP:</strong> 0</span>
+            <span><strong>Rank:</strong> Loading...</span>
           </div>
-          <div class="chip chip--success">Next badge: Geometry Guru</div>
+          <div class="chip chip--success" aria-live="polite">Next badge syncing...</div>
         </div>
       </section>
 
@@ -70,22 +70,22 @@
         <form class="info-form">
           <div class="form-group">
             <label for="name">Full Name</label>
-            <input id="name" type="text" value="Aina" readonly>
+            <input id="name" type="text" value="" placeholder="Loading..." readonly>
           </div>
 
           <div class="form-group">
             <label for="email">Email</label>
-            <input id="email" type="email" value="aina123@gmail.com" readonly>
+            <input id="email" type="email" value="" placeholder="Loading..." readonly>
           </div>
 
           <div class="form-group">
             <label for="school">School</label>
-            <input id="school" type="text" value="SMK Taman Melati" readonly>
+            <input id="school" type="text" value="" placeholder="Loading..." readonly>
           </div>
 
           <div class="form-group">
             <label for="year">Year</label>
-            <input id="year" type="text" value="Form 5" readonly>
+            <input id="year" type="text" value="" placeholder="Loading..." readonly>
           </div>
         </form>
       </section>
@@ -93,11 +93,11 @@
       <section class="grid grid--two">
         <article class="card achievements">
           <div class="section-head">
-            <h2>Achievements 🏆</h2>
-            <span class="chip chip--success">3 new this term</span>
+            <h2>Achievements</h2>
+            <span class="chip chip--success" aria-live="polite">Syncing...</span>
           </div>
           <div class="badge-collections" data-role="badge-collections">
-            <p class="muted">Badge shelves loading…</p>
+            <p class="muted">Badge shelves loading...</p>
           </div>
         </article>
 
@@ -109,33 +109,22 @@
           <ul class="recommended-list" id="notificationList">
             <li>
               <div>
-                <strong>Daily streak nudges</strong>
-                <small>Sent at 8:00 PM GMT+8</small>
+                <strong>Loading notification settings...</strong>
+                <small>We will list your preferences shortly.</small>
               </div>
-              <button class="btn btn--ghost" type="button">Toggle</button>
-            </li>
-            <li>
-              <div>
-                <strong>Coach feedback alerts</strong>
-                <small>Push + email</small>
-              </div>
-              <button class="btn btn--ghost" type="button">Manage</button>
-            </li>
-            <li>
-              <div>
-                <strong>Exam countdown</strong>
-                <small>Weekly digest on Fridays</small>
-              </div>
-              <button class="btn btn--primary" type="button">Edit</button>
             </li>
           </ul>
         </article>
       </section>
     </main>
   </div>
+
+  <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-shell.js"></script>
+  <script src="../js/badge-library.js"></script>
+  <script src="../js/learner-badges.js"></script>
+  <script src="../js/learner-profile-page.js"></script>
 </body>
-<script src="../js/learner-session.js"></script>
-<script src="../js/badge-library.js"></script>
-<script src="../js/learner-badges.js"></script>
-<script src="../js/learner-profile-page.js"></script>
 </html>
+
+

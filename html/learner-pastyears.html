@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -17,11 +17,11 @@
       </div>
 
       <div class="profile">
-        <div class="username">Aina</div>
+        <div class="username" aria-live="polite">Loading learner...</div>
         <div class="avatar" aria-hidden="true"></div>
-        <div class="streak">🔥 7-day streak</div>
-        <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 • 1200 XP</small>
+        <div class="streak" aria-live="polite">Syncing streak...</div>
+        <div class="xp-bar"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level updating - 0 XP</small>
       </div>
 
       <nav class="nav" aria-label="Learner navigation">
@@ -40,7 +40,7 @@
         <div>
           <p class="eyebrow">Exam mode</p>
           <h1>Past year papers</h1>
-          <p>Filter by paper type, year, or topic. Save favourites so they reappear on your dashboard.</p>
+          <p>Filter by paper type, year, or topic. Results will appear once loaded.</p>
         </div>
         <div class="heading-actions">
           <button class="btn btn--ghost" type="button">Import PDF</button>
@@ -57,14 +57,16 @@
           <div class="filter-group">
             <label for="subject">Type</label>
             <select id="subject">
-              <option>Trial papers</option>
-              <option>Actual papers</option>
+              <option value="">All types</option>
+              <option value="trial">Trial papers</option>
+              <option value="actual">Actual papers</option>
             </select>
           </div>
 
           <div class="filter-group">
             <label for="year">Year</label>
             <select id="year">
+              <option value="">Any year</option>
               <option>2024</option>
               <option>2023</option>
               <option>2022</option>
@@ -75,7 +77,7 @@
           <div class="filter-group">
             <label for="topic">Topic</label>
             <select id="topic">
-              <option>All topics</option>
+              <option value="">All topics</option>
               <option>Algebra</option>
               <option>Geometry</option>
               <option>Statistics</option>
@@ -85,42 +87,7 @@
       </section>
 
       <section class="card papers-list" aria-live="polite" id="papersList">
-        <div class="paper-row">
-          <div class="paper-info">
-            <span class="paper-title">SPM Mathematics 2023 Paper 2</span>
-            <span class="paper-details">Structured · 45 marks · Moderate difficulty</span>
-          </div>
-          <div class="paper-actions">
-            <button class="btn-view" type="button" onclick="window.open('resources/SPM_Math_2023_P2.pdf', '_blank')">View</button>
-            <a href="resources/SPM_Math_2023_P2.pdf" download>
-              <button class="btn-download" type="button">Download</button>
-            </a>
-          </div>
-        </div>
-
-        <div class="paper-row">
-          <div class="paper-info">
-            <span class="paper-title">SPM Mathematics 2022 Paper 1</span>
-            <span class="paper-details">Objective · 40 marks · Easy difficulty</span>
-          </div>
-          <div class="paper-actions">
-            <button class="btn-view" type="button" onclick="window.open('resources/SPM_Math_2022_P1.pdf', '_blank')">View</button>
-            <a href="resources/SPM_Math_2022_P1.pdf" download>
-              <button class="btn-download" type="button">Download</button>
-            </a>
-          </div>
-        </div>
-
-        <div class="paper-row">
-          <div class="paper-info">
-            <span class="paper-title">SPM Mathematics 2021 Paper 2</span>
-            <span class="paper-details">Structured · 45 marks · Hard difficulty</span>
-          </div>
-          <div class="paper-actions">
-            <button class="btn-view" type="button">View</button>
-            <button class="btn-download" type="button">Download</button>
-          </div>
-        </div>
+        <p class="muted">Loading papers that match your filters...</p>
       </section>
 
       <section class="grid grid--two">
@@ -132,24 +99,9 @@
           <ul class="recommended-list" id="pastChecklist">
             <li>
               <div>
-                <strong>Complete 2 timed papers</strong>
-                <small>Recommended pace: 1 per week</small>
+                <strong>Loading checklist...</strong>
+                <small>Complete or filter papers to see suggestions.</small>
               </div>
-              <button class="btn btn--ghost" type="button">Add</button>
-            </li>
-            <li>
-              <div>
-                <strong>Review marking scheme</strong>
-                <small>Highlight careless mistakes</small>
-              </div>
-              <button class="btn btn--ghost" type="button">Open</button>
-            </li>
-            <li>
-              <div>
-                <strong>Log reflections</strong>
-                <small>Capture what to improve next time</small>
-              </div>
-              <button class="btn btn--primary" type="button">Start</button>
             </li>
           </ul>
         </article>
@@ -157,15 +109,20 @@
         <article class="card fun-fact">
           <div class="section-head">
             <h2>Streak tip</h2>
-            <span class="chip">After each paper</span>
+            <span class="chip" aria-live="polite">Syncing...</span>
           </div>
-          <p id="pastTip">Snap a photo of one “aha!” solution and drop it into your learning journal—reflection boosts retention by 30%.</p>
+          <div id="pastTip">
+            <p>Tips appear here after you open a paper.</p>
+          </div>
         </article>
       </section>
     </main>
   </div>
 
   <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-shell.js"></script>
   <script src="../js/learner-pastpapers.js"></script>
 </body>
 </html>
+
+

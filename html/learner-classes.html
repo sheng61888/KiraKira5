@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -17,11 +17,11 @@
       </div>
 
       <div class="profile">
-        <div class="username">Aina</div>
+        <div class="username" aria-live="polite">Loading learner...</div>
         <div class="avatar" aria-hidden="true"></div>
-        <div class="streak">🔥 7-day streak</div>
-        <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 • 1200 XP</small>
+        <div class="streak" aria-live="polite">Syncing streak...</div>
+        <div class="xp-bar"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level updating - 0 XP</small>
       </div>
 
       <nav class="nav" aria-label="Learner navigation">
@@ -40,7 +40,7 @@
         <div>
           <p class="eyebrow">Classroom hub</p>
           <h1>Stay synced with your teacher</h1>
-          <p>Join a class with a code or check reminders, assignments, and topics in flight.</p>
+          <p>Join a class with a code or check reminders, assignments, and topics once they load.</p>
         </div>
         <div class="heading-actions">
           <button class="btn btn--ghost" type="button">Message coach</button>
@@ -64,30 +64,10 @@
         <article class="card">
           <div class="section-head">
             <h2>Announcements</h2>
-            <span class="chip">Updated today</span>
+            <span class="chip" aria-live="polite">Awaiting updates</span>
           </div>
           <div class="activity-list" id="announcementList">
-            <div class="activity-item">
-              <div>
-                <strong>Mock exam review uploaded</strong>
-                <p>Check the shared drive for official answers.</p>
-              </div>
-              <span>1h ago</span>
-            </div>
-            <div class="activity-item">
-              <div>
-                <strong>Bring geometry sets tomorrow</strong>
-                <p>We’re constructing loci in class.</p>
-              </div>
-              <span>4h ago</span>
-            </div>
-            <div class="activity-item">
-              <div>
-                <strong>Clinic slots open</strong>
-                <p>Book a 1:1 for tricky probability questions.</p>
-              </div>
-              <span>Yesterday</span>
-            </div>
+            <p class="muted">Announcements will appear here after we sync with your class.</p>
           </div>
         </article>
       </section>
@@ -101,7 +81,7 @@
           <span class="chip chip--info">Synced with public catalogue</span>
         </div>
         <div id="modulesByGrade" aria-live="polite">
-          <p class="muted">Loading module list…</p>
+          <p class="muted">Loading module list...</p>
         </div>
         <noscript>
           <p class="muted">Enable JavaScript to view your module list.</p>
@@ -111,52 +91,22 @@
       <section class="card class-dashboard" id="classDashboard" style="display:none;">
         <div class="class-info">
           <p class="eyebrow">Enrolled class</p>
-          <h2 id="classTitle">Form 5 Mathematics - Mr. Tan</h2>
-          <p id="classCodeDisplay">Code: MATH2025-A1</p>
+          <h2 id="classTitle">Your enrolled class</h2>
+          <p id="classCodeDisplay">Code: —</p>
         </div>
 
         <div class="grid grid--two">
           <div class="tasks-section">
-            <h3>📘 Ongoing topics</h3>
+            <h3>Ongoing topics</h3>
             <div id="ongoingTopics">
-              <div class="task">
-                <span>1. Linear Functions <strong>80%</strong></span>
-                <div class="meter progress-bar"><span style="width:80%"></span></div>
-              </div>
-              <div class="task">
-                <span>2. Quadratic Equations <strong>40%</strong></span>
-                <div class="meter progress-bar"><span style="width:40%"></span></div>
-              </div>
-              <div class="task">
-                <span>3. Coordinate Geometry <strong>10%</strong></span>
-                <div class="meter progress-bar"><span style="width:10%"></span></div>
-              </div>
+              <p class="muted">Coach topics will appear here after enrollment.</p>
             </div>
           </div>
 
           <div class="assignments-section">
-            <h3>📝 Assignments</h3>
+            <h3>Assignments</h3>
             <div id="assignmentList">
-              <div class="assignment">
-                <div class="assignment-info">
-                  <span class="assignment-title">Algebra Practice Set</span>
-                  <span class="assignment-date">Due: Oct 20, 2025</span>
-                </div>
-                <div class="completion">
-                  <div class="meter completion-bar"><span style="width:100%"></span></div>
-                  <small>Completed</small>
-                </div>
-              </div>
-              <div class="assignment">
-                <div class="assignment-info">
-                  <span class="assignment-title">Quadratic Quiz</span>
-                  <span class="assignment-date">Due: Oct 25, 2025</span>
-                </div>
-                <div class="completion">
-                  <div class="meter completion-bar"><span style="width:60%"></span></div>
-                  <small>In progress</small>
-                </div>
-              </div>
+              <p class="muted">Assignments will load once your class syncs.</p>
             </div>
           </div>
         </div>
@@ -166,9 +116,12 @@
 
   <!-- JS -->
   <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-shell.js"></script>
   <script src="../js/modules-data.js"></script>
   <script src="../js/learner-modules.js"></script>
   <script src="../js/catalogue-classes.js"></script>
   <script src="../js/learner-classes-page.js"></script>
 </body>
 </html>
+
+

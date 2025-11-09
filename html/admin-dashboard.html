@@ -18,7 +18,7 @@
                 <a href="admin-UserManagement.html">User Management</a>
                 <a href="admin-CourseManagement.html">Course Management</a>
                 <a href="admin-Reporting.html">Reports</a>
-                <a href="../html/login_signup.html">Sign Out</a>
+                <a href="../html/login_signup.html" onclick="return confirm('Are you sure you want to sign out?')">Sign Out</a>
             </nav>
         </aside>
 
@@ -26,7 +26,7 @@
             <header class="page-heading">
                 <div>
                     <p class="eyebrow">Admin Panel</p>
-                    <h1>Welcome, Admin</h1>
+                    <h1 id="welcomeMessage">Welcome, Admin</h1>
                     <p>Manage your KiraKira learning platform</p>
                 </div>
             </header>
@@ -84,6 +84,12 @@
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('welcomeMessage').textContent = `Welcome, ${userName}`;
+        }
+    </script>
     <script src="../js/admin.js"></script>
 </body>
 </html>

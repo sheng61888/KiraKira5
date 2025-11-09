@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -17,11 +17,11 @@
       </div>
 
       <div class="profile">
-        <div class="username">Aina</div>
+        <div class="username" aria-live="polite">Loading learner...</div>
         <div class="avatar" aria-hidden="true"></div>
-        <div class="streak">🔥 7-day streak</div>
-        <div class="xp-bar"><span style="width:65%"></span></div>
-        <small>Level 3 • 1200 XP</small>
+        <div class="streak" aria-live="polite">Syncing streak...</div>
+        <div class="xp-bar"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level updating - 0 XP</small>
       </div>
 
       <nav class="nav" aria-label="Learner navigation">
@@ -39,11 +39,11 @@
       <header class="page-heading">
         <div>
           <p class="eyebrow">Progress report</p>
-          <h1>You're 75% through Form 5 Math</h1>
-          <p>Keep your streak alive—2 more focused sessions this week will unlock the Geometry badge.</p>
+          <h1>Track your learning momentum</h1>
+          <p aria-live="polite">We will show your personalised stats as soon as they load.</p>
         </div>
         <div class="heading-actions">
-          <button class="btn btn--ghost" type="button" id="downloadReportBtn">Download report</button>
+          <button class="btn btn--ghost" type="button" id="downloadReportBtn" disabled>Preparing report...</button>
           <button class="btn btn--primary" type="button">Share with coach</button>
         </div>
       </header>
@@ -52,11 +52,11 @@
       <section class="card overall-progress">
         <div class="section-head">
           <h2>Overall completion</h2>
-          <span class="chip chip--success">+8% this week</span>
+          <span class="chip chip--info" aria-live="polite">Tracking...</span>
         </div>
-        <div class="big-progress" aria-label="Overall completion 75%">
-          <div class="meter big-progress-bar"><span style="width:75%"></span></div>
-          <p><strong>75%</strong> of your class materials completed!</p>
+        <div class="big-progress" aria-label="Overall completion">
+          <div class="meter big-progress-bar"><span style="width:0%"></span></div>
+          <p><strong>0%</strong> of your class materials completed.</p>
         </div>
       </section>
 
@@ -64,66 +64,32 @@
       <section class="card topic-progress" aria-labelledby="topics-title">
         <div class="section-head">
           <h2 id="topics-title">Topic progress</h2>
-          <span class="chip">4 topics in progress</span>
+          <span class="chip" aria-live="polite">Syncing...</span>
         </div>
 
         <div id="topicProgressList">
-          <div class="topic">
-            <span>Algebra Basics <strong>100%</strong></span>
-            <div class="meter progress-bar"><span style="width:100%"></span></div>
-            <small>Completed 🎉 — ready for mastery quiz.</small>
-          </div>
-          <div class="topic">
-            <span>Quadratic Equations <strong>65%</strong></span>
-            <div class="meter progress-bar"><span style="width:65%"></span></div>
-            <small>In progress — review mistakes from last drill.</small>
-          </div>
-          <div class="topic">
-            <span>Coordinate Geometry <strong>45%</strong></span>
-            <div class="meter progress-bar"><span style="width:45%"></span></div>
-            <small>In progress — live class today will push this to 60%.</small>
-          </div>
-          <div class="topic">
-            <span>Statistics <strong>25%</strong></span>
-            <div class="meter progress-bar"><span style="width:25%"></span></div>
-            <small>Just started — plan a catch-up session this weekend.</small>
-          </div>
+          <p class="muted">Loading topic progress...</p>
         </div>
       </section>
 
       <!-- Completion Message -->
       <section class="grid grid--two">
         <article class="card motivation" id="motivation">
-          <h2>You're doing amazing! 🐾</h2>
-          <p>Keep going — every problem solved brings you closer to mastery!</p>
+          <h2 aria-live="polite">Hang tight!</h2>
+          <p>Your encouragement card updates after we fetch your data.</p>
         </article>
 
         <article class="card">
           <div class="section-head">
             <h2>Next checkpoints</h2>
-            <span class="chip chip--info">Coach review Friday</span>
+            <span class="chip chip--info" aria-live="polite">Awaiting data</span>
           </div>
           <ul class="recommended-list" id="checkpointList">
             <li>
               <div>
-                <strong>Finish Quadratics drill</strong>
-                <small>Score ≥ 80% to stay on track.</small>
+                <strong>Loading checkpoints...</strong>
+                <small>We'll list your actionable steps here.</small>
               </div>
-              <button class="btn btn--ghost" type="button">Open</button>
-            </li>
-            <li>
-              <div>
-                <strong>Upload Geometry notes</strong>
-                <small>Coach Tan leaves feedback in 24h.</small>
-              </div>
-              <button class="btn btn--ghost" type="button">Upload</button>
-            </li>
-            <li>
-              <div>
-                <strong>Schedule Statistics catch-up</strong>
-                <small>Pick a weekend slot.</small>
-              </div>
-              <button class="btn btn--primary" type="button">Book</button>
             </li>
           </ul>
         </article>
@@ -132,6 +98,9 @@
   </div>
 
   <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-shell.js"></script>
   <script src="../js/learner-progress.js"></script>
 </body>
 </html>
+
+
