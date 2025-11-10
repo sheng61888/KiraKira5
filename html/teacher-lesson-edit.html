@@ -14,245 +14,54 @@
 
 
     <style>
-        /* --- NEW LAYOUT STYLES --- */
-        .app {
-            display: flex;
-            min-height: calc(100vh - 80px); /* 80px is approx header height */
-        }
-        .sidebar {
-            width: 280px;
-            flex-shrink: 0;
-            background: #fdfdfd;
-            border-right: 1px solid #eee;
-            padding: 1.5rem;
-            height: calc(100vh - 80px);
-            overflow-y: auto;
-            position: sticky;
-            top: 80px; /* Aligns with header */
-        }
-        .sidebar .nav {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-        .sidebar h3 {
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .sidebar .lesson-nav {
-             display: flex;
-             flex-direction: column;
-        }
-         .sidebar .lesson-nav a {
-            padding: 0.6rem 0.75rem;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #333;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border: 1px solid transparent;
-         }
-         .sidebar .lesson-nav a:hover {
-            background: #f4f4f4;
-         }
-         .sidebar .lesson-nav a.active {
-            font-weight: 600;
-            color: #4e54c8;
-            background: #eef0ff;
-            border-color: #c9cfff;
-         }
+        /* --- ALL CSS STYLES (Unchanged) --- */
+        .app { display: flex; min-height: calc(100vh - 80px); }
+        .sidebar { width: 280px; flex-shrink: 0; background: #fdfdfd; border-right: 1px solid #eee; padding: 1.5rem; height: calc(100vh - 80px); overflow-y: auto; position: sticky; top: 80px; }
+        .sidebar .nav { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+        .sidebar h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar .lesson-nav { display: flex; flex-direction: column; }
+         .sidebar .lesson-nav a { padding: 0.6rem 0.75rem; border-radius: 6px; text-decoration: none; color: #333; font-size: 0.9rem; font-weight: 500; border: 1px solid transparent; }
+         .sidebar .lesson-nav a:hover { background: #f4f4f4; }
+         .sidebar .lesson-nav a.active { font-weight: 600; color: #4e54c8; background: #eef0ff; border-color: #c9cfff; }
          
-        .main {
-            flex-grow: 1;
-            padding: 0; /* Existing sections have padding */
-            background: #f9f9f9;
-        }
+        .main { flex-grow: 1; padding: 0; background: #f9f9f9; }
         
-        main.main > section {
-             max-width: 960px;
-             margin: 2rem auto;
-             padding: 2rem;
-             border-radius: 8px;
-             background: #fff;
-             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .lesson-overview {
-            background: none;
-            box-shadow: none;
-            padding: 0;
-            margin: 0;
-            max-width: none;
-        }
-        main.main > .lesson-overview {
-            margin-top: 0;
-            border-radius: 0;
-        }
-
-        /* --- Form & Editor Styles (Existing) --- */
-        .editor-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            background: #fff; /* Assuming light theme default */
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .editor-form h2 {
-            margin-top: 0;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .form-group label {
-            font-weight: 600;
-            color: #444;
-        }
-        .form-group input[type="text"],
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box; /* Important for padding */
-        }
-        
-        .form-group .editor-container {
-            height: 250px;
-            background: #fff;
-            color: #000;
-        }
-        
-        .form-group .editor-container-mcq {
-            height: 120px; /* Shorter height for question/explanation */
-            background: #fff;
-            color: #000;
-        }
-
-        .btn-danger {
-            background-color: #d9534f;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .btn-danger:hover {
-            background-color: #c9302c;
-        }
-
-        .quiz-manager-header {
-            border-bottom: 2px solid #eee;
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        #addQuestionForm {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        #addQuestionForm h3 {
-            margin-top: 0;
-        }
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .quiz-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .quiz-tab {
-            padding: 0.75rem 1.25rem;
-            border: 1px solid #ccc;
-            background: #f9f9f9;
-            border-radius: 6px 6px 0 0;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .quiz-tab.active {
-            background: #fff;
-            border-bottom: 1px solid #fff;
-            color: #4e54c8; /* Example color from previous HTML */
-        }
-        
-        .quiz-question-management-list {
-            border: 1px solid #ccc;
-            padding: 1.5rem;
-            border-radius: 0 8px 8px 8px;
-        }
-        
-        .admin-question-card {
-            background: #fdfdfd;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-        }
-        .admin-question-card:last-child {
-            margin-bottom: 0;
-        }
-        .admin-question-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start; /* Align top for long questions */
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .admin-question-text {
-            font-weight: 600;
-            font-size: 1.1rem;
-            flex: 1; /* Allows text to wrap */
-        }
-        .admin-question-text p, .explanation p {
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-
-        .admin-question-card ul {
-            list-style-type: none;
-            padding-left: 0;
-            margin: 0.5rem 0;
-        }
-        .admin-question-card ul li {
-            padding: 0.25rem 0;
-            color: #555;
-        }
-        .admin-question-card ul li.correct {
-            font-weight: 700;
-            color: #2a8a48; /* Green for correct answer */
-        }
-        .admin-question-card .explanation {
-            font-style: italic;
-            color: #666;
-            border-top: 1px dashed #ccc;
-            padding-top: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        
-        .is-hidden {
-            display: none;
-        }
+        main.main > section { max-width: 960px; margin: 2rem auto; padding: 2rem; border-radius: 8px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .lesson-overview { background: none; box-shadow: none; padding: 0; margin: 0; max-width: none; }
+        main.main > .lesson-overview { margin-top: 0; border-radius: 0; }
+        .editor-form { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; background: #fff; border-radius: 8px; padding: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .editor-form h2 { margin-top: 0; margin-bottom: 0.5rem; color: #333; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group label { font-weight: 600; color: #444; }
+        .form-group input[type="text"], .form-group select, .form-group textarea { width: 100%; padding: 0.75rem 1rem; font-family: 'Inter', sans-serif; font-size: 1rem; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .form-group .editor-container { height: 250px; background: #fff; color: #000; }
+        .form-group .editor-container-mcq { height: 120px; background: #fff; color: #000; }
+        .btn-edit-question { background-color: #f0f0f0; color: #333; border: 1px solid #ccc; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 500; }
+        .btn-edit-question:hover { background-color: #e0e0e0; }
+        .btn-secondary { background-color: #6c757d; color: white; border: none; padding: 0.8rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 500; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-danger { background-color: #d9534f; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 500; }
+        .btn-danger:hover { background-color: #c9302c; }
+        .quiz-manager-header { border-bottom: 2px solid #eee; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+        #addQuestionForm { border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
+        #addQuestionForm h3 { margin-top: 0; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .quiz-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .quiz-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .quiz-tab { padding: 0.75rem 1.25rem; border: 1px solid #ccc; background: #f9f9f9; border-radius: 6px 6px 0 0; cursor: pointer; font-weight: 500; }
+        .quiz-tab.active { background: #fff; border-bottom: 1px solid #fff; color: #4e54c8; }
+        .quiz-question-management-list { border: 1px solid #ccc; padding: 1.5rem; border-radius: 0 8px 8px 8px; }
+        .admin-question-card { background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 6px; padding: 1.25rem; margin-bottom: 1rem; }
+        .admin-question-card:last-child { margin-bottom: 0; }
+        .admin-question-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+        .admin-question-card-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+        .admin-question-text { font-weight: 600; font-size: 1.1rem; flex: 1; }
+        .admin-question-text p, .explanation p { margin-top: 0; margin-bottom: 0; }
+        .admin-question-card ul { list-style-type: none; padding-left: 0; margin: 0.5rem 0; }
+        .admin-question-card ul li { padding: 0.25rem 0; color: #555; }
+        .admin-question-card ul li.correct { font-weight: 700; color: #2a8a48; }
+        .admin-question-card .explanation { font-style: italic; color: #666; border-top: 1px dashed #ccc; padding-top: 0.5rem; margin-top: 0.5rem; }
+        .is-hidden { display: none; }
     </style>
 
 </head>
@@ -321,22 +130,18 @@
             <section class="container lesson-overview">
                 <form id="lessonDetailsForm" class="editor-form">
                     <h2>Edit Lesson Content</h2>
-                    
                     <div class="form-group">
                         <label for="lessonOverviewEditor">Lesson Overview</label>
                         <div id="lessonOverviewEditor" class="editor-container"></div>
                     </div>
-
                     <div class="form-group">
                         <label for="lessonConceptsEditor">Key Concepts / Skills</label>
                         <div id="lessonConceptsEditor" class="editor-container"></div>
                     </div>
-
                     <div class="form-group">
                         <label for="lessonSource">Source Citation</label>
                         <input type="text" id="lessonSource" name="lessonSource" value="" />
                     </div>
-                    
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Save Lesson Details</button>
                     </div>
@@ -348,12 +153,11 @@
                     <div class="section-header quiz-manager-header">
                         <p class="eyebrow">Quizzes</p>
                         <h2 class="section-title">Manage Quiz Questions</h2>
-                        <p>Add or delete questions for Quiz A (Easy) and Quiz B (Hard).</p>
+                        <p>Add, edit, or delete questions for Quiz A (Easy) and Quiz B (Hard).</p>
                     </div>
 
                     <form id="addQuestionForm">
-                        <h3>Add a New Question</h3>
-                        
+                        <h3 id="formTitle">Add a New Question</h3>
                         <div class="form-group">
                             <label for="quizSelect">Add to which quiz?</label>
                             <select id="quizSelect" name="quizSelect">
@@ -361,12 +165,10 @@
                                 <option value="quizB">Quiz B (Hard)</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label for="questionTextEditor">Question Text</label>
                             <div id="questionTextEditor" class="editor-container-mcq"></div>
                         </div>
-                        
                         <div class="options-grid">
                             <div class="form-group">
                                 <label for="option1">Option 1 (Plain Text)</label>
@@ -385,7 +187,6 @@
                                 <input type="text" id="option4" name="option4" />
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label for="correctAnswer">Correct Answer</label>
                             <select id="correctAnswer" name="correctAnswer">
@@ -395,14 +196,13 @@
                                 <option value="4">Option 4</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label for="explanationEditor">Answer Explanation</label>
                             <div id="explanationEditor" class="editor-container-mcq"></div>
                         </div>
-
                         <div class="quiz-actions">
                             <button id="addQuestionBtn" class="btn btn-primary" type="submit">Add Question</button>
+                            <button id="cancelEditBtn" class="btn btn-secondary is-hidden" type="button">Cancel Edit</button>
                         </div>
                     </form>
 
@@ -411,12 +211,8 @@
                         <button class="quiz-tab active" data-quiz="quizA" type="button">Quiz A</button>
                         <button class="quiz-tab" data-quiz="quizB" type="button">Quiz B</button>
                     </div>
-
-                    <div id="quizAList" class="quiz-question-management-list">
-                        </div>
-                    <div id="quizBList" class="quiz-question-management-list is-hidden">
-                        </div>
-
+                    <div id="quizAList" class="quiz-question-management-list"></div>
+                    <div id="quizBList" class="quiz-question-management-list is-hidden"></div>
                 </div>
             </section>
         </main>
@@ -427,188 +223,17 @@
         </div>
     </footer>
 
-    <script src="../js/theme.js"></script> <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="../js/theme.js"></script> 
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
     
     <script>
-        // --- START OF (NOW COMPLETE) DUMMY DATABASE ---
-        const DUMMY_DATABASE = new Map();
-
-        // --- FORM 4 DATA ---
-        DUMMY_DATABASE.set('form4-01', {
-            eyebrow: 'Form 4 - Module 01',
-            title: 'Quadratic Functions & Equations in One Variable',
-            overview: `<p>This module builds fluency with the three equivalent forms of a quadratic function: standard form <em>y = ax<sup>2</sup> + bx + c</em>, factored form, and vertex form. You will investigate how changing the values of <em>a</em>, <em>b</em>, and <em>c</em> affects the graph, and how the discriminant reveals the number of real roots a quadratic equation possesses.</p>
-                       <ul><li>Sketch parabolas by identifying axis of symmetry, roots, and vertex.</li><li>Select a solving method (factorisation, completing the square, quadratic formula) suited to the equation.</li><li>Interpret solutions within financial, measurement, and motion contexts.</li></ul>`,
-            concepts: `<ul><li>Formula Booklet: Quadratic identities & discriminant definitions.</li><li>Interactive Graph Tool: Visualise how parameter changes stretch or shift a parabola.</li><li>Practice Pack: 20 exam-style questions arranged by difficulty.</li></ul>`,
-            source: 'KiraKira Internal Notes',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form4-02', {
-            eyebrow: 'Form 4 - Module 02',
-            title: 'Number Bases & Conversions',
-            overview: `<p>A number base tells you which digits are allowed and how each place represents powers of that base. In any base b (where b is at least 2) the valid digits run from 0 up to b minus 1. ... A numeral such as (d<sub>k</sub> d<sub>k-1</sub> ... d<sub>1</sub> d<sub>0</sub>)<sub>b</sub> represents the expanded sum d<sub>k</sub>b<sup>k</sup> + ... + d<sub>0</sub>.</p>`,
-            concepts: `<ul><li><strong>Base b to base 10:</strong> Expand using place value and sum digit times b to the relevant power.</li><li><strong>Base 10 to base b:</strong> Use repeated division by b and read the remainders from last to first.</li><li><strong>Between non-decimal bases:</strong> Convert via base 10 or group digits when bases are related (for example binary to octal or hex).</li></ul>`,
-            source: 'KiraKira Chapter 2, Number Bases.',
-            quizzes: {
-                quizA: [
-                    { id: 'q2a', text: '<p>What is the place value of the digit \'2\' in <strong>213<sub>8</sub></strong>?</p>', options: ['8⁰', '8²', '8¹', '10²'], correct: 2, explanation: '<p>The \'2\' is in the 3rd position, which corresponds to <strong>8<sup>2</sup></strong>.</p>' }
-                ],
-                quizB: []
-            }
-        });
-
-        DUMMY_DATABASE.set('form4-03', {
-            eyebrow: 'Form 4 - Module 03',
-            title: 'Logical Reasoning: Statements & Arguments',
-            overview: `<p>A statement is any sentence that can be labelled true or false. We build complex statements with AND (written as and or P && Q), OR (P or Q), and NOT (not P), then track their truth values using tables. Conditional statements (if P then Q) have relatives: converse, inverse, and contrapositive.</p><p>Arguments chain statements together. An argument is valid when true premises force the conclusion to be true. Validity depends on structure, not the topic of the sentence. Classic traps include affirming the consequent and denying the antecedent.</p>`,
-            concepts: `<ul><li>Classify sentences as statements or non-statements.</li><li>Write truth tables and find negations, converses, and contrapositives.</li><li>Test arguments for validity and identify common fallacies.</li></ul>`,
-            source: 'KiraKira Internal Notes',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form4-04', {
-            eyebrow: 'Form 4 - Module 04',
-            title: 'Operations on Sets',
-            overview: `<p>Sets collect related elements. Union (A U B) captures everything in A or B, intersection (A n B) keeps only the overlap, and difference (A \ B) removes members of B. Complements depend on the universal set U and flip membership in or out of U.</p><p>De Morgan's laws (complement of A U B equals A' n B' and complement of A n B equals A' U B') help simplify expressions and solve questions quickly. Venn diagrams make combined operations visible so you can reason visually and algebraically.</p>`,
-            concepts: `<ul><li>Interpret subset notation and cardinality relationships.</li><li>Apply inclusion and exclusion principles to count elements across sets.</li><li>Use Venn diagrams and De Morgan's laws to simplify expressions.</li></ul>`,
-            source: 'KiraKira Internal Notes',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form4-05', {
-            eyebrow: 'Form 4 - Module 05',
-            title: 'Networks & Graph Theory Basics',
-            overview: `<p>A graph (or network) is a set of vertices linked by edges. Degree counts how many edges touch a vertex, while paths and cycles describe how we move through the graph. Euler trails use every edge once, Hamiltonian paths visit every vertex once, and trees are connected graphs with no cycles.</p><p>Weighted graphs assign distances or costs. Algorithms such as Dijkstra's shortest path or Kruskal's minimum spanning tree help solve routing and optimisation problems quickly.</p>`,
-            concepts: `<ul><li>Determine degrees and classify Euler vs Hamiltonian possibilities.</li><li>Apply rules for existence of Euler trails/circuits and properties of trees.</li><li>Use shortest-path or spanning-tree ideas to interpret network diagrams.</li></ul>`,
-            source: 'KiraKira Internal Notes',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form4-06', {
-            eyebrow: 'Form 4 - Module 06',
-            title: 'Linear Inequalities in Two Variables',
-            overview: `<p>Inequalities such as ax + by <= c describe half-planes. The boundary line ax + by = c is solid for <= or >= and dashed for < or >. Pick a test point (often (0,0)) to decide which side to shade.</p><p>Systems combine several inequalities. Their solution set is the overlapping region. Many optimisation problems restrict x and y to the first quadrant (x >= 0, y >= 0), so be comfortable interpreting these geometric constraints.</p>`,
-            concepts: `<ul><li>Convert inequalities to boundary-line form and determine intercepts.</li><li>Decide whether the boundary is solid or dashed and test shading.</li><li>Graph feasible regions for systems and interpret coordinate solutions.</li></ul>`,
-            source: 'KiraKira Internal Notes',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form4-07', {
-            eyebrow: 'Form 4 - Module 07',
-            title: 'Graphs of Motion',
-            overview: `<p>In distance-time graphs, slope equals speed. Flat segments mean resting, steeper segments mean faster travel, and a line sloping down would be impossible.</p><p>In speed-time graphs, slope equals acceleration and the area under the curve equals distance travelled. Use rectangles and triangles to split piecewise graphs, then sum the areas for total distance.</p>`,
-            concepts: `<ul><li>Describe motion stories from distance-time graphs.</li><li>Compute distance as area under speed-time graphs.</li><li>Interpret acceleration from slopes and compare motion segments.</li></ul>`,
-            source: 'KiraKira Internal Notes',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form4-08', {
-            eyebrow: 'Form 4 - Module 08',
-            title: 'Measures of Dispersion (Ungrouped Data)',
-            overview: `<p>Dispersion tells the story of variability. Range compares extremes, IQR captures the middle 50%, and MAD averages absolute deviations from the mean. Variance and standard deviation square deviations before averaging to emphasise outliers.</p><p>Understand how adding or multiplying all data values affects each measure so you can predict changes without recalculating everything from scratch.</p>`,
-            concepts: `<ul><li>Compute range, IQR, MAD, variance, and standard deviation for raw data.</li><li>Explain which measures resist outliers best.</li><li>Describe how shifting or scaling data transforms each measure.</li></ul>`,
-            source: 'KiraKira Internal Notes',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form4-09', {
-            eyebrow: 'Form 4 - Module 09',
-            title: 'Probability of Combined Events',
-            overview: `<p>For any events A and B, use P(A U B) = P(A) + P(B) - P(A n B). Mutually exclusive events have P(A n B) = 0. Independent events satisfy P(A n B) = P(A)P(B) or P(A | B) = P(A). Without replacement typically means dependence.</p><p>Tree diagrams and tables help visualise sequential events. Conditional probability P(A | B) = P(A n B) / P(B) keeps your logic precise.</p>`,
-            concepts: `<ul><li>Decide when events are mutually exclusive, independent, or dependent.</li><li>Apply addition and multiplication rules accurately.</li><li>Use conditional probability to interpret real contexts (with or without replacement).</li></ul>`,
-            source: 'KiraKira Internal Notes',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form4-10', {
-            eyebrow: 'Form 4 - Module 10',
-            title: 'Consumer Mathematics: Financial Planning & Management',
-            overview: `<p>Budgeting balances income against needs and wants, while emergency funds cover 3-6 months of expenses. Interest can be simple (I = P r t) or compound (A = P(1 + r / n)^(n t)). Compare best buys using unit pricing and percentage change, and manage loans by paying down principal early.</p><p>Understand effective annual rates, discounts, and amortisation schedules so you can judge the true cost of financial decisions.</p>`,
-            concepts: `<ul><li>Compute simple and compound interest plus effective rates.</li><li>Analyse budgets, percentage increases, and best-buy comparisons.</li><li>Explain debt strategies, emergency funds, and amortisation behaviour.</li></ul>`,
-            source: 'KiraKira Internal Notes',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        // --- FORM 5 DATA ---
-        DUMMY_DATABASE.set('form5-01', {
-            eyebrow: 'Form 5 - Module 01',
-            title: 'Variation (Direct, Inverse & Joint)',
-            overview: `<p>Variation problems always begin with a relationship statement: "y varies directly as x" becomes y = kx^n, inverse variation becomes y = k / x^n, and joint scenarios combine several variables such as y = kx^a z^b. Once the sentence becomes a proportional model, plug in the given values to find the constant k before making any prediction.</p><p>Track exponents and units because they reveal whether the change is linear, quadratic, or links multiple variables. When a variable changes by a percentage or factor, apply the same multiplier to the whole equation to determine how the dependent quantity reacts.</p>`,
-            concepts: `<ul><li>Underline the trigger words (direct, inversely, jointly) and write the proportional statement before turning it into an equation.</li><li>Use the provided pair of values to solve for the constant k, then plug it back for predictions.</li><li>When multiple variables vary together, treat any unchanged variable as a constant so only the changing variables remain.</li></ul>`,
-            source: 'KiraKira Form 5 Variation chapter.',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form5-02', {
-            eyebrow: 'Form 5 - Module 02',
-            title: 'Matrices & Operations',
-            overview: `<p>A matrix is simply a rectangular array with dimensions rows x columns. Two matrices are equal only when their orders and every corresponding entry match. Addition and subtraction are performed entry-wise, while multiplication AB is possible only when the number of columns in A equals the number of rows in B, resulting in a matrix whose order is determined by the outer dimensions.</p><p>Thinking about rows and columns as vectors helps when performing dot products for multiplication. You will also read contexts such as transformation matrices or tabular data, so labelling your matrices clearly prevents order mistakes.</p>`,
-            concepts: `<ul><li>State the order of every matrix before deciding what operation is possible.</li><li>Use element-by-element addition or subtraction only when orders match exactly.</li><li>For multiplication, write the row of the first matrix and column of the second matrix you are combining to avoid mixing indices.</li></ul>`,
-            source: 'KiraKira Form 5 Matrices notes.',
-            quizzes: { quizA: [], quizB: [] }
-        });
-
-        DUMMY_DATABASE.set('form5-03', {
-            eyebrow: 'Form 5 - Module 03',
-            title: 'Consumer Math: Insurance',
-            overview: `<p>Insurance is a contract that shifts the possibility of loss from an individual to an insurer. These Form 5 notes focus on identifying the type of risk (life versus general), matching it with the correct coverage, and reading the policy features that decide how much a claim pays. Premiums rise with higher risk profiles or wider coverage because the insurer promises a larger sum assured.</p><p>You will interpret real policy snippets, calculate out-of-pocket costs when deductibles or co-insurance apply, and explain why exclusions exist. Linking each feature to its practical effect prepares you for structured and objective questions alike.</p>`,
-            concepts: `<ul><li><strong>Risk:</strong> the possibility of loss; not every negative event is insurable.</li><li><strong>Premium:</strong> the periodic payment made to secure coverage, influenced by risk level and benefits.</li><li><strong>Sum assured, deductible, and co-insurance:</strong> determine how much the insurer pays versus how much you pay.</li></ul>`,
-            source: 'KiraKira Consumer Math - Insurance.',
-            quizzes: { quizA: [], quizB: [] }
-        });
-        
-        DUMMY_DATABASE.set('form5-04', {
-            eyebrow: 'Form 5 - Module 04',
-            title: 'Consumer Math: Taxation',
-            overview: `<p>SST has two components: a sales tax applied once at the manufacturing or import stage, and a service tax imposed on specific services such as hotels, prepared food, and telecommunication providers. Personal income tax is progressive, so higher income bands are taxed at higher rates, but reliefs and rebates reduce the chargeable income before tax is computed.</p><p>You will read short cases, identify whether SST applies, and practise rearranging the chargeable income formula. Keeping receipts and documentation matters because taxpayers must prove eligibility for reliefs.</p>`,
-            concepts: `<ul><li>SST stands for Sales and Service Tax; it is not charged at every stage like GST.</li><li>Tax reliefs and rebates bring down the chargeable income, which in turn reduces tax payable.</li><li>Progressive systems mean a higher bracket attracts a higher rate, so calculations must be tiered.</li></ul>`,
-            source: 'KiraKira Consumer Math - Taxation.',
-            quizzes: { quizA: [], quizB: [] }
-        });
-        
-        DUMMY_DATABASE.set('form5-05', {
-            eyebrow: 'Form 5 - Module 05',
-            title: 'Congruent, Enlargement & Combined Transformations',
-            overview: `<p>Congruent figures share the same shape and size and can be mapped using translations, rotations, or reflections. Enlargement introduces a scale factor (k) that multiplies lengths by (k) and areas by (k^2). Negative scale factors reflect through the centre before enlarging. Combined transformations require you to describe the actions in order, while tessellations rely on repeating shapes without gaps.</p><p> We group these skills under the same chapter so you can connect congruency tests, vector descriptions of translations, rotation details (centre, angle, direction), and enlargement coordinates in one go.</p>`,
-            concepts: `<ul><li>State the centre and scale factor whenever you describe an enlargement; mention sign changes if k is negative.</li><li>For combined moves, write them in the order performed because reflect-then-rotate differs from rotate-then-reflect.</li><li>Remember that a regular tessellation needs one regular polygon repeated with no overlaps.</li></ul>`,
-            source: 'KiraKira Transformations set.',
-            quizzes: { quizA: [], quizB: [] }
-        });
-        
-        DUMMY_DATABASE.set('form5-06', {
-            eyebrow: 'Form 5 - Module 06',
-            title: 'Ratio & Graph of Trigonometric Functions',
-            overview: `<p>This module revisits the unit circle so you can determine exact values (like sin 30 degrees or cos 180 degrees) and infer signs in every quadrant using the ASTC mnemonic ("All Students Take Coffee"). From there, you sketch or read sine and cosine graphs (range -1 to 1, period 360 degrees) and tangent graphs (period 180 degrees with vertical asymptotes).</p><p>Scaling the graph with amplitudes or vertical stretches changes only the range, not the period, unless the angle input is multiplied by a factor. Tangent functions produce zeros and asymptotes at predictable intervals, which examiners love to test.</p>`,
-            concepts: `<ul><li>Memorise benchmark values at 0, 30, 45, 60, 90, 180, 270, and 360 degrees.</li><li>Quote the period and amplitude whenever you describe a trig graph.</li><li>State where tangent is undefined by listing the angles of its vertical asymptotes.</li></ul>`,
-            source: 'KiraKira Form 5 Trigonometric Functions.',
-            quizzes: { quizA: [], quizB: [] }
-        });
-        
-        DUMMY_DATABASE.set('form5-07', {
-            eyebrow: 'Form 5 - Module 07',
-            title: 'Measures of Dispersion for Grouped Data',
-            overview: `<p>Unlike ungrouped data, grouped data require estimating with class midpoints. Mean is computed with the ratio (sum of fx) / (sum of f), while variance uses (sum of fx^2) / (sum of f) minus (mean)^2. Interquartile range draws from a cumulative frequency (ogive) to locate Q1 and Q3 before subtracting. Remember: shifting every value by a constant leaves standard deviation unchanged, but scaling by a factor multiplies it.</p><p>You will also reason about skewness (mean vs median) and how outliers push mean and standard deviation more than medians.</p>`,
-            concepts: `<ul><li>Use class midpoints when estimating range or calculating the sum of fx and fx^2.</li><li>Build a cumulative frequency table to read off quartile positions quickly.</li><li>State the median position ((sum of f) / 2) before interpolating within the relevant class.</li></ul>`,
-            source: 'KiraKira Measures of Dispersion (Grouped Data).',
-            quizzes: { quizA: [], quizB: [] }
-        });
-        
-        DUMMY_DATABASE.set('form5-08', {
-            eyebrow: 'Form 5 - Module 08',
-            title: 'Mathematical Modelling',
-            overview: `<p>Modelling always starts with clarity: what quantity are we trying to predict and under what conditions? From there, we define assumptions, introduce variables, and choose a mathematical relationship (variation, linear, quadratic, exponential, and so on) that best matches the situation. After solving, we interpret the answer, verify against the context, and refine the model if reality disagrees with the prediction.</p><p>KiraKira Form 5 notes emphasise using given data to estimate parameters such as the constant k, evaluating residuals to judge the fit, and communicating the process with limitations clearly stated.</p>`,
-            concepts: `<ul><li>Define the problem and scope.</li><li>List assumptions and choose variables or parameters.</li><li>Build, test, and refine the model before presenting results with context and limitations.</li></ul>`,
-            source: 'KiraKira Mathematical Modelling.',
-            quizzes: { quizA: [], quizB: [] }
-        });
-        // --- END OF DATABASE ---
-
-
         // --- GLOBAL VARIABLES ---
         let currentLessonId = null;
-        let currentLessonData = null;
+        let currentLessonData = {}; // Will hold lesson details and quizzes
+        
+        // --- NEW: Track editing state ---
+        let currentlyEditingQuestionId = null; 
         
         let overviewEditor, conceptsEditor, questionTextEditor, explanationEditor;
         
@@ -623,57 +248,80 @@
 
         // --- CORE FUNCTIONS ---
         
+        /**
+         * NEW: This function runs on page load.
+         * It gets the lesson ID from the URL and fetches all data from the server.
+         */
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             currentLessonId = urlParams.get('lesson');
 
             if (!currentLessonId) {
-                currentLessonId = 'form4-01'; 
+                currentLessonId = 'form4-01'; // Default
             }
 
-            currentLessonData = DUMMY_DATABASE.get(currentLessonId);
-
-            if (!currentLessonData) {
-                alert(`Lesson "${currentLessonId}" not found. Redirecting.`);
-                window.location.href = 'teacher-dashboard.html';
-                return;
-            }
-
-            overviewEditor = new Quill('#lessonOverviewEditor', {
-                theme: 'snow',
-                modules: { toolbar: mathToolbarOptions }
-            });
-            conceptsEditor = new Quill('#lessonConceptsEditor', {
-                theme: 'snow',
-                modules: { toolbar: mathToolbarOptions }
-            });
-            questionTextEditor = new Quill('#questionTextEditor', {
-                theme: 'snow',
-                modules: { toolbar: mathToolbarOptions },
-                placeholder: 'e.g., What is 1011₂ in base 10?'
-            });
-            explanationEditor = new Quill('#explanationEditor', {
-                theme: 'snow',
-                modules: { toolbar: mathToolbarOptions },
-                placeholder: 'Explain why the answer is correct...'
-            });
-
-            loadLessonContent();
-            renderAllQuizLists();
-            highlightActiveLesson();
+            // Initialize Quill Editors (must be done before fetching data)
+            overviewEditor = new Quill('#lessonOverviewEditor', { theme: 'snow', modules: { toolbar: mathToolbarOptions } });
+            conceptsEditor = new Quill('#lessonConceptsEditor', { theme: 'snow', modules: { toolbar: mathToolbarOptions } });
+            questionTextEditor = new Quill('#questionTextEditor', { theme: 'snow', modules: { toolbar: mathToolbarOptions }, placeholder: 'e.g., What is 1011₂ in base 10?' });
+            explanationEditor = new Quill('#explanationEditor', { theme: 'snow', modules: { toolbar: mathToolbarOptions }, placeholder: 'Explain why the answer is correct...' });
             
+            // Fetch all data and populate the page
+            loadPageData(currentLessonId);
+
+            // Set up footer year
             document.getElementById("current-year").textContent = new Date().getFullYear();
+            
+            // Add listener for Cancel button
+            document.getElementById('cancelEditBtn').addEventListener('click', cancelEditMode);
         });
 
-        function loadLessonContent() {
-            document.getElementById('heroEyebrow').textContent = currentLessonData.eyebrow;
-            document.getElementById('heroTitle').textContent = currentLessonData.title;
-            
-            overviewEditor.root.innerHTML = currentLessonData.overview;
-            conceptsEditor.root.innerHTML = currentLessonData.concepts;
-            document.getElementById('lessonSource').value = currentLessonData.source;
+        /**
+         * NEW: Fetches lesson and quiz data from the server API.
+         */
+        async function loadPageData(lessonId) {
+            // This is the *NEW* API endpoint you will need to create in your server.
+            // It should return JSON for the lesson and its questions.
+            try {
+                const response = await fetch(`/api/get-lesson-data?lesson=${lessonId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentLessonData = data.lesson; // e.g., { lessonId, title, overview, concepts, source, quizzes: { quizA: [], quizB: [] } }
+                    loadLessonContent();
+                    renderAllQuizLists();
+                    highlightActiveLesson();
+                } else {
+                    throw new Error(data.message);
+                }
+                
+            } catch (error) {
+                console.error('Failed to load lesson data:', error);
+                alert(`Error loading lesson data for ${lessonId}. Please try again.`);
+                document.getElementById('heroTitle').textContent = "Error loading data";
+            }
         }
 
+        /**
+         * Fills the hero, editors, and inputs with the loaded lesson data.
+         * (This function is mostly unchanged, but now uses 'currentLessonData')
+         */
+        function loadLessonContent() {
+            document.getElementById('heroEyebrow').textContent = currentLessonData.eyebrow || '...';
+            document.getElementById('heroTitle').textContent = currentLessonData.title || '...';
+            
+            overviewEditor.root.innerHTML = currentLessonData.overview || '';
+            conceptsEditor.root.innerHTML = currentLessonData.concepts || '';
+            document.getElementById('lessonSource').value = currentLessonData.source || '';
+        }
+
+        /**
+        * Highlights the current lesson in the sidebar nav. (Unchanged)
+        */
         function highlightActiveLesson() {
             document.querySelectorAll('.lesson-nav a').forEach(a => {
                 a.classList.remove('active');
@@ -685,42 +333,50 @@
             }
         }
 
+        /**
+        * Generates the HTML for all questions in both quiz lists. (Unchanged)
+        */
         function renderAllQuizLists() {
             const quizAList = document.getElementById('quizAList');
             const quizBList = document.getElementById('quizBList');
-
             quizAList.innerHTML = '';
             quizBList.innerHTML = '';
 
-            // Handle cases where quizzes might be undefined
             if (currentLessonData.quizzes && currentLessonData.quizzes.quizA) {
                 currentLessonData.quizzes.quizA.forEach(q => {
-                    quizAList.appendChild(createQuestionCard(q));
+                    quizAList.appendChild(createQuestionCard(q, 'quizA'));
                 });
             }
             if (currentLessonData.quizzes && currentLessonData.quizzes.quizB) {
                 currentLessonData.quizzes.quizB.forEach(q => {
-                    quizBList.appendChild(createQuestionCard(q));
+                    quizBList.appendChild(createQuestionCard(q, 'quizB'));
                 });
             }
         }
 
-        function createQuestionCard(question) {
+        /**
+         * Helper function to create a single question card element.
+         * (Unchanged from previous edit-enabled version)
+         */
+        function createQuestionCard(question, quizType) {
             const card = document.createElement('article');
             card.className = 'admin-question-card';
-            card.setAttribute('data-question-id', question.id);
+            card.setAttribute('data-question-id', question.question_id); // Use DB ID
 
-            let optionsHtml = '';
-            question.options.forEach((opt, index) => {
-                const isCorrect = (index + 1) === question.correct;
-                const safeOpt = opt.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                optionsHtml += `<li class="${isCorrect ? 'correct' : ''}">${safeOpt}</li>`;
-            });
+            let optionsHtml = `
+                <li class="${question.correct_answer === 1 ? 'correct' : ''}">${question.option_1}</li>
+                <li class="${question.correct_answer === 2 ? 'correct' : ''}">${question.option_2}</li>
+                <li class="${question.correct_answer === 3 ? 'correct' : ''}">${question.option_3}</li>
+                <li class="${question.correct_answer === 4 ? 'correct' : ''}">${question.option_4}</li>
+            `;
 
             card.innerHTML = `
                 <div class="admin-question-card-header">
-                    <div class="admin-question-text">${question.text}</div>
-                    <button class="btn btn-danger" type="button" onclick="deleteQuestion('${question.id}')">Delete</button>
+                    <div class="admin-question-text">${question.question_text}</div>
+                    <div class="admin-question-card-actions">
+                        <button class="btn-edit-question" type="button" onclick="loadQuestionForEdit('${question.question_id}', '${quizType}')">Edit</button>
+                        <button class="btn-danger" type="button" onclick="deleteQuestion('${question.question_id}')">Delete</button>
+                    </div>
                 </div>
                 <ul>${optionsHtml}</ul>
                 <div class="explanation">${question.explanation}</div>
@@ -728,78 +384,194 @@
             return card;
         }
 
-        function deleteQuestion(questionId) {
-            if (!confirm('Are you sure you want to delete this question?')) {
+        /**
+         * NEW: Deletes a question by calling the server API.
+         * This now uses the API from `api/delete-question.js`.
+         */
+        async function deleteQuestion(questionId) {
+            if (!confirm('Are you sure you want to delete this question permanently?')) {
                 return;
             }
 
-            let indexA = currentLessonData.quizzes.quizA.findIndex(q => q.id === questionId);
-            if (indexA > -1) {
-                currentLessonData.quizzes.quizA.splice(indexA, 1);
+            try {
+                const response = await fetch('/api/delete-question', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ questionId: questionId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Question deleted successfully.');
+                    // Reload data from server to show change
+                    loadPageData(currentLessonId); 
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Failed to delete question:', error);
+                alert('Error deleting question. See console for details.');
             }
-
-            let indexB = currentLessonData.quizzes.quizB.findIndex(q => q.id === questionId);
-            if (indexB > -1) {
-                currentLessonData.quizzes.quizB.splice(indexB, 1);
-            }
-
-            alert(`Question deleted (Demo)! This change will NOT be saved permanently.`);
-            renderAllQuizLists(); 
         }
         
-        // --- EVENT LISTENERS for FORMS ---
+        /**
+         * NEW: Loads a question into the form for editing.
+         * It finds the question data from the *local* `currentLessonData` object.
+         */
+        function loadQuestionForEdit(questionId, quizType) {
+            let question = null;
+            if (quizType === 'quizA') {
+                question = currentLessonData.quizzes.quizA.find(q => q.question_id == questionId);
+            } else {
+                question = currentLessonData.quizzes.quizB.find(q => q.question_id == questionId);
+            }
 
-        document.getElementById('lessonDetailsForm').addEventListener('submit', (e) => {
+            if (!question) {
+                alert('Error: Could not find question data.');
+                return;
+            }
+
+            // Set the global editing ID
+            currentlyEditingQuestionId = questionId;
+
+            // Populate the form fields
+            document.getElementById('quizSelect').value = quizType;
+            questionTextEditor.root.innerHTML = question.question_text;
+            explanationEditor.root.innerHTML = question.explanation;
+            
+            document.getElementById('option1').value = question.option_1;
+            document.getElementById('option2').value = question.option_2;
+            document.getElementById('option3').value = question.option_3;
+            document.getElementById('option4').value = question.option_4;
+            
+            document.getElementById('correctAnswer').value = question.correct_answer;
+
+            // Update form UI to "Edit Mode"
+            document.getElementById('formTitle').textContent = `Edit Question (${questionId})`;
+            document.getElementById('addQuestionBtn').textContent = 'Save Changes';
+            document.getElementById('cancelEditBtn').classList.remove('is-hidden');
+
+            document.getElementById('addQuestionForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        /**
+         * NEW: Cancels edit mode and resets the form. (Unchanged)
+         */
+        function cancelEditMode() {
+            currentlyEditingQuestionId = null;
+            document.getElementById('addQuestionForm').reset();
+            questionTextEditor.setText('');
+            explanationEditor.setText('');
+            document.getElementById('formTitle').textContent = 'Add a New Question';
+            document.getElementById('addQuestionBtn').textContent = 'Add Question';
+            document.getElementById('cancelEditBtn').classList.add('is-hidden');
+        }
+        
+        
+        // --- EVENT LISTENERS for FORMS (Now use fetch) ---
+
+        /**
+         * NEW: Saves lesson details by calling the server API.
+         * This uses the API from `api/save-lesson.js`.
+         */
+        document.getElementById('lessonDetailsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            currentLessonData.overview = overviewEditor.root.innerHTML;
-            currentLessonData.concepts = conceptsEditor.root.innerHTML;
-            currentLessonData.source = document.getElementById('lessonSource').value;
+            const dataToSave = {
+                lessonId: currentLessonId,
+                overview: overviewEditor.root.innerHTML,
+                concepts: conceptsEditor.root.innerHTML,
+                source: document.getElementById('lessonSource').value
+            };
 
-            DUMMY_DATABASE.set(currentLessonId, currentLessonData);
-
-            console.log("Saved Data:", currentLessonData);
-            alert(`Lesson "${currentLessonId}" saved successfully! (Demo)`);
+            try {
+                const response = await fetch('/api/save-lesson', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToSave)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Lesson details saved successfully!');
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Failed to save lesson:', error);
+                alert('Error saving lesson. See console for details.');
+            }
         });
 
-        document.getElementById('addQuestionForm').addEventListener('submit', (e) => {
+        /**
+         * NEW: Handles BOTH adding and editing questions by calling server APIs.
+         */
+        document.getElementById('addQuestionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
             
-            const quizSelect = form.querySelector('#quizSelect').value; 
-            
-            const newQuestion = {
-                id: 'q' + Math.random().toString(36).substr(2, 9), 
-                text: questionTextEditor.root.innerHTML,
+            // Get all values from the form
+            const questionData = {
+                lessonId: currentLessonId,
+                quizType: form.querySelector('#quizSelect').value,
+                questionText: questionTextEditor.root.innerHTML,
                 explanation: explanationEditor.root.innerHTML,
-                options: [
-                    form.querySelector('#option1').value,
-                    form.querySelector('#option2').value,
-                    form.querySelector('#option3').value,
-                    form.querySelector('#option4').value
-                ],
-                correct: parseInt(form.querySelector('#correctAnswer').value)
+                option1: form.querySelector('#option1').value,
+                option2: form.querySelector('#option2').value,
+                option3: form.querySelector('#option3').value,
+                option4: form.querySelector('#option4').value,
+                correctAnswer: parseInt(form.querySelector('#correctAnswer').value)
             };
 
-            currentLessonData.quizzes[quizSelect].push(newQuestion);
-            
-            alert(`New question added to ${quizSelect}! (Demo)`);
-            
-            form.reset(); 
-            questionTextEditor.setText('');
-            explanationEditor.setText('');
-            
-            renderAllQuizLists();
+            let url = '';
+            let body = {};
+
+            if (currentlyEditingQuestionId) {
+                // --- EDIT MODE ---
+                // This is a *NEW* API endpoint you will need to create.
+                url = '/api/edit-question';
+                body = {
+                    ...questionData,
+                    questionId: currentlyEditingQuestionId
+                };
+            } else {
+                // --- ADD MODE ---
+                // This is also a *NEW* API endpoint you will need to create.
+                url = '/api/add-question';
+                body = questionData;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Question ${currentlyEditingQuestionId ? 'updated' : 'added'} successfully!`);
+                    cancelEditMode();
+                    loadPageData(currentLessonId); // Reload all data
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Failed to save question:', error);
+                alert('Error saving question. See console for details.');
+            }
         });
 
 
-        // --- Tab Switching Logic ---
+        // --- Tab Switching Logic (Unchanged) ---
         document.querySelectorAll('.quiz-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 const targetQuiz = tab.dataset.quiz;
                 document.querySelectorAll('.quiz-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                
                 document.getElementById('quizAList').classList.toggle('is-hidden', targetQuiz !== 'quizA');
                 document.getElementById('quizBList').classList.toggle('is-hidden', targetQuiz !== 'quizB');
             });

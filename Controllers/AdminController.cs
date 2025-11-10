@@ -71,4 +71,44 @@ public class AdminController : ControllerBase
             return StatusCode(500, new { error = ex.Message });
         }
     }
+
+    /// <summary>
+    /// Gets all replies for a thread
+    /// </summary>
+    [HttpGet("community/threads/{threadId}/replies")]
+    public async Task<IActionResult> GetThreadReplies(int threadId)
+    {
+        try
+        {
+            var replies = await CommunityService.GetThreadRepliesAsync(_configuration, threadId);
+            return Ok(replies);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting replies: {ex.Message}");
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Deletes a reply
+    /// </summary>
+    [HttpDelete("community/replies/{replyId}")]
+    public async Task<IActionResult> DeleteReply(int replyId)
+    {
+        try
+        {
+            var success = await CommunityService.DeleteReplyAsync(_configuration, replyId);
+            if (success)
+            {
+                return Ok(new { message = "Reply deleted successfully" });
+            }
+            return NotFound(new { error = "Reply not found" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting reply: {ex.Message}");
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
 }

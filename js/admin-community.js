@@ -51,7 +51,7 @@ function renderThreads() {
     `).join('');
 }
 
-function viewThread(threadId) {
+async function viewThread(threadId) {
     const thread = threads.find(t => t.threadId === threadId);
     if (!thread) return;
 
@@ -62,7 +62,70 @@ function viewThread(threadId) {
     document.getElementById('viewReplies').textContent = thread.replyCount;
     document.getElementById('viewBody').textContent = thread.body;
     
+    await loadReplies(threadId);
+    
     document.getElementById('viewModal').style.display = 'flex';
+}
+
+async function loadReplies(threadId) {
+    const repliesDiv = document.getElementById('repliesList');
+    repliesDiv.innerHTML = '<p>Loading replies...</p>';
+    
+    try {
+        const response = await fetch(`/api/Admin/community/threads/${threadId}/replies`);
+        if (!response.ok) {
+            throw new Error('Failed to load replies');
+        }
+        
+        const replies = await response.json();
+        
+        if (!replies || replies.length === 0) {
+            repliesDiv.innerHTML = '<p class="text-muted">No replies yet</p>';
+            return;
+        }
+        
+        repliesDiv.innerHTML = replies.map(reply => `
+            <div class="reply-item" style="border-left: 3px solid #ddd; padding-left: 1rem; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <strong>${escapeHtml(reply.username)}</strong>
+                        <small class="text-muted" style="margin-left: 0.5rem;">${formatDate(reply.createdAt)}</small>
+                        <p style="margin-top: 0.5rem;">${escapeHtml(reply.body)}</p>
+                    </div>
+                    <button onclick="deleteReply(${reply.replyId}, ${threadId})" class="btn-danger btn-sm" style="margin-left: 1rem;">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading replies:', error);
+        repliesDiv.innerHTML = '<p class="text-muted">Error loading replies</p>';
+    }
+}
+
+async function deleteReply(replyId, threadId) {
+    if (!confirm('Are you sure you want to delete this reply?')) return;
+    
+    try {
+        const response = await fetch(`/api/Admin/community/replies/${replyId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete reply');
+        }
+        
+        showStatus('Reply deleted successfully', 'success');
+        await loadReplies(threadId);
+        
+        const thread = threads.find(t => t.threadId === threadId);
+        if (thread) {
+            thread.replyCount = Math.max(0, thread.replyCount - 1);
+            renderThreads();
+        }
+    } catch (error) {
+        console.error('Error deleting reply:', error);
+        showStatus('Error deleting reply', 'error');
+    }
 }
 
 function closeViewModal() {
