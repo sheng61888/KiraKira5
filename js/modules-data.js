@@ -15,143 +15,90 @@ window.kiraModules = [
             id: "overview",
             title: "Module overview",
             type: "overview",
-            duration: "1 min",
-            summary: "Welcome to Function Clinic. Patients keep coming in with parabola problems. Your job? Diagnose their vertex shifts, treat their discriminant disorders, and prescribe perfect roots. Don't worry, we'll guide you along the way.",
-            body: "Did you know a single negative sign can flip an entire universe?",
+            duration: "2 min",
+            summary: "Map the two Form 4 KSSM subtopics: Quadratic Functions plus Quadratic Equations in One Variable.",
+            body: "We will sketch, interpret, and solve every style of SPM-relevant quadratic question with clear checkpoints along the way.",
             objectives: [
-              "Understand and master vertex form",
-              "Understand and master factor form",
-              "Understand and master completing-the-square surgery"
+              "Name each part of y = ax^2 + bx + c and match it to what you see on a graph",
+              "Infer ranges, turning points, and intercepts straight from a graph or equation",
+              "Select and justify the right solving strategy for any single-variable quadratic"
             ],
           },
           {
             id: "rescue-intro",
-            title: "Intro video: Quadratic intuition",
+            title: "Introductory video (optional)",
             type: "video",
             duration: "4 min",
             rescueOnly: true,
-            summary: "Need a slower start? Watch this primer on how parabolas move when a, h, or k change.",
-            body: "We walk through the vertex form, label every parameter, and show how to sketch without a calculator.",
+            summary: "Turn videos on in onboarding to unlock this visual walk-through of how parabolas move.",
+            body: "We animate changes in a, b, and c, point out the axis of symmetry, and show how the vertex links to max/min questions.",
             objectives: [
-              "Spot vertex, axis of symmetry, opening direction in seconds",
-              "Link transformations to real graph images"
+              "Spot vertex, axis of symmetry, and opening direction in seconds",
+              "Link algebraic changes to real graph motions before diving into practice"
             ],
             cta: {
-              label: "Play rescue video",
+              label: "Play primer",
               link: "https://www.youtube.com/watch?v=bgM8F1J-rescue",
               kind: "video"
             }
           },
           {
-            id: "lesson-quadratic-intro",
-            title: "Lesson 1 · How Parabolas Feel",
+            id: "topic-quadratic-functions",
+            title: "Topic 1 - Quadratic Functions",
             type: "lesson",
-            duration: "8 min",
-            summary: "Meet the parabola. Learn how its mood changes when a, b and c shift.",
-            body: "We’ll explore how y = ax² + bx + c behaves when each coefficient changes.",
-            objectives: [
-              "Recognise how ‘a’ controls smile/frown + width",
-              "See how ‘b’ moves the vertex sideways",
-              "See how ‘c’ shifts the curve up/down"
-            ],
-            cta: { label: "Open interactive lesson", link: "/html/lessons/lesson-quadratic-intro.html", kind: "lesson" }
-          },
-
-          {
-            id: "quiz-vertex-sense",
-            title: "Quick check · Graph sense",
-            type: "quiz",
-            duration: "3 min",
-            summary: "Match three vertex-form equations to their graphs.",
-            body: "You have 90 seconds per prompt. Focus on identifying vertex + opening direction.",
-            cta: { label: "Start quiz", link: "../docs/module01-quiz-vertex.html", kind: "quiz" }
-          },
-          {
-            id: "lesson-form-switch",
-            title: "Lesson 2 · Switch between forms",
-            type: "lesson",
-            duration: "6 min",
-            summary: "Convert standard form to vertex/factored form in bite-sized steps.",
-            body: "We complete the square on a guided worksheet, then factor friendly quadratics to spot roots.",
-            objectives: [
-              "Complete the square without losing constant terms",
-              "Explain when factoring beats the square method"
-            ],
-
-          },
-          {
-            id: "quiz-form-switch",
-            title: "Quick check · Form shuffle",
-            type: "quiz",
-            duration: "4 min",
-            summary: "Two conversions with instant feedback and hints if you get stuck.",
-            body: "Convert the given standard form to vertex form, then to factored form.",
-            cta: { label: "Try shuffle quiz", link: "../docs/module01-quiz-forms.html", kind: "quiz" }
-          },
-          {
-            id: "lesson-solving-paths",
-            title: "Lesson 3 · Choose the solving path",
-            type: "lesson",
-            duration: "6 min",
-            summary: "Classify quadratics and lock in the fastest solving method.",
-            body: "Sort cards into 'factor', 'complete square', 'quadratic formula' buckets and justify each choice.",
-            objectives: [
-              "Classify quadratics by structure",
-              "State a reason behind each solving choice"
-            ],
-
-          },
-          {
-            id: "quiz-solving-paths",
-            title: "Quick check · Solve + explain",
-            type: "quiz",
-            duration: "4 min",
-            summary: "Solve two equations and type one-sentence reasoning after each answer.",
-            body: "Focus on communicating why your method worked, not just the final root.",
-            cta: { label: "Take reasoning quiz", link: "../docs/module01-quiz-solve.html", kind: "quiz" }
-          },
-          {
-            id: "lesson-modelling",
-            title: "Lesson 4 · Model real situations",
-            type: "lesson",
-            duration: "5 min",
-            summary: "Translate revenue and projectile prompts into quadratics.",
-            body: "Use the modelling canvas: identify variables, write the quadratic, and interpret the vertex or roots.",
-            objectives: [
-              "Build quadratic models from short scenarios",
-              "Interpret vertex/roots in context"
-            ],
-
-          },
-          {
-            id: "quiz-application",
-            title: "Quick check · Application",
-            type: "quiz",
-            duration: "4 min",
-            summary: "Two context problems that ask what the vertex or roots mean.",
-            body: "Explain whether your solutions fit the real-world restriction.",
-            cta: { label: "Start context quiz", link: "../docs/module01-quiz-context.html", kind: "quiz" }
-          },
-          {
-            id: "final-test",
-            title: "Final mastery test",
-            type: "assessment",
             duration: "10 min",
-            summary: "6-question timed drill mixing graphs, solving, and modelling.",
-            body: "Attempt under exam timing. Mark whether each question felt easy, medium, or panic.",
-            cta: { label: "Begin timed test", link: "../docs/module01-mastery.pdf", kind: "quiz" }
+            summary: "Work with the general form y = ax^2 + bx + c, sketch key points, and describe what each coefficient does.",
+            body: "Break down the axis of symmetry x = -b/(2a), locate the vertex, predict intercepts, and explain how changing a, b, or c affects shape, direction, and position.",
+            objectives: [
+              "Identify axis of symmetry, vertex, and intercepts from equations and graphs",
+              "Describe how the coefficients move or stretch the graph",
+              "Use the vertex to decide maximum/minimum values and answer range questions"
+            ],
+            cta: { label: "Open Topic 1 lesson", link: "/html/lessons/lesson-quadratic-intro.html", kind: "lesson" }
           },
           {
-            id: "practice-bank",
-            title: "Practice question bank",
+            id: "practice-functions",
+            title: "Practice questions - Graph sense",
             type: "practice",
-            duration: "15 min",
-            summary: "Extra questions sorted by skill so you can keep drilling weak spots.",
-            body: "Pick any row and attempt 4 questions. Log mistakes in your notebook.",
-            resources: [
-              { label: "Practice set", type: "sheet", detail: "18 questions + answers", url: "../docs/module01-practice.pdf" }
+            duration: "6 min",
+            summary: "Four quick SPM-style prompts on sketching, identifying turning points, and explaining when y = 0.",
+            body: "Translate between equations and graphs: state the vertex, locate intercepts, and justify the range of y for each case.",
+            cta: { label: "Attempt graph practice", link: "../docs/module01-quiz-vertex.html", kind: "quiz" }
+          },
+          {
+            id: "topic-quadratic-equations",
+            title: "Topic 2 - Quadratic Equations in One Variable",
+            type: "lesson",
+            duration: "12 min",
+            summary: "Form and solve quadratic equations using factorisation, completing the square, or the quadratic formula.",
+            body: "Move from word problems to algebra, compare solving paths, apply sum/product of roots, and use the discriminant b^2 - 4ac to describe the number and type of roots.",
+            objectives: [
+              "Form quadratic equations from word or algebra prompts",
+              "Choose between factorisation, completing the square, and the quadratic formula with reasoning",
+              "Use sum and product of roots plus the discriminant to discuss solutions",
+              "Apply the methods to real contexts like projectile motion or area optimisation"
             ],
-            cta: { label: "Open practice set", link: "../docs/module01-practice.pdf", kind: "download" }
+          },
+          {
+            id: "practice-equations",
+            title: "Practice questions - Solve and explain",
+            type: "practice",
+            duration: "8 min",
+            summary: "Mixed problems that require different solving paths and discriminant analysis.",
+            body: "Solve equations, justify your chosen method, and interpret what the roots or lack of roots mean in context.",
+            cta: { label: "Work through solving set", link: "../docs/module01-quiz-solve.html", kind: "quiz" }
+          },
+          {
+            id: "checkpoint-final",
+            title: "Last checkpoint",
+            type: "checkpoint",
+            duration: "10 min",
+            summary: "Wrap up the module with a single sheet that mixes graphs, equations, and real-life modelling.",
+            body: "Confirm you can state graph features, decide on a solving strategy, and interpret discriminant results before moving on.",
+            resources: [
+              { label: "Checkpoint sheet", type: "sheet", detail: "6 curated questions + answers", url: "../docs/module01-mastery.pdf" }
+            ],
+            cta: { label: "Download checkpoint", link: "../docs/module01-mastery.pdf", kind: "download" }
           }
         ]
       },
@@ -305,3 +252,4 @@ window.kiraModulesMap = window.kiraModules.reduce((map, section) => {
   map[section.grade] = section;
   return map;
 }, {});
+
