@@ -258,7 +258,7 @@ public class LearnerService : ILearnerService
         var saved = false;
         const string sql = @"INSERT INTO learner_mission (uid, grade, readiness_percent, target_focus, wants_videos, mission_title, mission_mood, mission_mode)
                              VALUES (@Uid, @Grade, @Readiness, @Focus, @WantsVideos, @Title, @Mood, @Mode)
-                             ON DUPLICATE KEY UPDATE grade = VALUES(grade), readiness_percent = VALUES(readiness_percent), target_focus = VALUES(target_focus), wants_videos = VALUES(wants_videos), mission_title = VALUES(mission_title), mission_mood = VALUES(mission_mood), mission_mode = VALUES(mission_mode)";
+                             ON DUPLICATE KEY UPDATE grade = @Grade, readiness_percent = @Readiness, target_focus = @Focus, wants_videos = @WantsVideos, mission_title = @Title, mission_mood = @Mood, mission_mode = @Mode";
 
         try
         {
@@ -274,8 +274,10 @@ public class LearnerService : ILearnerService
                 command.Parameters.AddWithValue("@Title", copy.Title);
                 command.Parameters.AddWithValue("@Mood", copy.Mood);
                 command.Parameters.AddWithValue("@Mode", copy.Mode);
+                Console.WriteLine($"[LearnerService] Saving mission: readiness={readiness}, grade={grade}");
                 await command.ExecuteNonQueryAsync();
                 saved = true;
+                Console.WriteLine($"[LearnerService] Mission saved successfully for {learnerId}");
             }
         }
         catch (Exception ex)
