@@ -31,4 +31,44 @@ public class AdminController : ControllerBase
             return StatusCode(500, new { totalUsers = 0, error = ex.Message });
         }
     }
+
+    /// <summary>
+    /// Gets all community threads
+    /// </summary>
+    [HttpGet("community/threads")]
+    public async Task<IActionResult> GetCommunityThreads()
+    {
+        try
+        {
+            var threads = await CommunityService.GetAllThreadsAsync(_configuration);
+            return Ok(threads);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting community threads: {ex.Message}");
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Deletes a community thread
+    /// </summary>
+    [HttpDelete("community/threads/{threadId}")]
+    public async Task<IActionResult> DeleteThread(int threadId)
+    {
+        try
+        {
+            var success = await CommunityService.DeleteThreadAsync(_configuration, threadId);
+            if (success)
+            {
+                return Ok(new { message = "Thread deleted successfully" });
+            }
+            return NotFound(new { error = "Thread not found" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting thread: {ex.Message}");
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
 }
