@@ -36,6 +36,18 @@ public class LearnerController : ControllerBase
         return Ok(data);
     }
 
+    [HttpPost("{learnerId}/mission")]
+    public async Task<IActionResult> SaveMissionPreferences(string learnerId, [FromBody] LearnerMissionUpdateRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new { error = "Mission preferences are required." });
+        }
+
+        var mission = await _learnerService.SaveMissionPreferencesAsync(learnerId, request);
+        return Ok(mission);
+    }
+
     [HttpPost("{learnerId}/classes/join")]
     public async Task<IActionResult> JoinClass(string learnerId, [FromBody] JoinClassRequest request)
     {
@@ -152,6 +164,13 @@ public class ProfileDetailsUpdateRequest
     public string Motto { get; set; } = string.Empty;
     public string School { get; set; } = string.Empty;
     public string Year { get; set; } = string.Empty;
+}
+
+public class LearnerMissionUpdateRequest
+{
+    public string Grade { get; set; } = string.Empty;
+    public int Readiness { get; set; }
+    public bool WantsVideos { get; set; }
 }
 
 public class CommunityThreadQuery
