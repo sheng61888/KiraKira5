@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 02 · Quadratic Equations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/learner.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="/images/logo transparent.png" alt="KiraKira logo">
+      </div>
+
+      <div class="profile">
+        <div class="username" aria-live="polite">Loading learner...</div>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak" aria-live="polite">Syncing streak...</div>
+        <div class="xp-bar"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level loading...</small>
+      </div>
+
+      <nav class="nav" aria-label="Learner navigation">
+        <a href="../learner-home.html">Dashboard</a>
+        <a href="../learner-progress.html">Progress</a>
+        <a href="../learner-pastyears.html">Past Papers</a>
+        <a href="../learner-classes.html">Classes</a>
+        <a href="../learner-community.html">Community</a>
+        <a href="../learner-profile.html">Profile</a>
+      </nav>
+    </aside>
+
+    <!-- Main Lesson -->
+    <main class="main lesson-page">
+      <header class="page-heading">
+        <p class="eyebrow">Module 02 · Quadratic Equations</p>
+        <h1>Finding where the ball hits the ground</h1>
+        <p>We’ve met the parabola — now let’s figure out when it lands.</p>
+      </header>
+
+      <!-- Scene 1: The Two Moments of Impact -->
+      <section class="card lesson-block scene" data-scene="impact">
+        <p class="scene-label">Scene 1</p>
+        <h2>The Two Moments of Impact</h2>
+        <p class="big-math">y = ax² + bx + c</p>
+        <p>
+          The parabola tells a story of motion — the ball rises, falls, and hits the ground.  
+          Each place it touches the ground represents a solution to the equation where <code>y = 0</code>.
+        </p>
+        <ul class="beat-list">
+          <li>Solving <code>ax² + bx + c = 0</code> means finding the <em>x-values</em> where the height becomes 0.</li>
+          <li>Those x-values are called the <strong>roots</strong> or <strong>solutions</strong>.</li>
+        </ul>
+        <div class="scene-graph" id="impact-graph">
+          <div class="graph-controls">
+            <label>a: <input type="range" id="impact-a" min="-3" max="3" step="0.1" value="1"></label>
+            <label>b: <input type="range" id="impact-b" min="-6" max="6" step="0.1" value="-6"></label>
+            <label>c: <input type="range" id="impact-c" min="-5" max="5" step="0.1" value="8"></label>
+          </div>
+          <svg id="impact-svg" viewBox="-10 -10 20 20" width="100%" height="260"></svg>
+        </div>
+
+
+        <div class="quick-check" data-check="impact">
+          <p><strong>Quick check:</strong> For <code>y = x² − 6x + 8</code>, how many times does the ball hit the ground?</p>
+          <div class="quick-check-options">
+            <button type="button" data-correct="true">2 times</button>
+            <button type="button" data-correct="false">1 time</button>
+            <button type="button" data-correct="false">0 times</button>
+          </div>
+          <p class="quick-check-feedback"></p>
+        </div>
+      </section>
+
+      <!-- Scene 2: Factoring -->
+      <section class="card lesson-block scene" data-scene="factoring">
+        <p class="scene-label">Scene 2</p>
+        <h2>Factoring — Finding the Ground Touch Points</h2>
+        <p class="big-math">y = (x − p)(x − q)</p>
+        <p>
+          If we can rewrite a quadratic into two simple brackets,  
+          we immediately know where the ball lands.  
+          Each bracket gives one impact point: <code>(x − root) = 0</code>.
+        </p>
+
+        <div class="scene-graph" id="factoring-graph"></div>
+
+        <div class="quick-check" data-check="factoring">
+          <p><strong>Quick check:</strong> Which equation lands at x = 2 and x = 4?</p>
+          <div class="quick-check-options">
+            <button type="button" data-correct="true">(x − 2)(x − 4)</button>
+            <button type="button" data-correct="false">(x + 2)(x − 4)</button>
+            <button type="button" data-correct="false">(x + 2)(x + 4)</button>
+          </div>
+          <p class="quick-check-feedback"></p>
+        </div>
+      </section>
+
+      <!-- Scene 3: Completing the Square -->
+      <section class="card lesson-block scene" data-scene="square">
+        <p class="scene-label">Scene 3</p>
+        <h2>Completing the Square — Recenter the Path</h2>
+        <p class="big-math">y = (x + p)² + q</p>
+        <p>
+          Sometimes it’s easier to see the parabola’s shape by “recentering” it at its vertex.  
+          Completing the square helps us rewrite <code>ax² + bx + c</code> into this form.
+        </p>
+        <ul class="beat-list">
+          <li>It shows where the vertex is — the ball’s highest or lowest point.</li>
+          <li>It helps us visualize symmetry and calculate roots more easily.</li>
+        </ul>
+
+        <div class="scene-graph" id="square-graph"></div>
+
+        <div class="quick-check" data-check="square">
+          <p><strong>Quick check:</strong> What’s the vertex form of <code>x² + 4x + 1</code>?</p>
+          <div class="quick-check-options">
+            <button type="button" data-correct="true">(x + 2)² − 3</button>
+            <button type="button" data-correct="false">(x − 2)² + 3</button>
+            <button type="button" data-correct="false">(x + 1)² − 2</button>
+          </div>
+          <p class="quick-check-feedback"></p>
+        </div>
+      </section>
+
+      <!-- Scene 4: Quadratic Formula -->
+      <section class="card lesson-block scene" data-scene="formula">
+        <p class="scene-label">Scene 4</p>
+        <h2>The Universal Impact Finder</h2>
+        <p class="big-math">x = (−b ± √(b² − 4ac)) / 2a</p>
+        <p>
+          This formula works for <em>any</em> quadratic.  
+          The expression under the square root — <code>b² − 4ac</code> —  
+          tells us how many real impacts the ball makes.
+        </p>
+
+        <ul class="beat-list">
+          <li>If <code>b² − 4ac &gt; 0</code> → two real roots.</li>
+          <li>If <code>b² − 4ac = 0</code> → one repeated root.</li>
+          <li>If <code>b² − 4ac &lt; 0</code> → no real roots (the ball never reaches the ground).</li>
+        </ul>
+
+        <div class="scene-graph" id="formula-graph"></div>
+
+        <div class="quick-check" data-check="formula">
+          <p><strong>Quick check:</strong> If <code>b² − 4ac = 0</code>, how many times does the ball touch the ground?</p>
+          <div class="quick-check-options">
+            <button type="button" data-correct="false">2</button>
+            <button type="button" data-correct="true">1</button>
+            <button type="button" data-correct="false">0</button>
+          </div>
+          <p class="quick-check-feedback"></p>
+        </div>
+      </section>
+
+      <!-- Wrap -->
+      <section class="card lesson-block scene scene-wrap">
+        <h2>Unlocked: Solving the full motion</h2>
+        <p>
+          You’ve seen how every method tells the same story —  
+          whether through factoring, completing the square, or the formula,  
+          the goal is always the same: find where the curve meets the ground.
+        </p>
+        <div class="wrap-actions">
+          <a class="btn btn--primary" href="../course-map.html?module=form4-02">
+            Back to module map
+          </a>
+          <a class="btn btn--ghost" href="lesson-quadratic-functions.html">
+            Revisit the previous lesson
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../js/learner-session.js"></script>
+  <script src="../../js/learner-shell.js"></script>
+  <script src="../../js/modules/lesson-quadratic-equations.js"></script>
+</body>
+</html>

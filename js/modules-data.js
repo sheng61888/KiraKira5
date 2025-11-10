@@ -43,42 +43,57 @@ window.kiraModules = [
             }
           },
           {
-            id: "topic-quadratic-functions",
-            title: "Topic 1 - Quadratic Functions",
+            id: "lesson-quadratic-functions",
+            title: "Lesson 1 · Reading a parabola like a story",
             type: "lesson",
-            duration: "10 min",
-            summary: "Work with the general form y = ax^2 + bx + c, sketch key points, and describe what each coefficient does.",
-            body: "Break down the axis of symmetry x = -b/(2a), locate the vertex, predict intercepts, and explain how changing a, b, or c affects shape, direction, and position.",
-            objectives: [
-              "Identify axis of symmetry, vertex, and intercepts from equations and graphs",
-              "Describe how the coefficients move or stretch the graph",
-              "Use the vertex to decide maximum/minimum values and answer range questions"
-            ],
-            cta: { label: "Open Topic 1 lesson", link: "/html/lessons/lesson-quadratic-intro.html", kind: "lesson" }
-          },
-          {
-            id: "practice-functions",
-            title: "Practice questions - Graph sense",
-            type: "practice",
             duration: "6 min",
-            summary: "Four quick SPM-style prompts on sketching, identifying turning points, and explaining when y = 0.",
-            body: "Translate between equations and graphs: state the vertex, locate intercepts, and justify the range of y for each case.",
-            cta: { label: "Attempt graph practice", link: "../docs/module01-quiz-vertex.html", kind: "quiz" }
+            summary: "Visualise how a parabola smiles, shifts, and touches the x-axis.",
+            body: "Learn to read every part of a quadratic function — what 'a', 'h', and 'k' do to the curve — through minimal cinematic visuals.",
+            objectives: [
+              "Recognise how the sign of a affects the graph shape",
+              "Identify the vertex and axis of symmetry",
+              "Predict how parameter changes move the curve"
+            ],
+            cta: {
+              label: "Open lesson",
+              link: "/html/lessons/lesson-quadratic-functions.html",
+              kind: "lesson"
+            }
+          },
+
+        {
+            id: "lesson-ground-hits",
+            title: "Lesson 2 · The Two Moments of Impact",
+            type: "lesson",
+            duration: "6 min",
+            summary: "Discover how the ball’s landing points reveal the roots of a quadratic equation.",
+            body: "We explore what happens when the ball touches the ground — each contact point is where y = 0. You’ll learn to factor simple quadratics and see how their x-intercepts tell the full story of motion.",
+            objectives: [
+              "Understand the meaning of roots in a quadratic graph",
+              "Factor simple quadratics to find their x-intercepts",
+              "Connect real-world motion to algebraic solutions"
+            ],
+            cta: {
+              label: "Open lesson",
+              link: "/html/lessons/lesson-quadratic-equations.html",
+              kind: "lesson"
+            }
           },
           {
-            id: "topic-quadratic-equations",
-            title: "Topic 2 - Quadratic Equations in One Variable",
-            type: "lesson",
-            duration: "12 min",
-            summary: "Form and solve quadratic equations using factorisation, completing the square, or the quadratic formula.",
-            body: "Move from word problems to algebra, compare solving paths, apply sum/product of roots, and use the discriminant b^2 - 4ac to describe the number and type of roots.",
-            objectives: [
-              "Form quadratic equations from word or algebra prompts",
-              "Choose between factorisation, completing the square, and the quadratic formula with reasoning",
-              "Use sum and product of roots plus the discriminant to discuss solutions",
-              "Apply the methods to real contexts like projectile motion or area optimisation"
-            ],
+            id: "quiz-ground-hits",
+            title: "Quick Check · Ball’s Landing Points",
+            type: "quiz",
+            duration: "3 min",
+            summary: "Test your understanding of factoring and identifying the ball’s landing points.",
+            body: "Identify the roots of sample quadratic equations and interpret what they represent.",
+            cta: {
+              label: "Take quick quiz",
+              link: "lessons/lesson-quadratic-equations.html#quickcheck",
+              kind: "quiz"
+            }
           },
+
+
           {
             id: "practice-equations",
             title: "Practice questions - Solve and explain",

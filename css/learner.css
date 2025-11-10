@@ -2158,4 +2158,122 @@ ul {
 .cardflip .back { transform:rotateY(180deg); }
 .cardflip.flipped .front { transform:rotateY(180deg); }
 .cardflip.flipped .back { transform:rotateY(0deg); }
+.lesson-page .lesson-block {
+  margin-bottom: 1.5rem;
+}
+
+.scene-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
+}
+
+.big-math {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0.2rem 0 0.8rem;
+}
+
+.beat-list {
+  margin: 0 0 0.8rem;
+  padding-left: 1.1rem;
+  font-size: 0.95rem;
+}
+
+.scene-graph {
+  margin: 0.6rem auto 0.8rem;
+  max-width: 280px;
+}
+
+.lesson-graph {
+  width: 100%;
+  height: auto;
+}
+
+.axis-line {
+  stroke: rgba(0,0,0,0.18);
+  stroke-width: 1;
+}
+
+.parabola-path {
+  fill: none;
+  stroke-width: 2;
+  stroke: currentColor;
+}
+
+.parabola-alt {
+  opacity: 0.35;
+  stroke-width: 1.6;
+}
+
+/* keep the box subtle and static */
+.quick-check {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1.2rem;
+  padding: 1.8rem 2rem;
+  margin-top: 1.8rem;
+  color: #e7ebf6;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* buttons inside the quick check */
+.quick-check button {
+  background: rgba(255, 255, 255, 0.08);
+  color: #eaefff;
+  border: 1px solid rgba(140, 170, 255, 0.3);
+  border-radius: 0.8rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0.4rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* hover animation for buttons */
+.quick-check button:hover {
+  transform: translateY(-4px) scale(1.05);
+  background: rgba(120, 150, 255, 0.25);
+  border-color: rgba(160, 180, 255, 0.8);
+  box-shadow: 0 0 14px rgba(140, 170, 255, 0.4);
+  color: #fff;
+}
+
+/* when selected / correct */
+.quick-check button.correct {
+  background: rgba(100, 255, 150, 0.15);
+  border-color: rgba(100, 255, 150, 0.5);
+  color: #b7ffc6;
+  box-shadow: 0 0 12px rgba(100, 255, 150, 0.3);
+}
+
+.quick-check button.wrong {
+  background: rgba(255, 120, 120, 0.12);
+  border-color: rgba(255, 100, 100, 0.4);
+  color: #ffc8c8;
+  box-shadow: 0 0 12px rgba(255, 100, 100, 0.2);
+}
+.graph-controls {
+  display: flex;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.graph-controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.graph-controls input[type="range"] {
+  width: 80px;
+  accent-color: #b89fff;
+}
 

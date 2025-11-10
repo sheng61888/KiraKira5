@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Module 01 · Quadratic Functions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/learner.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Sidebar (reuse your existing style) -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="/images/logo transparent.png" alt="KiraKira logo">
+      </div>
+
+      <div class="profile">
+        <div class="username" aria-live="polite">Loading learner...</div>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak" aria-live="polite">Syncing streak...</div>
+        <div class="xp-bar"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level loading...</small>
+      </div>
+
+      <nav class="nav" aria-label="Learner navigation">
+        <a href="../learner-home.html">Dashboard</a>
+        <a href="../learner-progress.html">Progress</a>
+        <a href="../learner-pastyears.html">Past Papers</a>
+        <a href="../learner-classes.html">Classes</a>
+        <a href="../learner-community.html">Community</a>
+        <a href="../learner-profile.html">Profile</a>
+      </nav>
+    </aside>
+
+    <!-- Main Lesson -->
+    <main class="main lesson-page">
+      <header class="page-heading">
+        <p class="eyebrow">Module 01 · Quadratic Functions</p>
+        <h1>Reading a parabola like a story</h1>
+        <p>
+          An introduction and overview on parabolas.
+        </p>
+      </header>
+
+      <!-- Scene 1: Shape first -->
+      <section class="card lesson-block scene" data-scene="shape">
+        <p class="scene-label">Scene 1</p>
+        <h2>Start with the vibe: smile or frown</h2>
+        <p class="big-math">y = ax²</p>
+        <p>
+          Before numbers, formulas, or panic:
+          a quadratic in its simplest form is “How does this curve feel?”
+        </p>
+        <ul class="beat-list">
+          <li><strong>a &gt; 0</strong> → opens up → <strong>U-shape</strong> → “bowl”, “minimum”, “holding things”.</li>
+          <li><strong>a &lt; 0</strong> → opens down → <strong>∩-shape</strong> → “hill”, “maximum”, “about to fall”.</li>
+          <li>No need to solve anything. Just check the sign of <strong>a</strong>.</li>
+        </ul>
+
+        <div class="scene-graph" data-a="1" data-h="0" data-k="0"></div>
+
+        <div class="quick-check" data-check="shape">
+          <p><strong>Quick check:</strong> For <code>y = -2x²</code>, is this a bowl or a hill?</p>
+          <div class="quick-check-options">
+            <button type="button" data-correct="false">Bowl (minimum)</button>
+            <button type="button" data-correct="true">Hill (maximum)</button>
+          </div>
+          <p class="quick-check-feedback"></p>
+        </div>
+      </section>
+
+      <!-- Scene 2: Meet vertex form -->
+      <section class="card lesson-block scene" data-scene="vertex">
+        <p class="scene-label">Scene 2</p>
+        <h2>Where’s the turning point?</h2>
+        <p class="big-math">y = a(x − h)² + k</p>
+        <p>
+          Imaging tossing a ball upward. It slows, stops, and then falls - that pause in motion is the vertex of its path.
+          On a graph, that's the highest or lowest point of a parabola.
+        </p>
+        <ul class="beat-list">
+          <li><strong>a&gt;0</strong>, your ball starts at the ground and goes up then down (a minimum point).</li>
+          <li><strong>a&lt;0</strong>, it’s like tossing the ball from above — it falls and bounces up (a maximum point).</li>
+
+        </ul>
+
+        <div class="scene-graph" data-a="1" data-h="2" data-k="3"></div>
+
+        <div class="quick-check" data-check="vertex">
+          <p><strong>Quick check:</strong> For <code>y = 3(x - 1)² - 4</code>, what’s the vertex?</p>
+          <div class="quick-check-options">
+            <button type="button" data-correct="false">(3, -1)</button>
+            <button type="button" data-correct="true">(1, -4)</button>
+            <button type="button" data-correct="false">(-1, 4)</button>
+          </div>
+          <p class="quick-check-feedback"></p>
+        </div>
+      </section>
+
+      <!-- Scene 3: Wide, narrow, dramatic -->
+      <section class="card lesson-block scene" data-scene="stretch">
+        <p class="scene-label">Scene 3</p>
+        <h2>How dramatic is the curve?</h2>
+        <p class="big-math">“a” controls intensity</p>
+        <ul class="beat-list">
+          <li>|a| small (e.g. 0.5) → wide, chill curve.</li>
+          <li>|a| big (e.g. 3) → narrow, dramatic spike.</li>
+          <li>Sign of a: up vs down. Size of a: how “extra” the curve is.</li>
+        </ul>
+
+        <p class="muted">
+          Watch how changing <code>a</code> alone reshapes the same vertex.
+        </p>
+        <div class="scene-graph" data-a="0.5" data-h="0" data-k="0" data-alt-a="2"></div>
+      </section>
+
+      <!-- Scene 4: Roots as intersections -->
+      <section class="card lesson-block scene" data-scene="roots">
+        <p class="scene-label">Scene 4</p>
+        <h2>Roots = where the story hits the ground</h2>
+        <p class="big-math">Roots are x where y = 0</p>
+        <p>
+          On the graph, roots are just where the curve crosses the x-axis.
+          On paper, those are the solutions of the quadratic equation.
+        </p>
+        <ul class="beat-list">
+          <li>2 roots → curve cuts the axis twice.</li>
+          <li>1 root → curve just kisses the axis (touches at the vertex).</li>
+          <li>0 roots → curve floats completely above/below the axis.</li>
+        </ul>
+
+        <div class="scene-graph" data-a="1" data-h="1" data-k="-4"></div>
+
+        <div class="quick-check" data-check="roots">
+          <p><strong>Quick check:</strong> Based on the picture above, do you expect 2, 1, or 0 real roots?</p>
+          <div class="quick-check-options">
+            <button type="button" data-correct="true">2 real roots</button>
+            <button type="button" data-correct="false">1 real root</button>
+            <button type="button" data-correct="false">0 real roots</button>
+          </div>
+          <p class="quick-check-feedback"></p>
+        </div>
+      </section>
+
+      <!-- Scene 5: Bridge to exam form -->
+      <section class="card lesson-block scene" data-scene="bridge">
+        <p class="scene-label">Scene 5</p>
+        <h2>Why this matters for exams</h2>
+        <p class="big-math">Standard form: y = ax² + bx + c</p>
+        <p>
+          Exam questions love this version. But under the hood,
+          it’s the same curve you’ve just met:
+        </p>
+        <ul class="beat-list">
+          <li>You can rewrite to vertex form to find the turning point faster.</li>
+          <li>You can factor (if nice) to see roots immediately.</li>
+          <li>The graph is not new. It’s the same character in a different outfit.</li>
+        </ul>
+
+        <div class="quick-check" data-check="bridge">
+          <p><strong>Checkpoint:</strong> For <code>y = 2x² + 4x + 1</code>, which move helps you see the vertex?</p>
+          <div class="quick-check-options">
+            <button type="button" data-correct="true">Complete the square</button>
+            <button type="button" data-correct="false">Multiply everything by 10</button>
+            <button type="button" data-correct="false">Guess random x values</button>
+          </div>
+          <p class="quick-check-feedback"></p>
+        </div>
+      </section>
+
+      <!-- Wrap / CTA -->
+      <section class="card lesson-block scene scene-wrap">
+        <h2>Unlocked: graph sense for quadratics</h2>
+        <p>
+          If you can look at any quadratic and quickly say:
+          “up/down, where’s the vertex, how many roots, wide or narrow?” —
+          you’re ready for solving, completing the square, and formula questions.
+        </p>
+        <div class="wrap-actions">
+          <a class="btn btn--primary" href="lesson-quadratic-equations.html">
+            Next: Solving quadratics without pain
+          </a>
+          <a class="btn btn--ghost" href="../course-map.html?module=form4-01">
+            Back to module map
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- JS wiring -->
+  <script src="../../js/learner-session.js"></script>
+  <script src="../../js/learner-shell.js"></script>
+  <script src="../../js/modules/lesson-quadratic-functions.js"></script>
+</body>
+</html>
