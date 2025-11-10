@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MathPath · Kickoff</title>
+  <title>KiraKira · Kickoff</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/learner.css">
 </head>
@@ -124,7 +124,8 @@
     </main>
   </div>
 
-    <script src="../js/modules-data.js"></script>
+  <script src="../js/learner-session.js"></script>
+  <script src="../js/modules-data.js"></script>
   <script>
     const form = document.getElementById("onboardingForm");
     const readinessRange = document.getElementById("readinessRange");
@@ -134,6 +135,8 @@
     const videoToggle = document.getElementById("videoToggle");
     const videoRecommendations = document.getElementById("videoRecommendations");
     const videoAccessChip = document.getElementById("videoAccessChip");
+    const submitButton = form.querySelector("button[type='submit']");
+    const defaultSubmit = submitButton ? submitButton.textContent : "Save & continue";
 
     const readinessMessages = value => {
       if (value >= 80) {
@@ -143,6 +146,13 @@
         return "Solid work - let's balance revision with tricky problem sets.";
       }
       return "We've got your back - let's prioritise Algebra rescue drills.";
+    };
+
+    const setSubmitState = (label, disabled) => {
+      if (submitButton) {
+        submitButton.textContent = label;
+        submitButton.disabled = Boolean(disabled);
+      }
     };
 
     const updateSummary = () => {
@@ -172,6 +182,37 @@
       summaryLine.textContent = summary;
     };
 
+    const persistMission = async payload => {
+      const session = window.kiraLearnerSession;
+      if (!session) {
+        return { ok: false, message: "Please log in again to save your preferences." };
+      }
+
+      try {
+        const response = await session.fetch("mission", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+          let errorMessage = `Save failed (status ${response.status})`;
+          try {
+            const detail = await response.json();
+            if (detail && detail.error) {
+              errorMessage = detail.error;
+            }
+          } catch (error) {
+            // Ignore body parsing issues
+          }
+          return { ok: false, message: errorMessage };
+        }
+        return { ok: true };
+      } catch (error) {
+        console.error("Unable to save mission preferences", error);
+        return { ok: false, message: "We couldn't reach the server. Please try again." };
+      }
+    };
+
     readinessRange.addEventListener("input", updateSummary);
     videoToggle.addEventListener("change", updateSummary);
     form.addEventListener("change", event => {
@@ -180,19 +221,29 @@
       }
     });
 
-    form.addEventListener("submit", event => {
+    form.addEventListener("submit", async event => {
       event.preventDefault();
       const formData = new FormData(form);
       const payload = {
-        grade: formData.get("grade"),
+        grade: formData.get("grade") || "Form 4",
         readiness: Number(readinessRange.value),
         wantsVideos: videoToggle.checked
       };
-      localStorage.setItem("kiraOnboarding", JSON.stringify(payload));
-      summaryLine.textContent = "Saved! Redirecting you to the dashboard...";
-      setTimeout(() => {
-        window.location.href = "learner-home.html";
-      }, 1200);
+
+      setSubmitState("Saving...", true);
+      summaryLine.textContent = "Saving your preferences...";
+
+      const result = await persistMission(payload);
+      if (result.ok) {
+        localStorage.setItem("kiraOnboarding", JSON.stringify(payload));
+        summaryLine.textContent = "Saved! Redirecting you to the dashboard...";
+        setTimeout(() => {
+          window.location.href = "learner-home.html";
+        }, 1200);
+      } else {
+        summaryLine.textContent = result.message || "Unable to save right now. Please try again.";
+        setSubmitState(defaultSubmit, false);
+      }
     });
 
     updateSummary();

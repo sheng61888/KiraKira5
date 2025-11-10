@@ -20,6 +20,7 @@ public interface ILearnerService
     Task<LearnerProfilePayload> GetProfileAsync(string learnerId);
     Task<LearnerProfileDto> UpdateAvatarAsync(string learnerId, string avatarUrl);
     Task<LearnerProfilePayload> UpdateProfileDetailsAsync(string learnerId, ProfileDetailsUpdateRequest request);
+    Task<LearnerMissionDto> SaveMissionPreferencesAsync(string learnerId, LearnerMissionUpdateRequest request);
     Task<CommunityFeedDto> GetCommunityThreadsAsync(string learnerId, CommunityThreadQuery query);
     Task<CommunityThreadDto> CreateCommunityThreadAsync(string learnerId, CommunityThreadCreateRequest request);
     Task<CommunityReplyDto> CreateCommunityReplyAsync(string learnerId, long threadId, CommunityReplyCreateRequest request);
@@ -239,6 +240,57 @@ public class LearnerService : ILearnerService
         await UpdateLearnerAccountAsync(learnerId, request.Name, request.Email);
 
         return await GetProfileAsync(learnerId);
+    }
+
+    public async Task<LearnerMissionDto> SaveMissionPreferencesAsync(string learnerId, LearnerMissionUpdateRequest request)
+    {
+        request ??= new LearnerMissionUpdateRequest();
+        var grade = string.IsNullOrWhiteSpace(request.Grade) ? "Form 4" : request.Grade.Trim();
+        var readiness = Math.Max(0, Math.Min(100, request.Readiness));
+        var wantsVideos = request.WantsVideos;
+        var copy = DescribeMissionByReadiness(readiness);
+
+        if (string.IsNullOrWhiteSpace(learnerId))
+        {
+            return BuildMissionDto(grade, readiness, wantsVideos, copy);
+        }
+
+        var saved = false;
+        const string sql = @"INSERT INTO learner_mission (uid, grade, readiness_percent, target_focus, wants_videos, mission_title, mission_mood, mission_mode)
+                             VALUES (@Uid, @Grade, @Readiness, @Focus, @WantsVideos, @Title, @Mood, @Mode)
+                             ON DUPLICATE KEY UPDATE grade = VALUES(grade), readiness_percent = VALUES(readiness_percent), target_focus = VALUES(target_focus), wants_videos = VALUES(wants_videos), mission_title = VALUES(mission_title), mission_mood = VALUES(mission_mood), mission_mode = VALUES(mission_mode)";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection != null)
+            {
+                await using var command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Uid", learnerId);
+                command.Parameters.AddWithValue("@Grade", grade);
+                command.Parameters.AddWithValue("@Readiness", readiness);
+                command.Parameters.AddWithValue("@Focus", copy.Focus);
+                command.Parameters.AddWithValue("@WantsVideos", wantsVideos);
+                command.Parameters.AddWithValue("@Title", copy.Title);
+                command.Parameters.AddWithValue("@Mood", copy.Mood);
+                command.Parameters.AddWithValue("@Mode", copy.Mode);
+                await command.ExecuteNonQueryAsync();
+                saved = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to save learner_mission for {learnerId}: {ex.Message}");
+        }
+
+        if (!saved)
+        {
+            return BuildMissionDto(grade, readiness, wantsVideos, copy);
+        }
+
+        var record = await FetchLearnerAsync(learnerId);
+        var profile = await FetchProfileDtoAsync(learnerId, record);
+        return await FetchMissionDtoAsync(learnerId, profile);
     }
 
     public async Task<CommunityFeedDto> GetCommunityThreadsAsync(string learnerId, CommunityThreadQuery query)
@@ -986,6 +1038,62 @@ public class LearnerService : ILearnerService
         }
 
         return mission;
+    }
+
+    private static MissionLanguage DescribeMissionByReadiness(int readiness)
+    {
+        if (readiness < 50)
+        {
+            return new MissionLanguage
+            {
+                Title = "Rescue plan activated",
+                Mood = "We'll prioritise Algebra rescue drills until you're steady again.",
+                Mode = "Rescue mode",
+                Focus = "Core rescue"
+            };
+        }
+
+        if (readiness < 80)
+        {
+            return new MissionLanguage
+            {
+                Title = "Keep the momentum going",
+                Mood = "Solid footing - let's balance revision with trickier sets.",
+                Mode = "Momentum mode",
+                Focus = "Balanced practice"
+            };
+        }
+
+        return new MissionLanguage
+        {
+            Title = "Mastery push unlocked",
+            Mood = "Legend status - chase perfect timed papers.",
+            Mode = "Mastery mode",
+            Focus = "Exam mastery"
+        };
+    }
+
+    private static LearnerMissionDto BuildMissionDto(string grade, int readiness, bool wantsVideos, MissionLanguage copy)
+    {
+        var normalizedGrade = string.IsNullOrWhiteSpace(grade) ? "Form 4" : grade;
+        return new LearnerMissionDto
+        {
+            Badge = $"{normalizedGrade} track",
+            Grade = normalizedGrade,
+            Title = copy.Title,
+            Mood = copy.Mood,
+            Confidence = readiness,
+            Mode = copy.Mode,
+            WantsVideos = wantsVideos
+        };
+    }
+
+    private sealed class MissionLanguage
+    {
+        public string Title { get; init; } = string.Empty;
+        public string Mood { get; init; } = string.Empty;
+        public string Mode { get; init; } = string.Empty;
+        public string Focus { get; init; } = string.Empty;
     }
 
     private async Task<LearnerStreakDto> FetchStreakDtoAsync(string learnerId, LearnerProfileDto profile)
