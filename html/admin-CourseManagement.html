@@ -1,146 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>About KiraKira | SPM Math Companion</title>
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Management - KiraKira Admin</title>
+    <link rel="stylesheet" href="../css/learner.css">
+    <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body>
-    <header class="header">
-        <nav class="container nav-container">
-            <a href="home.html" class="brand-logo">KiraKira</a>
-            <div class="nav-links">
-                <a href="home.html">Home</a>
-                <a href="catalogue-classes.html">Browse Classes</a>
-                <a href="login_signup.html">Login</a>
-                <div class="nav-cta">
-                    <a href="login_signup.html" class="btn btn-primary">Get Started</a>
-                    <div class="theme-switcher" role="group" aria-label="Theme selection">
-                        <button type="button" class="theme-button" data-theme-select="light">Day</button>
-                        <button type="button" class="theme-button" data-theme-select="dark">Night</button>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="../images/logo transparent.png" alt="KiraKira Logo">
+            </div>
+            <nav class="nav">
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a href="admin-UserManagement.html">User Management</a>
+                <a href="admin-CourseManagement.html" aria-current="page">Course Management</a>
+                <a href="admin-CommunityManagement.html">Community Management</a>
+                <a href="admin-Reporting.html">Reports</a>
+                <a href="admin-Requests.html">Requests</a>
+                <a href="../html/login_signup.html" onclick="return confirm('Are you sure you want to sign out?')">Sign Out</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="page-heading">
+                <div>
+                    <p class="eyebrow">Admin Panel</p>
+                    <h1>Course Management</h1>
+                    <p>Create and manage courses, chapters, and sub-chapters</p>
+                </div>
+            </header>
+
+            <section class="card">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">Create Course</p>
+                        <h2>New Course</h2>
                     </div>
                 </div>
-            </div>
-        </nav>
-    </header>
+                <form id="createCourseForm">
+                    <div class="form-group">
+                        <label>Course Title:</label>
+                        <input type="text" id="courseTitle" placeholder="Course Title" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Course Description:</label>
+                        <textarea id="courseDescription" placeholder="Course Description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Enrollment Code:</label>
+                        <input type="text" id="enrollmentCode" placeholder="e.g., MATH4-2024" required />
+                    </div>
+                    <button type="submit" class="btn btn--primary">Create Course</button>
+                </form>
+            </section>
 
-    <main>
-        <section class="hero-section about-hero">
-            <div class="container hero-container">
-                <h1>About KiraKira</h1>
-                <p class="subtitle">
-                    We empower Malaysian students to master SPM Mathematics through guided self-study, bite-sized explanations, and endless practice opportunities.
-                </p>
-            </div>
-        </section>
-
-        <section class="container about-story">
-            <div class="section-header">
-                <p class="eyebrow">Our Story</p>
-                <h2 class="section-title">Born From Real SPM Struggles</h2>
-                <p>
-                    KiraKira started when a group of SPM graduates realized there was no single place to revise, drill past questions, and build exam confidence without expensive tuition.
-                    We teamed up with teachers, examiners, and university students to translate modern classroom strategies into an independent-learning platform that feels like a patient mentor.
-                </p>
-            </div>
-            <div class="about-grid">
-                <article class="about-card">
-                    <h3>Laser-Focused Content</h3>
-                    <p>
-                        Every lesson follows the latest KSSM syllabus for Modern & Additional Mathematics. We highlight what the examiner really wants and how to earn every method mark.
-                    </p>
-                </article>
-                <article class="about-card">
-                    <h3>Independent, Not Isolated</h3>
-                    <p>
-                        Step-by-step walkthroughs, annotated solutions, and instant feedback help you study whenever you have time, while still feeling guided.
-                    </p>
-                </article>
-                <article class="about-card">
-                    <h3>Practice That Builds Stamina</h3>
-                    <p>
-                        Auto-generated drills, topical quizzes, and full-length simulators make it easy to turn weak topics into strengths before the real paper.
-                    </p>
-                </article>
-            </div>
-        </section>
-
-        <section class="spm-advantage-section">
-            <div class="container">
-                <h2 class="section-title">How We Support SPM Learners</h2>
-                <div class="features-grid">
-                    <article class="feature-card">
-                        <div class="feature-icon-wrapper icon-green">1</div>
-                        <h3>Understand</h3>
-                        <p>Visual notes, concept maps, and quick formula checks to refresh fundamentals before attempting questions.</p>
-                    </article>
-                    <article class="feature-card">
-                        <div class="feature-icon-wrapper icon-indigo">2</div>
-                        <h3>Practice</h3>
-                        <p>Topic drills, past-year problems, and exam-mode timers for both Modern Math and Add Math papers.</p>
-                    </article>
-                    <article class="feature-card">
-                        <div class="feature-icon-wrapper icon-purple">3</div>
-                        <h3>Review</h3>
-                        <p>Instant marking, worked solutions, and personalised tip sheets so every mistake becomes a lesson.</p>
-                    </article>
+            <section class="card">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">Add Chapter</p>
+                        <h2>New Chapter</h2>
+                    </div>
                 </div>
-            </div>
-        </section>
+                <form id="createChapterForm">
+                    <div class="form-group">
+                        <label>Select Course:</label>
+                        <select id="chapterCourseId" required>
+                            <option value="">-- Select Course --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Chapter Title:</label>
+                        <input type="text" id="chapterTitle" placeholder="Chapter Title" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Chapter Content:</label>
+                        <textarea id="chapterContent" placeholder="Chapter Content"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Order Index:</label>
+                        <input type="number" id="chapterOrder" placeholder="Order Index" required />
+                    </div>
+                    <button type="submit" class="btn btn--primary">Add Chapter</button>
+                </form>
+            </section>
 
-        <section class="container about-impact">
-            <div class="impact-copy">
-                <h2 class="section-title">Built For Malaysian Context</h2>
-                <ul>
-                    <li>Uses Bahasa Melayu and English terminology side by side so you can switch seamlessly between textbooks and KiraKira.</li>
-                    <li>Includes real PT3 & SPM trend questions to highlight HOTS-style reasoning.</li>
-                    <li>Shows exam tips based on common mistakes from recent marking schemes.</li>
-                    <li>Designed for laptops and computers so that students can get quality practice.</li>
-                </ul>
-            </div>
-            <div class="impact-stats">
-                <div class="stat-card">
-                    <span class="stat-value">1,200+</span>
-                    <p class="stat-label">Exam-style questions with full solutions.</p>
+            <section class="card">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">Add Sub-Chapter</p>
+                        <h2>New Sub-Chapter</h2>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-value">15</span>
-                    <p class="stat-label">Complete learning paths for each SPM topic.</p>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value">24/7</span>
-                    <p class="stat-label">Learning access, anytime revision motivation strikes.</p>
-                </div>
-            </div>
-        </section>
+                <form id="createSubChapterForm">
+                    <div class="form-group">
+                        <label>Select Course:</label>
+                        <select id="subChapterCourseId" required onchange="loadChaptersForSubChapter()">
+                            <option value="">-- Select Course --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Chapter:</label>
+                        <select id="subChapterId" required>
+                            <option value="">-- Select Chapter --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Sub-Chapter Title:</label>
+                        <input type="text" id="subChapterTitle" placeholder="Sub-Chapter Title" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Sub-Chapter Content:</label>
+                        <textarea id="subChapterContent" placeholder="Sub-Chapter Content"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Order Index:</label>
+                        <input type="number" id="subChapterOrder" placeholder="Order Index" required />
+                    </div>
+                    <button type="submit" class="btn btn--primary">Add Sub-Chapter</button>
+                </form>
+            </section>
 
-        <section class="cta-section">
-            <div class="container cta-card">
-                <div>
-                    <p class="eyebrow">Join the Movement</p>
-                    <h2 class="section-title">Ready To Feel Confident For SPM Math?</h2>
-                    <p>Explore KiraKira's learner classes, download curated notes, and track your streaks all the way to exam day.</p>
+            <section class="card">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">Course Structure</p>
+                        <h2>All Courses</h2>
+                    </div>
+                    <button class="btn btn--ghost" onclick="loadCourseStructure()">Refresh</button>
                 </div>
-                <a class="btn btn-primary btn-large" href="catalogue-classes.html">Explore Classes</a>
-            </div>
-        </section>
-    </main>
+                <div id="courseStructure" style="margin-top: 1rem;"></div>
+            </section>
 
-    <footer class="site-footer">
-        <div class="container footer-content">
-            <p>&copy; <span id="current-year"></span> KiraKira. Built in Malaysia for Malaysian learners.</p>
-            <p><a href="mailto:hello@kirakira.my">hello@kirakira.my</a></p>
-        </div>
-    </footer>
+            <div id="message" style="margin-top: 1rem; padding: 1rem; border-radius: 4px;"></div>
+        </main>
+    </div>
 
-    <script src="../js/theme.js"></script>
     <script>
-        document.getElementById("current-year").textContent = new Date().getFullYear();
+        const API_BASE = 'http://localhost:5000/api/course';
+
+        async function loadCourses() {
+            const response = await fetch(`${API_BASE}/admin/courses`);
+            const courses = await response.json();
+            
+            const courseSelects = [document.getElementById('chapterCourseId'), document.getElementById('subChapterCourseId')];
+            courseSelects.forEach(select => {
+                select.innerHTML = '<option value="">-- Select Course --</option>';
+                courses.forEach(course => {
+                    select.innerHTML += `<option value="${course.courseId}">${course.title} (${course.enrollmentCode})</option>`;
+                });
+            });
+        }
+
+        async function loadChaptersForSubChapter() {
+            const courseId = document.getElementById('subChapterCourseId').value;
+            const chapterSelect = document.getElementById('subChapterId');
+            
+            if (!courseId) {
+                chapterSelect.innerHTML = '<option value="">-- Select Chapter --</option>';
+                return;
+            }
+
+            const response = await fetch(`${API_BASE}/admin/chapters/${courseId}`);
+            const chapters = await response.json();
+            
+            chapterSelect.innerHTML = '<option value="">-- Select Chapter --</option>';
+            chapters.forEach(chapter => {
+                chapterSelect.innerHTML += `<option value="${chapter.chapterId}">${chapter.orderIndex}. ${chapter.title}</option>`;
+            });
+        }
+
+        async function loadCourseStructure() {
+            const response = await fetch(`${API_BASE}/admin/structure`);
+            const structure = await response.json();
+            
+            const container = document.getElementById('courseStructure');
+            container.innerHTML = '';
+            
+            structure.forEach(course => {
+                let html = `<div style="margin-bottom: 2rem; padding: 1rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <h3>${course.title} <span style="color: #666; font-size: 0.9em;">(${course.enrollmentCode})</span></h3>`;
+                
+                if (course.chapters.length > 0) {
+                    course.chapters.forEach(chapter => {
+                        html += `<div style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <strong>${chapter.orderIndex}. ${chapter.title}</strong>`;
+                        
+                        if (chapter.subChapters.length > 0) {
+                            chapter.subChapters.forEach(sub => {
+                                html += `<div style="margin-left: 1.5rem; color: #666;">${chapter.orderIndex}.${sub.orderIndex} ${sub.title}</div>`;
+                            });
+                        }
+                        html += `</div>`;
+                    });
+                } else {
+                    html += `<p style="color: #999; margin-left: 1.5rem;">No chapters yet</p>`;
+                }
+                html += `</div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCourses();
+            loadCourseStructure();
+        });
+
+        document.getElementById('createCourseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const response = await fetch(`${API_BASE}/admin/course`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    title: document.getElementById('courseTitle').value,
+                    description: document.getElementById('courseDescription').value,
+                    enrollmentCode: document.getElementById('enrollmentCode').value
+                })
+            });
+            const data = await response.json();
+            showMessage(`Course created with ID: ${data.courseId}`);
+            e.target.reset();
+            loadCourses();
+            loadCourseStructure();
+        });
+
+        document.getElementById('createChapterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const response = await fetch(`${API_BASE}/admin/chapter`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    courseId: parseInt(document.getElementById('chapterCourseId').value),
+                    title: document.getElementById('chapterTitle').value,
+                    content: document.getElementById('chapterContent').value,
+                    orderIndex: parseInt(document.getElementById('chapterOrder').value)
+                })
+            });
+            const data = await response.json();
+            showMessage(`Chapter created with ID: ${data.chapterId}`);
+            e.target.reset();
+            loadCourseStructure();
+        });
+
+        document.getElementById('createSubChapterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const response = await fetch(`${API_BASE}/admin/subchapter`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    chapterId: parseInt(document.getElementById('subChapterId').value),
+                    title: document.getElementById('subChapterTitle').value,
+                    content: document.getElementById('subChapterContent').value,
+                    orderIndex: parseInt(document.getElementById('subChapterOrder').value)
+                })
+            });
+            const data = await response.json();
+            showMessage(`Sub-Chapter created with ID: ${data.subChapterId}`);
+            e.target.reset();
+            loadCourseStructure();
+        });
+
+        function showMessage(msg) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            messageDiv.style.backgroundColor = '#d4edda';
+            messageDiv.style.color = '#155724';
+            setTimeout(() => messageDiv.textContent = '', 3000);
+        }
     </script>
 </body>
 </html>
-

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.FileProviders;
 using System.Text.Json;
+using KiraKira5.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
 });
 builder.Services.AddScoped<ILearnerService, LearnerService>();
+builder.Services.AddScoped<CourseService>(sp => 
+    new CourseService(builder.Configuration.GetConnectionString("KiraKiraDB")));
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>

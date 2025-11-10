@@ -2,16 +2,13 @@
   const selectors = {
     joinSection: "#joinClassSection",
     dashboard: "#classDashboard",
+    enrolledCoursesList: "#enrolledCoursesList",
+    courseDetailSection: "#courseDetailSection",
     classTitle: "#classTitle",
     classCode: "#classCodeDisplay",
-    classTeacher: "#classTeacher",
     classGrade: "#classGrade",
     classDescription: "#classDescription",
-    announcements: "#announcementList",
-    topics: "#ongoingTopics",
-    assignments: "#assignmentList",
-    classModules: "#classModulesList",
-    classModulesChip: "#classModulesChip",
+    courseChapters: "#courseChapters",
     joinForm: "#joinClassForm",
     classCodeInput: "#classCode"
   };
@@ -30,11 +27,7 @@
   };
 
   const setVisibility = hasEnrollment => {
-    const joinSection = getElement(selectors.joinSection);
     const dashboard = getElement(selectors.dashboard);
-    if (joinSection) {
-      joinSection.style.display = hasEnrollment ? "none" : "block";
-    }
     if (dashboard) {
       dashboard.style.display = hasEnrollment ? "block" : "none";
     }
@@ -47,202 +40,176 @@
     }
     setVisibility(true);
     if (info) {
-      setText(selectors.classTitle, info.title || "Your enrolled class");
+      setText(selectors.classTitle, info.title || "Your enrolled course");
       setText(selectors.classCode, `Code: ${info.code || "-"}`);
-      const teacherName = info.teacherName ? `Teacher: ${info.teacherName}` : "Teacher: To be assigned";
-      setText(selectors.classTeacher, teacherName);
-      const gradeLabel = info.gradeLevel ? `${info.gradeLevel} class` : "Class space unlocked";
+      const gradeLabel = info.gradeLevel || "Enrolled Course";
       setText(selectors.classGrade, gradeLabel);
-      const description = info.description || copy.defaultClassDescription;
+      const description = info.description || "Course description";
       setText(selectors.classDescription, description);
     }
   };
 
-  const renderAnnouncements = announcements => {
-    const container = document.querySelector(selectors.announcements);
-    if (!container) {
+  const renderCourseChapters = async (courseId) => {
+    const container = getElement(selectors.courseChapters);
+    if (!container) return;
+
+    try {
+      console.log('Fetching chapters for course:', courseId);
+      const response = await fetch(`http://localhost:5000/api/course/chapters/${courseId}`);
+      console.log('Chapters response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch chapters: ${response.status}`);
+      }
+      
+      const chapters = await response.json();
+      console.log('Chapters:', chapters);
+
+      if (!chapters || chapters.length === 0) {
+        container.innerHTML = "<p class='muted'>No chapters available yet.</p>";
+        return;
+      }
+
+      let html = '';
+      for (const chapter of chapters) {
+        html += `<div style="margin-bottom: 1.5rem; padding: 1rem; border: 1px solid #ddd; border-radius: 4px;">
+          <h4>${chapter.orderIndex}. ${chapter.title}</h4>`;
+        
+        const subResponse = await fetch(`http://localhost:5000/api/course/subchapters/${chapter.chapterId}`);
+        if (subResponse.ok) {
+          const subChapters = await subResponse.json();
+          
+          if (subChapters && subChapters.length > 0) {
+            subChapters.forEach(sub => {
+              html += `<div style="margin-left: 1.5rem; margin-top: 0.5rem; color: #666;">
+                ${chapter.orderIndex}.${sub.orderIndex} ${sub.title}
+              </div>`;
+            });
+          }
+        }
+        html += `</div>`;
+      }
+      container.innerHTML = html;
+    } catch (error) {
+      console.error("Error loading chapters:", error);
+      container.innerHTML = `<p class='muted'>Unable to load course content. ${error.message}</p>`;
+    }
+  };
+
+  const renderEnrolledCourses = (enrollments) => {
+    const container = getElement(selectors.enrolledCoursesList);
+    if (!container) return;
+
+    if (!enrollments || enrollments.length === 0) {
+      container.innerHTML = "<p class='muted'>No enrolled courses yet. Use the form above to join a course.</p>";
       return;
     }
-    if (!Array.isArray(announcements) || !announcements.length) {
-      container.innerHTML = "<p class=\"muted\">No announcements yet.</p>";
-      return;
-    }
-    container.innerHTML = announcements
-      .map(
-        announcement => `
-        <div class="activity-item">
+
+    let html = '';
+    enrollments.forEach(enrollment => {
+      html += `<article class="card" style="margin-bottom: 1rem;">
+        <div class="section-head">
           <div>
-            <strong>${announcement.title}</strong>
-            <p>${announcement.detail}</p>
+            <h3>${enrollment.course.title}</h3>
+            <p class="muted">${enrollment.course.description}</p>
+            <p><strong>Code:</strong> ${enrollment.course.enrollmentCode} | <strong>Status:</strong> ${enrollment.isCompleted ? 'Completed' : 'In Progress'}</p>
           </div>
-          <span>${announcement.timestamp}</span>
-        </div>`
-      )
-      .join("");
-  };
-
-  const renderTopics = topics => {
-    const container = document.querySelector(selectors.topics);
-    if (!container) {
-      return;
-    }
-    if (!Array.isArray(topics) || !topics.length) {
-      container.innerHTML = "<p class=\"muted\">Coach has not assigned topics yet.</p>";
-      return;
-    }
-    container.innerHTML = topics
-      .map(
-        topic => `
-        <div class="task">
-          <span>${topic.title} <strong>${topic.percent}%</strong></span>
-          <div class="meter progress-bar"><span style="width:${topic.percent}%"></span></div>
-        </div>`
-      )
-      .join("");
-  };
-
-  const renderAssignments = assignments => {
-    const container = getElement(selectors.assignments);
-    if (!container) {
-      return;
-    }
-    if (!Array.isArray(assignments) || !assignments.length) {
-      container.innerHTML = "<p class=\"muted\">No assignments due.</p>";
-      return;
-    }
-    container.innerHTML = assignments
-      .map(
-        assignment => `
-        <div class="assignment">
-          <div class="assignment-info">
-            <span class="assignment-title">${assignment.title}</span>
-            <span class="assignment-date">Due: ${assignment.dueDate}</span>
-          </div>
-          <div class="completion">
-            <div class="meter completion-bar"><span style="width:${assignment.completionPercent}%"></span></div>
-            <small>${assignment.status}</small>
-          </div>
-        </div>`
-      )
-      .join("");
-  };
-
-  const buildLessonList = lessons => {
-    const safeLessons = Array.isArray(lessons) ? lessons : [];
-    const list = document.createElement("ul");
-    list.className = "lesson-pill-list";
-
-    if (!safeLessons.length) {
-      const emptyItem = document.createElement("li");
-      emptyItem.textContent = "Coach will add lesson focus soon.";
-      list.appendChild(emptyItem);
-      return list;
-    }
-
-    safeLessons.slice(0, 3).forEach(lesson => {
-      const item = document.createElement("li");
-      item.textContent = lesson;
-      list.appendChild(item);
+          <button class="btn btn--primary" onclick="viewCourse(${enrollment.courseId})">View Course</button>
+        </div>
+      </article>`;
     });
-
-    if (safeLessons.length > 3) {
-      const more = document.createElement("li");
-      more.textContent = `+${safeLessons.length - 3} more`;
-      list.appendChild(more);
-    }
-
-    return list;
+    container.innerHTML = html;
   };
 
-  const renderClassModules = modules => {
-    const container = getElement(selectors.classModules);
-    const chip = getElement(selectors.classModulesChip);
-    if (!container) {
-      return;
-    }
+  window.viewCourse = async (courseId) => {
+    const detailSection = getElement(selectors.courseDetailSection);
+    if (!detailSection) return;
 
-    if (!Array.isArray(modules) || !modules.length) {
-      container.innerHTML = "<p class=\"muted\">Your coach hasn't assigned modules yet.</p>";
-      if (chip) {
-        chip.textContent = "Waiting for coach";
-        chip.className = "chip";
+    try {
+      const response = await fetch(`http://localhost:5000/api/course/admin/courses`);
+      const courses = await response.json();
+      const course = courses.find(c => c.courseId === courseId);
+
+      if (course) {
+        setText(selectors.classTitle, course.title);
+        setText(selectors.classCode, `Code: ${course.enrollmentCode}`);
+        setText(selectors.classDescription, course.description);
+        
+        const session = window.kiraLearnerSession;
+        const learnerId = session ? session.ensureId() : null;
+        if (learnerId) {
+          const numericLearnerId = learnerId.replace(/\D/g, '');
+          const enrollResponse = await fetch(`http://localhost:5000/api/course/enrollments/${numericLearnerId}`);
+          const enrollments = await enrollResponse.json();
+          const enrollment = enrollments.find(e => e.courseId === courseId);
+          
+          if (enrollment) {
+            window.currentEnrollmentId = enrollment.enrollmentId;
+            window.currentEnrollmentCompleted = enrollment.isCompleted;
+            
+            const btn = document.getElementById('completeCourseBtn');
+            if (btn) {
+              if (enrollment.isCompleted) {
+                btn.textContent = 'Completed';
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+              } else {
+                btn.textContent = 'Complete Course (Earn 1000 XP)';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+              }
+            }
+          }
+        }
+        
+        await renderCourseChapters(courseId);
+        detailSection.style.display = 'block';
+        detailSection.scrollIntoView({ behavior: 'smooth' });
       }
-      return;
-    }
-
-    container.innerHTML = "";
-    modules.forEach(module => {
-      const row = document.createElement("div");
-      row.className = "class-module-row";
-
-      const info = document.createElement("div");
-      info.className = "class-module-info";
-
-      const title = document.createElement("p");
-      title.className = "class-module-title";
-      title.textContent = module.title || module.moduleId || "Module";
-
-      const meta = document.createElement("p");
-      meta.className = "muted";
-      const metaParts = [];
-      if (module.grade) {
-        metaParts.push(module.grade);
-      }
-      if (module.number) {
-        metaParts.push(`Module ${module.number}`);
-      }
-      meta.textContent = metaParts.join(" | ");
-
-      info.appendChild(title);
-      if (meta.textContent) {
-        info.appendChild(meta);
-      }
-      info.appendChild(buildLessonList(module.lessons));
-
-      const details = document.createElement("div");
-      details.className = "class-module-meta";
-
-      const dueChip = document.createElement("span");
-      dueChip.className = module.dueDate ? "chip chip--info" : "chip";
-      dueChip.textContent = module.dueDate ? `Due ${module.dueDate}` : "No due date";
-      details.appendChild(dueChip);
-
-      if (module.assignedAt) {
-        const assigned = document.createElement("small");
-        assigned.className = "muted";
-        assigned.textContent = `Assigned ${module.assignedAt}`;
-        details.appendChild(assigned);
-      }
-
-      if (module.link) {
-        const action = document.createElement("a");
-        action.href = module.link;
-        action.className = "btn btn--ghost";
-        action.textContent = "Open module";
-        details.appendChild(action);
-      }
-
-      row.appendChild(info);
-      row.appendChild(details);
-      container.appendChild(row);
-    });
-
-    if (chip) {
-      chip.textContent = modules.length === 1 ? "1 module" : `${modules.length} modules`;
-      chip.className = "chip chip--info";
+    } catch (error) {
+      console.error('Error loading course details:', error);
     }
   };
 
-  const hydrateClassPage = data => {
-    if (!data) {
-      setVisibility(false);
+  window.completeCourse = async () => {
+    if (!window.currentEnrollmentId) {
+      alert('Enrollment not found.');
       return;
     }
-    renderClassInfo(data.classInfo, data.hasEnrollment);
-    renderAnnouncements(data.announcements);
-    renderTopics(data.ongoingTopics);
-    renderAssignments(data.assignments);
-    renderClassModules(data.classModules);
+    
+    if (window.currentEnrollmentCompleted) {
+      alert('This course is already completed!');
+      return;
+    }
+
+    if (!confirm('Mark this course as completed and earn 1000 XP?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/course/complete/${window.currentEnrollmentId}`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        alert('Congratulations! Course completed. You earned 1000 XP!');
+        window.currentEnrollmentCompleted = true;
+        
+        const btn = document.getElementById('completeCourseBtn');
+        if (btn) {
+          btn.textContent = 'Completed';
+          btn.disabled = true;
+          btn.style.opacity = '0.6';
+        }
+        
+        await fetchClasses();
+      } else {
+        alert('Failed to complete course.');
+      }
+    } catch (error) {
+      console.error('Error completing course:', error);
+      alert('Error completing course.');
+    }
   };
 
   const fetchClasses = async () => {
@@ -256,19 +223,22 @@
       return;
     }
     try {
-      const response = await session.fetch("classes");
+      const numericLearnerId = learnerId.replace(/\D/g, '');
+      const response = await fetch(`http://localhost:5000/api/course/enrollments/${numericLearnerId}`);
       if (!response.ok) {
         throw new Error(`Classes request failed with status ${response.status}`);
       }
-      const data = await response.json();
-      hydrateClassPage(data);
+      const enrollments = await response.json();
+      
+      if (enrollments && enrollments.length > 0) {
+        setVisibility(true);
+        renderEnrolledCourses(enrollments);
+      } else {
+        setVisibility(false);
+      }
     } catch (error) {
       console.error("Unable to load classes", error);
       setVisibility(false);
-      const announcements = document.querySelector(selectors.announcements);
-      if (announcements) {
-        announcements.innerHTML = "<p class=\"muted\">Unable to load announcements right now.</p>";
-      }
     }
   };
 
@@ -276,32 +246,45 @@
     event.preventDefault();
     const session = window.kiraLearnerSession;
     if (!session) {
+      alert("Session not found. Please log in again.");
+      return;
+    }
+    const learnerId = session.ensureId();
+    if (!learnerId) {
+      alert("Learner ID not found. Please log in again.");
       return;
     }
     const input = document.querySelector(selectors.classCodeInput);
     const code = input ? input.value.trim() : "";
     if (!code) {
+      alert("Please enter a class code.");
       return;
     }
+    const numericLearnerId = learnerId.replace(/\D/g, '');
+    console.log("Attempting to join class with:", { learnerId, numericLearnerId, code });
     try {
-      const response = await session.fetch("classes/join", {
+      const response = await fetch('http://localhost:5000/api/course/enroll', {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ code })
+        body: JSON.stringify({ learnerId: parseInt(numericLearnerId), enrollmentCode: code })
       });
-      if (!response.ok) {
-        throw new Error(`Join class failed with status ${response.status}`);
-      }
+      console.log("Response status:", response.status);
       const data = await response.json();
-      hydrateClassPage(data);
+      console.log("Response data:", data);
+      if (!response.ok) {
+        alert(data.message || "Unable to join class. Please check the code.");
+        return;
+      }
+      alert("Successfully enrolled in class!");
+      await fetchClasses();
       if (input) {
         input.value = "";
       }
     } catch (error) {
       console.error("Unable to join class", error);
-      alert("Unable to join class. Please check the code and try again.");
+      alert("Unable to join class. Error: " + error.message);
     }
   };
 
