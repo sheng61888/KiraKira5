@@ -44,6 +44,7 @@ public class LearnerController : ControllerBase
             return BadRequest(new { error = "Mission preferences are required." });
         }
 
+        Console.WriteLine($"Received mission: Grade={request.Grade}, Readiness={request.Readiness}, WantsVideos={request.WantsVideos}");
         var mission = await _learnerService.SaveMissionPreferencesAsync(learnerId, request);
         return Ok(mission);
     }

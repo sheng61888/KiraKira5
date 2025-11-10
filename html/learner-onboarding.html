@@ -224,11 +224,13 @@
     form.addEventListener("submit", async event => {
       event.preventDefault();
       const formData = new FormData(form);
+      const readinessValue = parseInt(readinessRange.value, 10);
       const payload = {
         grade: formData.get("grade") || "Form 4",
-        readiness: Number(readinessRange.value),
+        readiness: readinessValue,
         wantsVideos: videoToggle.checked
       };
+      console.log("Saving mission with readiness:", readinessValue);
 
       setSubmitState("Saving...", true);
       summaryLine.textContent = "Saving your preferences...";
@@ -238,7 +240,7 @@
         localStorage.setItem("kiraOnboarding", JSON.stringify(payload));
         summaryLine.textContent = "Saved! Redirecting you to the dashboard...";
         setTimeout(() => {
-          window.location.href = "learner-home.html";
+          window.location.href = "learner-home.html?refresh=" + Date.now();
         }, 1200);
       } else {
         summaryLine.textContent = result.message || "Unable to save right now. Please try again.";
