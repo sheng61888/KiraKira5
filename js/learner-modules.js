@@ -3,7 +3,7 @@
   const modulesMap = () => window.kiraModulesMap || {};
 
   const moduleProgressMap = {
-    "lesson-form4-01.html": 100,
+    "course-map.html?module=form4-01": 100,
     "lesson-form4-02.html": 62,
     "lesson-form4-03.html": 35
   };
@@ -74,6 +74,21 @@
     if (!section) {
       grid.innerHTML = "<p class=\"muted\">Module data unavailable. Please refresh.</p>";
       return;
+    }
+
+    const courseMapButton = document.querySelector("[data-action='course-map']");
+    if (courseMapButton) {
+      const targetModule =
+        section.modules.find(module => Array.isArray(module.units) && module.units.length) || section.modules[0];
+      const mapLink = targetModule && targetModule.link;
+      if (mapLink) {
+        courseMapButton.disabled = false;
+        courseMapButton.onclick = () => {
+          window.location.href = mapLink;
+        };
+      } else {
+        courseMapButton.disabled = true;
+      }
     }
 
     grid.innerHTML = "";

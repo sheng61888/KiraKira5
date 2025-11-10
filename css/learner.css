@@ -1938,13 +1938,192 @@ ul {
 }
 
 @media (max-width: 960px) {
-  .onboarding-card {
+.onboarding-card {
+  grid-template-columns: 1fr;
+}
+
+.onboarding-header {
+  grid-template-columns: 1fr;
+  text-align: center;
+}
+}
+
+/* Course map */
+.course-map-main .page-heading {
+  margin-bottom: 1.5rem;
+}
+
+.course-map-summary {
+  margin-bottom: 1.5rem;
+}
+
+.course-meta-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.course-meta-grid article {
+  padding: 0.9rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+}
+
+.course-unit-shell {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(240px, 320px) 1fr;
+  color: var(--text);
+}
+
+.course-unit-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-right: 1.5rem;
+  border-right: 1px solid var(--border);
+}
+
+.unit-nav-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  text-align: left;
+  cursor: pointer;
+  transform: translateY(0);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.unit-nav-item:hover,
+.unit-nav-item:focus-visible {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 26px rgba(124, 93, 250, 0.2);
+  border-color: rgba(168, 142, 240, 0.95);
+}
+
+.unit-nav-item strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+  color: var(--text);
+}
+
+.unit-nav-item small {
+  color: var(--muted);
+}
+
+.unit-nav-item.is-active {
+  border-color: rgba(168, 142, 240, 0.9);
+  background: rgba(124, 93, 250, 0.15);
+  box-shadow: 0 12px 24px rgba(124, 93, 250, 0.25);
+}
+
+.unit-nav-order {
+  font-weight: 600;
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+}
+
+.course-unit-detail {
+  padding: 1rem 0;
+  color: var(--text);
+}
+
+.unit-detail-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.course-unit-detail h2 {
+  color: var(--text);
+}
+
+.unit-summary {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.unit-body {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+}
+
+.unit-objectives {
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.unit-objectives li {
+  margin-bottom: 0.35rem;
+}
+
+.unit-resource-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.unit-resource-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.unit-resource-list li:last-child {
+  border-bottom: none;
+}
+
+.unit-resource-list strong {
+  color: var(--text);
+}
+
+.unit-resource-list small {
+  color: var(--muted);
+}
+
+.unit-cta {
+  margin-top: 1rem;
+}
+
+.unit-subhead {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.unit-next {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.unit-next .btn {
+  min-width: 200px;
+}
+
+@media (max-width: 900px) {
+  .course-unit-shell {
     grid-template-columns: 1fr;
   }
 
-  .onboarding-header {
-    grid-template-columns: 1fr;
-    text-align: center;
+  .course-unit-nav {
+    padding-right: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
   }
 }
 
@@ -1967,3 +2146,16 @@ ul {
     opacity: 0.35;
   }
 }
+.cardflip {
+  width: 260px; height: 120px; margin: 10px;
+  perspective: 800px; cursor: pointer; display:inline-block;
+}
+.cardflip div {
+  position:absolute; width:100%; height:100%; backface-visibility:hidden;
+  border-radius:12px; padding:1em; transition:transform .6s;
+  background:#fff; box-shadow:0 4px 6px rgba(0,0,0,.1);
+}
+.cardflip .back { transform:rotateY(180deg); }
+.cardflip.flipped .front { transform:rotateY(180deg); }
+.cardflip.flipped .back { transform:rotateY(0deg); }
+
