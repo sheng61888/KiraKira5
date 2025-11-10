@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KiraKira - Course Map</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/learner.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="/images/logo transparent.png" alt="KiraKira logo">
+      </div>
+      <div class="profile">
+        <div class="username" aria-live="polite">Course navigator</div>
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="streak" aria-live="polite">Loading streak...</div>
+        <div class="xp-bar"><span style="width:0%"></span></div>
+        <small aria-live="polite">Level loading</small>
+      </div>
+      <nav class="nav" aria-label="Learner navigation">
+        <a href="learner-home.html">Dashboard</a>
+        <a href="learner-progress.html">Progress</a>
+        <a href="learner-pastyears.html">Past Papers</a>
+        <a href="learner-classes.html">Classes</a>
+        <a href="learner-community.html">Community</a>
+        <a href="learner-profile.html">Profile</a>
+      </nav>
+    </aside>
+
+    <main class="main course-map-main">
+      <header class="page-heading" id="courseHeader">
+        <div>
+          <p class="eyebrow" id="courseGrade">Loading module...</p>
+          <h1 id="courseTitle">Preparing course map</h1>
+          <p id="courseSummary">Hang tight while we fetch the module outline.</p>
+        </div>
+        <div class="heading-actions">
+          <button class="btn btn--ghost" type="button" onclick="history.back()">Back</button>
+          <button class="btn btn--primary" type="button" data-action="start-module" disabled>Start module</button>
+        </div>
+      </header>
+
+      <section class="card course-map-summary" id="courseMeta">
+        <div>
+          <p class="eyebrow">Module focus</p>
+          <h2 id="courseFocus">Quadratic mastery</h2>
+        </div>
+        <div class="course-meta-grid">
+          <article>
+            <p class="muted">Units</p>
+            <strong id="courseUnitCount">-</strong>
+          </article>
+          <article>
+            <p class="muted">Est. time</p>
+            <strong id="courseDuration">-</strong>
+          </article>
+          <article>
+            <p class="muted">Recommended pace</p>
+            <strong id="coursePace">-</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="card course-unit-shell">
+        <div class="course-unit-nav" id="unitNav" aria-live="polite">
+          <p class="muted">Loading unit list...</p>
+        </div>
+        <div class="course-unit-detail" id="unitDetail" aria-live="polite">
+          <p class="muted">Select a unit to see the overview, objectives, and files.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/learner-session.js"></script>
+  <script src="../js/learner-shell.js"></script>
+  <script src="../js/modules-data.js"></script>
+  <script src="../js/course-map.js"></script>
+</body>
+</html>
