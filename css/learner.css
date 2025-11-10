@@ -299,6 +299,25 @@ ul {
   flex-wrap: wrap;
 }
 
+.timer-picker select {
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text);
+  min-width: 170px;
+}
+
+.timer-picker select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.timer-picker select option {
+  color: #000;
+  background: #fff;
+}
+
 /* Buttons & Chips --------------------------------------------- */
 .btn {
   border-radius: 999px;
@@ -1345,6 +1364,11 @@ ul {
   color: var(--text);
 }
 
+.filter-group select option {
+  color: #000;
+  background: #fff;
+}
+
 .papers-list {
   display: flex;
   flex-direction: column;
@@ -1406,6 +1430,49 @@ ul {
 .btn-download:hover {
   color: var(--accent);
   border-color: var(--accent);
+}
+
+.timer-log {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.timer-log__title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--highlight);
+}
+
+.timer-log ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.timer-log li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.timer-log li strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.timer-log li span {
+  flex: 1;
+}
+
+.timer-log li small {
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 /* Profile Page ------------------------------------------------- */

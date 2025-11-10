@@ -40,18 +40,23 @@
         <div>
           <p class="eyebrow">Exam mode</p>
           <h1>Past year papers</h1>
-          <p>Filter by paper type, year, or topic. Results will appear once loaded.</p>
+          <p>Filter by paper type or year. Results will appear once loaded.</p>
         </div>
         <div class="heading-actions">
-          <button class="btn btn--ghost" type="button">Import PDF</button>
-          <button class="btn btn--primary" type="button">Start timer</button>
+          <label class="timer-picker">
+            <span class="sr-only">Timer duration</span>
+            <select id="timerDuration" aria-label="Timer duration">
+              <option value="90">1 hour 30 minutes</option>
+              <option value="150">2 hours 30 minutes</option>
+            </select>
+          </label>
+          <button class="btn btn--primary" type="button" id="timerButton">Start timer</button>
         </div>
       </header>
 
       <section class="card" aria-labelledby="filters-title">
         <div class="section-head">
           <h2 id="filters-title">Filters</h2>
-          <span class="chip">Personalised for SPM</span>
         </div>
         <div class="filters">
           <div class="filter-group">
@@ -74,15 +79,6 @@
             </select>
           </div>
 
-          <div class="filter-group">
-            <label for="topic">Topic</label>
-            <select id="topic">
-              <option value="">All topics</option>
-              <option>Algebra</option>
-              <option>Geometry</option>
-              <option>Statistics</option>
-            </select>
-          </div>
         </div>
       </section>
 
@@ -94,7 +90,6 @@
         <article class="card">
           <div class="section-head">
             <h2>Exam checklist</h2>
-            <span class="chip chip--info">Auto-summary</span>
           </div>
           <ul class="recommended-list" id="pastChecklist">
             <li>
@@ -121,6 +116,7 @@
 
   <script src="../js/learner-session.js"></script>
   <script src="../js/learner-shell.js"></script>
+  <script src="../js/learner-pastpapers.data.js"></script>
   <script src="../js/learner-pastpapers.js"></script>
 </body>
 </html>
