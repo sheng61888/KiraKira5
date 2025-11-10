@@ -526,11 +526,27 @@ public class LearnerService : ILearnerService
                 Description = "Core concepts that prepare you for the final SPM push in Form 5.",
                 Modules = new List<ModuleCardDto>
                 {
-                    new ModuleCardDto("01", "Quadratic Functions and Equations in One Variable", new List<string> { "Quadratic Functions", "Quadratic Equations" }, "lesson-form4-01.html", 100),
-                    new ModuleCardDto("02", "Number Bases", new List<string> { "Number Bases" }, "lesson-form4-02.html", 62),
-                    new ModuleCardDto("03", "Logical Reasoning", new List<string> { "Statements", "Arguments" }, "lesson-form4-03.html", 35),
-                    new ModuleCardDto("04", "Operations on Sets", new List<string> { "Intersection of Sets", "Union of Sets", "Combined Operations on Sets" }, "lesson-form4-04.html"),
+                    new ModuleCardDto("01", "Quadratic Functions and Equations in One Variable", new List<string> { "Quadratic Functions", "Quadratic Equations" }, "course-map.html?module=form4-01", 100)
+                    {
+                        ModuleId = "form4-01",
+                        Units = BuildQuadraticUnits()
+                    },
+                    new ModuleCardDto("02", "Number Bases", new List<string> { "Number Bases" }, "lesson-form4-02.html", 62)
+                    {
+                        ModuleId = "form4-02"
+                    },
+                    new ModuleCardDto("03", "Logical Reasoning", new List<string> { "Statements", "Arguments" }, "lesson-form4-03.html", 35)
+                    {
+                        ModuleId = "form4-03"
+                    },
+                    new ModuleCardDto("04", "Operations on Sets", new List<string> { "Intersection of Sets", "Union of Sets", "Combined Operations on Sets" }, "lesson-form4-04.html")
+                    {
+                        ModuleId = "form4-04"
+                    },
                     new ModuleCardDto("05", "Network in Graph Theory", new List<string> { "Network" }, "lesson-form4-05.html")
+                    {
+                        ModuleId = "form4-05"
+                    }
                 }
             },
             new ModuleCatalogueSectionDto
@@ -540,10 +556,237 @@ public class LearnerService : ILearnerService
                 Description = "Exam-focused topics that complete the SPM Modern Math syllabus.",
                 Modules = new List<ModuleCardDto>
                 {
-                    new ModuleCardDto("01", "Variation", new List<string> { "Direct Variation", "Inverse Variation", "Joint Variation" }),
-                    new ModuleCardDto("02", "Matrices", new List<string> { "Matrices", "Basic Operations on Matrices" }),
-                    new ModuleCardDto("03", "Consumer Mathematics: Insurance", new List<string> { "Risk and Insurance Protection" }),
+                    new ModuleCardDto("01", "Variation", new List<string> { "Direct Variation", "Inverse Variation", "Joint Variation" })
+                    {
+                        ModuleId = "form5-01"
+                    },
+                    new ModuleCardDto("02", "Matrices", new List<string> { "Matrices", "Basic Operations on Matrices" })
+                    {
+                        ModuleId = "form5-02"
+                    },
+                    new ModuleCardDto("03", "Consumer Mathematics: Insurance", new List<string> { "Risk and Insurance Protection" })
+                    {
+                        ModuleId = "form5-03"
+                    },
                     new ModuleCardDto("04", "Consumer Mathematics: Taxation", new List<string> { "Taxation" })
+                    {
+                        ModuleId = "form5-04"
+                    }
+                }
+            }
+        };
+    }
+
+    private static List<ModuleUnitDto> BuildQuadraticUnits()
+    {
+        return new List<ModuleUnitDto>
+        {
+            new ModuleUnitDto
+            {
+                UnitId = "overview",
+                Title = "Module overview",
+                Type = "overview",
+                Duration = "3 min",
+                Summary = "Scope out the skills, files, and XP tied to this module before you dive in.",
+                Body = "This roadmap shows you where each concept sits - from intuition and graph sense to the algebraic moves tested on SPM.",
+                Objectives = new List<string>
+                {
+                    "See how standard, vertex, and factored form connect",
+                    "Know which drills unlock XP and streak protection",
+                    "Prep your workspace with the same sheet coaches use"
+                },
+                Resources = new List<ModuleUnitResourceDto>
+                {
+                    new ModuleUnitResourceDto
+                    {
+                        Label = "Module planner",
+                        Type = "guide",
+                        Detail = "Print-ready, 2 pages",
+                        Url = "../docs/module01-planner.pdf"
+                    }
+                },
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Download planner",
+                    Link = "../docs/module01-planner.pdf",
+                    Kind = "download"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "rescue-intro",
+                Title = "Rescue video: Quadratic intuition",
+                Type = "video",
+                Duration = "4 min",
+                Summary = "Need a slower start? Watch this primer on how parabolas move when a, h, or k change.",
+                Body = "We walk through the vertex form, label every parameter, and show how to sketch without a calculator.",
+                Objectives = new List<string>
+                {
+                    "Spot vertex, axis of symmetry, and opening direction quickly",
+                    "Link transformations to a real graph"
+                },
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Play rescue video",
+                    Link = "https://www.youtube.com/watch?v=bgM8F1J-rescue",
+                    Kind = "video"
+                },
+                RescueOnly = true
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "lesson-vertex-sense",
+                Title = "Lesson 1 · Sketch from vertex form",
+                Type = "lesson",
+                Duration = "5 min",
+                Summary = "Build fast graph intuition from vertex form with a slider-based playground.",
+                Body = "Tweak a, h, and k to trace how the vertex and opening change. Log one observation per slider move.",
+                Objectives = new List<string>
+                {
+                    "Describe how each parameter shifts or stretches the graph",
+                    "Predict root count without solving"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "quiz-vertex-sense",
+                Title = "Quick check · Graph sense",
+                Type = "quiz",
+                Duration = "3 min",
+                Summary = "Match three vertex-form equations to their graphs.",
+                Body = "You have 90 seconds per prompt. Focus on identifying vertex + opening direction.",
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Start quiz",
+                    Link = "../docs/module01-quiz-vertex.html",
+                    Kind = "quiz"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "lesson-form-switch",
+                Title = "Lesson 2 · Switch between forms",
+                Type = "lesson",
+                Duration = "6 min",
+                Summary = "Convert standard form to vertex/factored form in bite-sized steps.",
+                Body = "Complete the square on a guided worksheet, then factor friendly quadratics to spot roots.",
+                Objectives = new List<string>
+                {
+                    "Complete the square without losing constant terms",
+                    "Explain when factoring beats the square method"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "quiz-form-switch",
+                Title = "Quick check · Form shuffle",
+                Type = "quiz",
+                Duration = "4 min",
+                Summary = "Two conversions with instant feedback and hints if you get stuck.",
+                Body = "Convert the given standard form to vertex form, then to factored form.",
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Try shuffle quiz",
+                    Link = "../docs/module01-quiz-forms.html",
+                    Kind = "quiz"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "lesson-solving-paths",
+                Title = "Lesson 3 · Choose the solving path",
+                Type = "lesson",
+                Duration = "6 min",
+                Summary = "Classify quadratics and lock in the fastest solving method.",
+                Body = "Sort cards into 'factor', 'complete square', or 'quadratic formula' buckets and justify each choice.",
+                Objectives = new List<string>
+                {
+                    "Classify quadratics by structure",
+                    "State a reason behind each solving choice"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "quiz-solving-paths",
+                Title = "Quick check · Solve + explain",
+                Type = "quiz",
+                Duration = "4 min",
+                Summary = "Solve two equations and type one-sentence reasoning after each answer.",
+                Body = "Focus on communicating why your method worked, not just the final root.",
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Take reasoning quiz",
+                    Link = "../docs/module01-quiz-solve.html",
+                    Kind = "quiz"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "lesson-modelling",
+                Title = "Lesson 4 · Model real situations",
+                Type = "lesson",
+                Duration = "5 min",
+                Summary = "Translate revenue and projectile prompts into quadratics.",
+                Body = "Use the modelling canvas: identify variables, write the quadratic, and interpret the vertex or roots.",
+                Objectives = new List<string>
+                {
+                    "Build quadratic models from short scenarios",
+                    "Interpret vertex/roots in context"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "quiz-application",
+                Title = "Quick check · Application",
+                Type = "quiz",
+                Duration = "4 min",
+                Summary = "Two context problems that ask what the vertex or roots mean.",
+                Body = "Explain whether your solutions fit the real-world restriction.",
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Start context quiz",
+                    Link = "../docs/module01-quiz-context.html",
+                    Kind = "quiz"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "final-test",
+                Title = "Final mastery test",
+                Type = "assessment",
+                Duration = "10 min",
+                Summary = "6-question timed drill mixing graphs, solving, and modelling.",
+                Body = "Attempt under exam timing. Mark whether each question felt easy, medium, or panic.",
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Begin timed test",
+                    Link = "../docs/module01-mastery.pdf",
+                    Kind = "quiz"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "practice-bank",
+                Title = "Practice question bank",
+                Type = "practice",
+                Duration = "15 min",
+                Summary = "Extra questions sorted by skill so you can keep drilling weak spots.",
+                Body = "Pick any row and attempt 4 questions. Log mistakes in your notebook.",
+                Resources = new List<ModuleUnitResourceDto>
+                {
+                    new ModuleUnitResourceDto
+                    {
+                        Label = "Practice set",
+                        Type = "sheet",
+                        Detail = "18 questions + answers",
+                        Url = "../docs/module01-practice.pdf"
+                    }
+                },
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Open practice set",
+                    Link = "../docs/module01-practice.pdf",
+                    Kind = "download"
                 }
             }
         };
@@ -2368,11 +2611,42 @@ public class ModuleCardDto
         ProgressPercent = progressPercent;
     }
 
+    public string ModuleId { get; set; } = string.Empty;
     public string Number { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public List<string> Lessons { get; set; } = new();
     public string Link { get; set; } = string.Empty;
     public int? ProgressPercent { get; set; }
+    public List<ModuleUnitDto> Units { get; set; } = new();
+}
+
+public class ModuleUnitDto
+{
+    public string UnitId { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string Duration { get; set; } = string.Empty;
+    public string Summary { get; set; } = string.Empty;
+    public string Body { get; set; } = string.Empty;
+    public List<string> Objectives { get; set; } = new();
+    public List<ModuleUnitResourceDto> Resources { get; set; } = new();
+    public ModuleUnitCtaDto? Cta { get; set; }
+    public bool RescueOnly { get; set; }
+}
+
+public class ModuleUnitResourceDto
+{
+    public string Label { get; set; } = string.Empty;
+    public string Detail { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+}
+
+public class ModuleUnitCtaDto
+{
+    public string Label { get; set; } = string.Empty;
+    public string Link { get; set; } = string.Empty;
+    public string Kind { get; set; } = string.Empty;
 }
 
 public class LearnerBadgeStatsDto

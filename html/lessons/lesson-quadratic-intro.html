@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lesson 1 · How Parabolas Feel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/learner.css">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="../../js/modules/lesson-quadratic-intro.js"></script>
+</head>
+
+<body class="lesson-body">
+  <main class="lesson-card">
+    <h1>How Parabolas Feel</h1>
+    <p>Move the sliders to change <code>a</code>, <code>b</code>, and <code>c</code> in y = ax² + bx + c.  
+       Watch your parabola smile, frown, or slide.</p>
+
+    <div id="graph" style="height:400px"></div>
+
+    <div class="controls">
+      <label>a = <input type="range" id="a" min="-5" max="5" step="0.5" value="1"></label>
+      <label>b = <input type="range" id="b" min="-5" max="5" step="0.5" value="0"></label>
+      <label>c = <input type="range" id="c" min="-5" max="5" step="0.5" value="0"></label>
+    </div>
+
+    <section id="insight" class="card tip">
+      <h2>Instant Insight</h2>
+      <p id="insightText">a > 0 → smile 😊</p>
+    </section>
+
+    <section class="flipcards">
+      <h2>Quick Quiz</h2>
+      <div class="cardflip" data-q="What happens if a is negative?" data-a="The parabola opens down ☹️"></div>
+      <div class="cardflip" data-q="What does c control?" data-a="It moves the parabola up or down."></div>
+      <div class="cardflip" data-q="Large |a| means…?" data-a="Narrow curve (steeper)."></div>
+    </section>
+  </main>
+
+  <script src="../../js/modules/lesson-quadratic-intro.js"></script>
+</body>
+</html>
