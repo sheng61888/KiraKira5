@@ -60,6 +60,19 @@ window.kiraModules = [
               kind: "lesson"
             }
           },
+          {
+            id: "quiz-quadratic-functions",
+            title: "Quick Check · Quadratic Functions",
+            type: "quiz",
+            duration: "3 min",
+            summary: "Test your understanding of factoring and identifying the ball’s landing points.",
+            body: "Identify the roots of sample quadratic equations and interpret what they represent.",
+            cta: {
+              label: "Take quick quiz",
+              link: "lessons/quiz-quadratic-functions.html",
+              kind: "quiz"
+            }
+          },
 
         {
             id: "lesson-ground-hits",
@@ -80,15 +93,15 @@ window.kiraModules = [
             }
           },
           {
-            id: "quiz-ground-hits",
-            title: "Quick Check · Ball’s Landing Points",
+            id: "quiz-quadratic-equations",
+            title: "Quick Check · Quadratic Equations",
             type: "quiz",
             duration: "3 min",
             summary: "Test your understanding of factoring and identifying the ball’s landing points.",
             body: "Identify the roots of sample quadratic equations and interpret what they represent.",
             cta: {
               label: "Take quick quiz",
-              link: "lessons/lesson-quadratic-equations.html#quickcheck",
+              link: "lessons/quiz-quadratic-equations.html",
               kind: "quiz"
             }
           },
