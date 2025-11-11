@@ -46,7 +46,7 @@
         <div class="heading-actions">
           <button class="btn btn--ghost" type="button">View weekly plan</button>
           <button class="btn btn--primary" type="button">Resume warm-up</button>
-          <button class="btn btn--ghost" type="button" onclick="window.location.href='login_signup.html'">Logout</button>
+          <button class="btn btn--ghost" type="button" onclick="if (window.kiraLearnerSession) { window.kiraLearnerSession.logout('login_signup.html'); } else { window.location.href='login_signup.html'; }">Logout</button>
         </div>
       </header>
 
