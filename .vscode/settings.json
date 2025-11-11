@@ -7,7 +7,7 @@
             "color": "#FFB095",
             "connectionType": "host",
             "host": "0.tcp.ap.ngrok.io",
-            "port": 17172,
+            "port": 15963,
             "ssl": false,
             "username": "root",
             "password": "",
