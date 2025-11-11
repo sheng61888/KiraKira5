@@ -169,7 +169,7 @@
           </ul>
         </article>
       </section>
-      <button class="btn btn--ghost profile-logout-btn" type="button" onclick="window.location.href='login_signup.html'">Log out</button>
+      <button class="btn btn--ghost profile-logout-btn" type="button" onclick="if (window.kiraLearnerSession) { window.kiraLearnerSession.logout('login_signup.html'); } else { window.location.href='login_signup.html'; }">Log out</button>
     </main>
   </div>
 
