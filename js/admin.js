@@ -81,7 +81,7 @@ function showAddModal() {
     document.getElementById('userId').value = '';
     document.getElementById('userPassword').style.display = 'block';
     document.getElementById('userPassword').previousElementSibling.style.display = 'block';
-    document.getElementById('userModal').style.display = 'block';
+    document.getElementById('userModal').style.display = 'flex';
 }
 
 function editUser(id) {
@@ -94,7 +94,7 @@ function editUser(id) {
     document.getElementById('userRole').value = user.role;
     document.getElementById('userPassword').style.display = 'none';
     document.getElementById('userPassword').previousElementSibling.style.display = 'none';
-    document.getElementById('userModal').style.display = 'block';
+    document.getElementById('userModal').style.display = 'flex';
 }
 
 function deleteUser(id) {

@@ -111,4 +111,42 @@ public class AdminController : ControllerBase
             return StatusCode(500, new { error = ex.Message });
         }
     }
+
+    /// <summary>
+    /// Gets user analytics by role
+    /// </summary>
+    [HttpGet("analytics/users")]
+    public async Task<IActionResult> GetUserAnalytics()
+    {
+        try
+        {
+            var analytics = await AdminService.GetUserAnalyticsAsync(_configuration);
+            return Ok(analytics);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting user analytics: {ex.Message}");
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Gets community activity statistics
+    /// </summary>
+    [HttpGet("analytics/community")]
+    public async Task<IActionResult> GetCommunityStats()
+    {
+        try
+        {
+            var stats = await AdminService.GetCommunityStatsAsync(_configuration);
+            return Ok(stats);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting community stats: {ex.Message}");
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
+
+
 }

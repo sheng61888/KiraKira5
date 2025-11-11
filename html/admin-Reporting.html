@@ -14,11 +14,11 @@
                 <img src="../images/logo transparent.png" alt="KiraKira Logo">
             </div>
             <nav class="nav">
-                <a href="admin-dashboard.html" aria-current="page">Dashboard</a>
+                <a href="admin-dashboard.html">Dashboard</a>
                 <a href="admin-UserManagement.html">User Management</a>
                 <a href="admin-CourseManagement.html">Course Management</a>
                 <a href="admin-CommunityManagement.html">Community Management</a>
-                <a href="admin-Reporting.html">Reports</a>
+                <a href="admin-Reporting.html" aria-current="page">Reports</a>
                 <a href="admin-Requests.html">Requests</a>
                 <a href="../html/login_signup.html">Sign Out</a>
             </nav>
@@ -28,64 +28,72 @@
             <header class="page-heading">
                 <div>
                     <p class="eyebrow">Admin Panel</p>
-                    <h1>Welcome, Admin</h1>
-                    <p>Manage your KiraKira learning platform</p>
+                    <h1>Reporting and Analytics</h1>
                 </div>
             </header>
 
-            <section class="grid stats-grid">
-                <article class="card stat-block">
-                    <h3>Total Users</h3>
-                    <strong id="totalUsers">Loading...</strong>
-                    <p class="muted">Active learners and teachers</p>
-                </article>
-                <article class="card stat-block">
-                    <h3>Active Lessons</h3>
-                    <strong>89</strong>
-                    <p class="muted">Currently available modules</p>
-                </article>
-                <article class="card stat-block">
-                    <h3>Completed Exercises</h3>
-                    <strong>3,456</strong>
-                    <p class="muted">This month</p>
-                </article>
-                <article class="card stat-block">
-                    <h3>System Uptime</h3>
-                    <strong>98.5%</strong>
-                    <p class="muted">Last 30 days</p>
-                </article>
+            <section class="card">
+                <div class="section-head">
+                    <div>
+                        <p class="eyebrow">User Analytics</p>
+                        <h2>User Distribution by Role</h2>
+                    </div>
+                </div>
+                <div class="grid stats-grid">
+                    <article class="stat-block">
+                        <h3>Learners</h3>
+                        <strong id="learnerCount">-</strong>
+                    </article>
+                    <article class="stat-block">
+                        <h3>Teachers</h3>
+                        <strong id="teacherCount">-</strong>
+                    </article>
+                    <article class="stat-block">
+                        <h3>Admins</h3>
+                        <strong id="adminCount">-</strong>
+                    </article>
+                </div>
             </section>
 
             <section class="card">
                 <div class="section-head">
                     <div>
-                        <p class="eyebrow">Quick Actions</p>
-                        <h2>Management Tools</h2>
+                        <p class="eyebrow">Community Activity</p>
+                        <h2>Community Engagement Statistics</h2>
                     </div>
                 </div>
-                <div class="grid grid--auto">
-                    <div class="action-card">
-                        <h3>User Management</h3>
-                        <p class="muted">Manage user accounts and permissions</p>
-                        <a href="admin-UserManagement.html" class="btn btn--primary">Manage Users</a>
-                    </div>
-                    <div class="action-card">
-                        <h3>Content Management</h3>
-                        <p class="muted">Create and organize lessons</p>
-                        <a href="admin-ContentManagement.html" class="btn btn--primary">Manage Content</a>
-                    </div>
-                    <div class="action-card">
-                        <h3>Analytics & Reports</h3>
-                        <p class="muted">View platform performance</p>
-                        <a href="admin-Reporting.html" class="btn btn--primary">View Reports</a>
-                    </div>
+                <div class="grid stats-grid">
+                    <article class="stat-block">
+                        <h3>Total Threads</h3>
+                        <strong id="totalThreads">-</strong>
+                    </article>
+                    <article class="stat-block">
+                        <h3>Total Replies</h3>
+                        <strong id="totalReplies">-</strong>
+                    </article>
+                </div>
+                <div class="section-head" style="margin-top: 2rem;">
+                    <h3>Most Active Users</h3>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Activity Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeUsersTable">
+                            <tr><td colspan="2" class="text-muted">Loading...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
+
+
         </main>
-    </div>
-
-
+ 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="../js/admin.js"></script>
+    <script src="../js/admin-reporting.js"></script>
 </body>
 </html>

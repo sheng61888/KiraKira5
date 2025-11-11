@@ -249,6 +249,37 @@
     return { type, year };
   };
 
+  const logPaperView = paperName => {
+    const session = window.kiraLearnerSession;
+    if (!session) {
+      console.warn("No learner session found");
+      return;
+    }
+    
+    const learnerId = session.ensureId();
+    if (!learnerId) {
+      console.warn("No learner ID found");
+      return;
+    }
+
+    console.log("Logging paper view:", paperName, "for user:", learnerId);
+    
+    fetch("/api/learner/log-paper-view", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ uid: learnerId, paperName: paperName })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Paper view logged successfully:", data);
+    })
+    .catch(error => {
+      console.error("Failed to log paper view:", error);
+    });
+  };
+
   const safeResourceUrl = resource => {
     if (!resource) {
       return "#";
@@ -295,8 +326,17 @@
       button.addEventListener("click", () => {
         const link = button.getAttribute("data-link");
         if (link) {
+          const paperName = button.closest(".paper-row")?.querySelector(".paper-title")?.textContent || "Unknown";
           window.open(link, "_blank");
+          logPaperView(paperName);
         }
+      });
+    });
+
+    container.querySelectorAll("a[download]").forEach(anchor => {
+      anchor.addEventListener("click", () => {
+        const paperName = anchor.closest(".paper-row")?.querySelector(".paper-title")?.textContent || "Unknown";
+        logPaperView(paperName);
       });
     });
   };
