@@ -1,2 +1,23 @@
 {
+    "dbcode.connections": [
+        {
+            "connectionId": "vjPOetarP_WBZOTD5khjt",
+            "name": "KiraKiraServer",
+            "driver": "mysql",
+            "connectionType": "host",
+            "host": "0.tcp.ap.ngrok.io",
+            "port": 16758,
+            "ssl": false,
+            "username": "root",
+            "password": "",
+            "savePassword": "secretStorage",
+            "database": "kirakiradb",
+            "readOnly": false,
+            "postConnectionSqlType": "inline",
+            "connectionTimeout": 30,
+            "driverOptions": {
+                "retrievePublickey": true
+            }
+        }
+    ]
 }
