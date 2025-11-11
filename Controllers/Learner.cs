@@ -146,6 +146,18 @@ public class LearnerController : ControllerBase
         var payload = await _learnerService.GetCommunityThreadDetailAsync(learnerId, threadId, query ?? new CommunityThreadDetailQuery());
         return Ok(payload);
     }
+
+    [HttpPost("log-paper-view")]
+    public async Task<IActionResult> LogPaperView([FromBody] PaperViewRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.PaperName))
+        {
+            return BadRequest(new { error = "uid and paperName are required." });
+        }
+
+        var success = await _learnerService.LogPaperViewAsync(request.Uid, request.PaperName);
+        return Ok(new { success });
+    }
 }
 
 public class JoinClassRequest
@@ -200,4 +212,10 @@ public class CommunityThreadDetailQuery
 {
     public string Cursor { get; set; } = string.Empty;
     public int Limit { get; set; } = 20;
+}
+
+public class PaperViewRequest
+{
+    public string Uid { get; set; } = string.Empty;
+    public string PaperName { get; set; } = string.Empty;
 }

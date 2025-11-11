@@ -25,6 +25,7 @@ public interface ILearnerService
     Task<CommunityThreadDto> CreateCommunityThreadAsync(string learnerId, CommunityThreadCreateRequest request);
     Task<CommunityReplyDto> CreateCommunityReplyAsync(string learnerId, long threadId, CommunityReplyCreateRequest request);
     Task<CommunityThreadDetailDto> GetCommunityThreadDetailAsync(string learnerId, long threadId, CommunityThreadDetailQuery query);
+    Task<bool> LogPaperViewAsync(string uid, string paperName);
 }
 
 /// <summary>
@@ -2429,6 +2430,32 @@ public class LearnerService : ILearnerService
         }
 
         return papers.Any() ? papers : SamplePastPapers();
+    }
+
+    public async Task<bool> LogPaperViewAsync(string uid, string paperName)
+    {
+        const string sql = @"INSERT INTO learner_paper_activity (uid, paper_name, viewed_at)
+                             VALUES (@Uid, @PaperName, NOW())";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return false;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", uid);
+            command.Parameters.AddWithValue("@PaperName", paperName);
+            await command.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to log paper view for {uid}: {ex.Message}");
+            return false;
+        }
     }
 
     private async Task<List<NotificationPreferenceDto>> FetchNotificationPreferencesAsync(string learnerId)
