@@ -94,7 +94,7 @@
             <p class="eyebrow">Active courses</p>
             <h2 id="courses-title">Your journeys</h2>
           </div>
-          <button class="btn btn--ghost" type="button" data-action="course-map">See course map</button>
+          <button class="btn btn--ghost" type="button" data-action="open-course-picker">See course map</button>
         </div>
 
         <div class="course-grid" data-role="course-grid" data-grade="Form 4" data-limit="3">
@@ -128,7 +128,23 @@
   <script src="../js/learner-modules.js"></script>
   <script src="../js/learner-badges.js"></script>
   <script src="../js/learner-home.js"></script>
+
+  <div class="module-picker-modal" id="modulePickerModal" aria-hidden="true">
+    <div class="module-picker-modal__backdrop" data-module-picker-close></div>
+    <div class="module-picker-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modulePickerHeading">
+      <header class="module-picker-modal__header">
+        <div>
+          <p class="eyebrow">Modules are universal</p>
+          <h2 id="modulePickerHeading">Pick a topic to open its roadmap</h2>
+          <p class="muted">You can jump between any Form 4 or Form 5 topic without joining a class.</p>
+        </div>
+        <button class="btn btn--ghost" type="button" data-module-picker-close aria-label="Close module picker">Close</button>
+      </header>
+      <div class="module-picker-modal__body" id="modulePickerList" aria-live="polite">
+        <p class="muted">Loading modules...</p>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
-
 

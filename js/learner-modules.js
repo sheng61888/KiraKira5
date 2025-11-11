@@ -1,21 +1,21 @@
 (() => {
   const modulesData = () => (Array.isArray(window.kiraModules) ? window.kiraModules : []);
   const modulesMap = () => window.kiraModulesMap || {};
+  const activeModules = () => (Array.isArray(window.kiraActiveModules) ? window.kiraActiveModules : []);
 
-  const moduleProgressMap = {
-    "course-map.html?module=form4-01": 100,
-    "lesson-form4-02.html": 62,
-    "lesson-form4-03.html": 35
-  };
+  const moduleProgressMap = {};
 
   const gradeDefaults = {
-    "Form 4": [100, 60, 25, 10, 0],
-    "Form 5": [45, 20, 15, 10, 0]
+    "Form 4": [0, 0, 0, 0, 0],
+    "Form 5": [0, 0, 0, 0, 0]
   };
 
-  const stickerPool = ["✨", "📐", "🎯", "🌀", "🧠", "🚀", "💡", "🐾"];
 
   const getProgressValue = (module, grade, index) => {
+    const provided = Number(module?.progressPercent);
+    if (Number.isFinite(provided)) {
+      return Math.max(0, Math.min(100, provided));
+    }
     if (module.link && typeof moduleProgressMap[module.link] === "number") {
       return moduleProgressMap[module.link];
     }
@@ -69,34 +69,17 @@
 
     const grade = grid.dataset.grade || "Form 4";
     const limit = parseInt(grid.dataset.limit || "3", 10);
-    const section = modulesMap()[grade];
+    const selectedModules = activeModules().filter(Boolean);
 
-    if (!section) {
-      grid.innerHTML = "<p class=\"muted\">Module data unavailable. Please refresh.</p>";
+    if (!selectedModules.length) {
+      grid.innerHTML = '<p class="muted">No courses added yet. Use "See course map" to add topics to your dashboard.</p>';
       return;
     }
 
-    const courseMapButton = document.querySelector("[data-action='course-map']");
-    if (courseMapButton) {
-      const targetModule =
-        section.modules.find(module => Array.isArray(module.units) && module.units.length) || section.modules[0];
-      const mapLink = targetModule && targetModule.link;
-      if (mapLink) {
-        courseMapButton.disabled = false;
-        courseMapButton.onclick = () => {
-          window.location.href = mapLink;
-        };
-      } else {
-        courseMapButton.disabled = true;
-      }
-    }
-
     grid.innerHTML = "";
-    section.modules.slice(0, limit).forEach((module, index) => {
+    selectedModules.slice(0, limit).forEach((module, index) => {
       const card = document.createElement("article");
       card.className = "course-card module-card";
-      const stickerIndex = (index + grade.length) % stickerPool.length;
-      card.dataset.sticker = stickerPool[stickerIndex];
 
       const number = document.createElement("span");
       number.className = "module-number";
@@ -109,10 +92,10 @@
       lessonsLabel.className = "muted";
       lessonsLabel.textContent = "Lessons unlocked";
 
-      const lessonList = createLessonPills(module.lessons);
+      const lessonList = createLessonPills(Array.isArray(module.lessons) ? module.lessons : []);
       lessonList.classList.add("lesson-pill-list--compact");
 
-      const progressValue = getProgressValue(module, grade, index);
+      const progressValue = getProgressValue(module, module.grade || grade, index);
       const meta = progressMeta(progressValue);
 
       const meter = document.createElement("div");
@@ -189,7 +172,7 @@
           <span class="module-number">${module.number}</span>
           <div>
             <p class="module-title">${module.title}</p>
-            <small>${module.lessons.join(" • ")}</small>
+            <small>${module.lessons.join(" â€¢ ")}</small>
           </div>
         `;
 
@@ -237,3 +220,4 @@
     classes: renderClassModules
   };
 })();
+

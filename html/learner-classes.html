@@ -40,12 +40,58 @@
         <div>
           <p class="eyebrow">Optional classes</p>
           <h1>Keep self-studying, join when ready</h1>
-          <p>Everything in KiraKira works for solo practice. Use a class code only if your teacher or school invited you.</p>
+          <p>Add a class code shared by your teacher if you want assignments, announcements, or shared pacing. Everything still works solo.</p>
         </div>
       </header>
 
-      <section class="card">
-        <p class="muted">Course enrollment features are currently unavailable.</p>
+      <section class="card" id="joinClassSection">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Join a class</p>
+            <h2>Enter a class code</h2>
+          </div>
+        </div>
+        <form id="joinClassForm" class="join-class-form">
+          <label for="classCode">Class code</label>
+          <div class="join-class-form__controls">
+            <input type="text" id="classCode" name="classCode" placeholder="e.g. FORM4-ALG-2025" required />
+            <button class="btn btn--primary" type="submit">Join class</button>
+          </div>
+          <p class="muted">Codes come from your teacher. Each code unlocks assignments, announcements, and class pacing.</p>
+        </form>
+      </section>
+
+      <section class="card class-dashboard" id="classDashboard" style="display:none">
+        <div class="class-dashboard__grid">
+          <article class="class-overview">
+            <header>
+              <p class="eyebrow">Current class</p>
+              <h2 id="classTitle">Your enrolled course</h2>
+              <p id="classCodeDisplay" class="muted">Code: —</p>
+            </header>
+            <p class="class-grade" id="classGrade">Grade level</p>
+            <p id="classDescription" class="muted">Your teacher can drop announcements, assignments, and focus topics here once you join.</p>
+            <div class="class-overview__actions">
+              <button class="btn btn--success" type="button" id="completeCourseBtn">Mark course complete</button>
+            </div>
+            <div class="class-overview__chapters">
+              <h3>Course outline</h3>
+              <div id="courseChapters">
+                <p class="muted">Select a class to view its outline.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="class-enrollments">
+            <header>
+              <p class="eyebrow">Enrolled classes</p>
+              <h3>Your joined codes</h3>
+            </header>
+            <div id="enrolledCoursesList">
+              <p class="muted">No enrolled courses yet. Use the form above to join a class.</p>
+            </div>
+          </article>
+        </div>
       </section>
     </main>
   </div>

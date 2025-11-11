@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -73,6 +74,81 @@ public class LearnerController : ControllerBase
     {
         var data = await _learnerService.GetProfileAsync(learnerId);
         return Ok(data);
+    }
+
+    [HttpPost("{learnerId}/modules/quizzes")]
+    public async Task<IActionResult> LogModuleQuiz(string learnerId, [FromBody] ModuleQuizLogRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.ModuleId) || string.IsNullOrWhiteSpace(request.UnitId))
+        {
+            return BadRequest(new { error = "moduleId and unitId are required." });
+        }
+
+        var result = await _learnerService.LogModuleQuizAsync(learnerId, request);
+        return Ok(result);
+    }
+
+    [HttpPost("{learnerId}/pastpapers/logs")]
+    public async Task<IActionResult> LogPastPaperSession(string learnerId, [FromBody] PastPaperLogRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.PaperTitle))
+        {
+            return BadRequest(new { error = "paperTitle is required." });
+        }
+
+        var result = await _learnerService.LogPastPaperAsync(learnerId, request);
+        return Ok(result);
+    }
+
+    [HttpPost("{learnerId}/modules/selection")]
+    public async Task<IActionResult> AddModuleSelection(string learnerId, [FromBody] ModuleSelectionRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.ModuleId))
+        {
+            return BadRequest(new { error = "moduleId is required." });
+        }
+
+        var result = await _learnerService.AddModuleSelectionAsync(learnerId, request);
+        if (!result.Success)
+        {
+            return BadRequest(new { error = result.Message });
+        }
+
+        return Ok(result);
+    }
+
+    [HttpDelete("{learnerId}/modules/selection/{moduleId}")]
+    public async Task<IActionResult> RemoveModuleSelection(string learnerId, string moduleId)
+    {
+        if (string.IsNullOrWhiteSpace(moduleId))
+        {
+            return BadRequest(new { error = "moduleId is required." });
+        }
+
+        var result = await _learnerService.RemoveModuleSelectionAsync(learnerId, moduleId);
+        if (!result.Success)
+        {
+            return BadRequest(new { error = result.Message });
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPost("{learnerId}/modules/progress")]
+    public async Task<IActionResult> LogModuleProgress(string learnerId, [FromBody] ModuleProgressLogRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.ModuleId) || string.IsNullOrWhiteSpace(request.UnitId))
+        {
+            return BadRequest(new { error = "moduleId and unitId are required." });
+        }
+
+        var result = await _learnerService.LogModuleProgressAsync(learnerId, request);
+        if (!result.Success)
+        {
+            return BadRequest(new { error = result.Message });
+        }
+
+        return Ok(result);
     }
 
     [HttpPost("{learnerId}/profile/avatar")]
@@ -200,4 +276,40 @@ public class CommunityThreadDetailQuery
 {
     public string Cursor { get; set; } = string.Empty;
     public int Limit { get; set; } = 20;
+}
+
+public class ModuleQuizLogRequest
+{
+    public string ModuleId { get; set; } = string.Empty;
+    public string UnitId { get; set; } = string.Empty;
+    public int? ScorePercent { get; set; }
+    public int? DurationSeconds { get; set; }
+    public DateTime? CompletedAt { get; set; }
+    public int? XpAwarded { get; set; }
+}
+
+public class PastPaperLogRequest
+{
+    public string PaperSlug { get; set; } = string.Empty;
+    public string PaperTitle { get; set; } = string.Empty;
+    public string Mode { get; set; } = "timed";
+    public int DurationMinutes { get; set; }
+    public decimal? ScorePercent { get; set; }
+    public string Reflection { get; set; } = string.Empty;
+    public DateTime? LoggedAt { get; set; }
+    public int? XpAwarded { get; set; }
+}
+
+public class ModuleSelectionRequest
+{
+    public string ModuleId { get; set; } = string.Empty;
+}
+
+public class ModuleProgressLogRequest
+{
+    public string ModuleId { get; set; } = string.Empty;
+    public string UnitId { get; set; } = string.Empty;
+    public string Status { get; set; } = "completed";
+    public int? ScorePercent { get; set; }
+    public int? DurationSeconds { get; set; }
 }

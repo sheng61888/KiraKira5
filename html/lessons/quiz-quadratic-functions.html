@@ -34,6 +34,8 @@
     </main>
   </div>
 
+<script src="../../js/learner-session.js"></script>
+<script src="../../js/learner-activity.js"></script>
 <script>
   const quizData = [
     {
@@ -70,6 +72,7 @@
 
   let current = 0;
   let score = 0;
+  const quizStartedAt = Date.now();
   const quizContainer = document.getElementById("quiz");
 
   function renderQuestion() {
@@ -145,6 +148,24 @@
         <a href="../course-map.html?module=form4-01" class="btn btn--primary">Back to module map</a>
       </div>
     `;
+
+    if (window.kiraActivity && typeof window.kiraActivity.logModuleQuiz === "function") {
+      window.kiraActivity.logModuleQuiz({
+        moduleId: "form4-01",
+        unitId: "quiz-vertex-sense",
+        scorePercent: percent,
+        durationSeconds: Math.max(1, Math.round((Date.now() - quizStartedAt) / 1000))
+      });
+    }
+    if (window.kiraActivity && typeof window.kiraActivity.logModuleProgress === "function") {
+      window.kiraActivity.logModuleProgress({
+        moduleId: "form4-01",
+        unitId: "quiz-vertex-sense",
+        status: "completed",
+        scorePercent: percent,
+        durationSeconds: Math.max(1, Math.round((Date.now() - quizStartedAt) / 1000))
+      });
+    }
   }
 
   renderQuestion();

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -25,6 +25,11 @@ public interface ILearnerService
     Task<CommunityThreadDto> CreateCommunityThreadAsync(string learnerId, CommunityThreadCreateRequest request);
     Task<CommunityReplyDto> CreateCommunityReplyAsync(string learnerId, long threadId, CommunityReplyCreateRequest request);
     Task<CommunityThreadDetailDto> GetCommunityThreadDetailAsync(string learnerId, long threadId, CommunityThreadDetailQuery query);
+    Task<StudyActivityResultDto> LogModuleQuizAsync(string learnerId, ModuleQuizLogRequest request);
+    Task<StudyActivityResultDto> LogPastPaperAsync(string learnerId, PastPaperLogRequest request);
+    Task<ModuleSelectionResponse> AddModuleSelectionAsync(string learnerId, ModuleSelectionRequest request);
+    Task<ModuleSelectionResponse> RemoveModuleSelectionAsync(string learnerId, string moduleId);
+    Task<ModuleProgressResponse> LogModuleProgressAsync(string learnerId, ModuleProgressLogRequest request);
 }
 
 /// <summary>
@@ -34,6 +39,9 @@ public class LearnerService : ILearnerService
 {
     private readonly IConfiguration _configuration;
     private readonly string _connectionString;
+    private const int DefaultModuleQuizXp = 120;
+    private const int DefaultPastPaperXp = 100;
+    private const int MaxActivityXp = 500;
     private const string DefaultAvatar = "/images/profile-cat.jpg";
     private static readonly HashSet<string> AllowedAvatars = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -184,6 +192,279 @@ public class LearnerService : ILearnerService
                 Body = "Snap a photo of one \"aha!\" solution and drop it into your learning journal - reflection boosts retention by 30%."
             }
         };
+    }
+
+    public async Task<StudyActivityResultDto> LogModuleQuizAsync(string learnerId, ModuleQuizLogRequest request)
+    {
+        var result = new StudyActivityResultDto
+        {
+            Source = "module-quiz",
+            ActivityDate = NormalizeActivityDate(NormalizeTimestamp(request?.CompletedAt))
+        };
+
+        if (string.IsNullOrWhiteSpace(learnerId) || request == null)
+        {
+            result.Message = "Invalid request.";
+            return result;
+        }
+
+        var moduleId = request.ModuleId?.Trim();
+        var unitId = request.UnitId?.Trim();
+        if (string.IsNullOrWhiteSpace(moduleId) || string.IsNullOrWhiteSpace(unitId))
+        {
+            result.Message = "moduleId and unitId are required.";
+            return result;
+        }
+
+        var completedAt = NormalizeTimestamp(request.CompletedAt);
+        result.ActivityDate = NormalizeActivityDate(completedAt);
+        var xpAwarded = NormalizeXpAward(request.XpAwarded, DefaultModuleQuizXp);
+        long logId = 0;
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                result.Message = "Database unavailable.";
+                return result;
+            }
+
+            const string sql = @"INSERT INTO learner_module_quiz_log
+                                 (uid, module_id, unit_id, score_percent, duration_seconds, completed_at, streak_applied)
+                                 VALUES (@Uid, @ModuleId, @UnitId, @Score, @Duration, @CompletedAt, 0)";
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@ModuleId", Truncate(moduleId, 64));
+            command.Parameters.AddWithValue("@UnitId", Truncate(unitId, 64));
+            command.Parameters.AddWithValue("@Score", request.ScorePercent.HasValue ? request.ScorePercent.Value : (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Duration", request.DurationSeconds.HasValue ? request.DurationSeconds.Value : (object)DBNull.Value);
+            command.Parameters.AddWithValue("@CompletedAt", completedAt);
+            await command.ExecuteNonQueryAsync();
+            logId = command.LastInsertedId;
+            result.Logged = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to log module quiz for {learnerId}: {ex.Message}");
+            result.Message = "Unable to log quiz completion.";
+            return result;
+        }
+
+        var streakChange = await ApplyStudyActivityAsync(learnerId, completedAt, "module-quiz", xpAwarded);
+        result.StreakUpdated = streakChange.Counted;
+        result.ActivityDate = streakChange.ActivityDate;
+        result.Message = streakChange.Message;
+
+        if (logId > 0)
+        {
+            await MarkModuleQuizLogAppliedAsync(logId);
+        }
+
+        result.Streak = await BuildStreakSnapshotAsync(learnerId);
+        return result;
+    }
+
+    public async Task<StudyActivityResultDto> LogPastPaperAsync(string learnerId, PastPaperLogRequest request)
+    {
+        var result = new StudyActivityResultDto
+        {
+            Source = "pastpaper-log",
+            ActivityDate = NormalizeActivityDate(NormalizeTimestamp(request?.LoggedAt))
+        };
+
+        if (string.IsNullOrWhiteSpace(learnerId) || request == null)
+        {
+            result.Message = "Invalid request.";
+            return result;
+        }
+
+        var title = string.IsNullOrWhiteSpace(request.PaperTitle) ? "Past paper session" : request.PaperTitle.Trim();
+        var slug = BuildPaperSlug(request.PaperSlug, title);
+        var loggedAt = NormalizeTimestamp(request.LoggedAt);
+        result.ActivityDate = NormalizeActivityDate(loggedAt);
+        var xpAwarded = NormalizeXpAward(request.XpAwarded, DefaultPastPaperXp);
+        long logId = 0;
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                result.Message = "Database unavailable.";
+                return result;
+            }
+
+            const string sql = @"INSERT INTO learner_pastpaper_log
+                                 (uid, paper_slug, paper_title, mode, duration_minutes, score_percent, reflection, logged_at, streak_applied)
+                                 VALUES (@Uid, @Slug, @Title, @Mode, @Duration, @Score, @Reflection, @LoggedAt, 0)";
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@Slug", Truncate(slug, 128));
+            command.Parameters.AddWithValue("@Title", Truncate(title, 255));
+            command.Parameters.AddWithValue("@Mode", Truncate(string.IsNullOrWhiteSpace(request.Mode) ? "timed" : request.Mode.Trim(), 32));
+            command.Parameters.AddWithValue("@Duration", Math.Max(0, request.DurationMinutes));
+            command.Parameters.AddWithValue("@Score", request.ScorePercent.HasValue ? request.ScorePercent.Value : (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Reflection", string.IsNullOrWhiteSpace(request.Reflection) ? (object)DBNull.Value : Truncate(request.Reflection.Trim(), 2000));
+            command.Parameters.AddWithValue("@LoggedAt", loggedAt);
+            await command.ExecuteNonQueryAsync();
+            logId = command.LastInsertedId;
+            result.Logged = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to log past paper for {learnerId}: {ex.Message}");
+            result.Message = "Unable to log past paper session.";
+            return result;
+        }
+
+        var streakChange = await ApplyStudyActivityAsync(learnerId, loggedAt, "pastpaper-log", xpAwarded);
+        result.StreakUpdated = streakChange.Counted;
+        result.ActivityDate = streakChange.ActivityDate;
+        result.Message = streakChange.Message;
+
+        if (logId > 0)
+        {
+            await MarkPastPaperLogAppliedAsync(logId);
+        }
+
+        result.Streak = await BuildStreakSnapshotAsync(learnerId);
+        return result;
+    }
+
+    public async Task<ModuleSelectionResponse> AddModuleSelectionAsync(string learnerId, ModuleSelectionRequest request)
+    {
+        var response = new ModuleSelectionResponse
+        {
+            ModuleId = request?.ModuleId ?? string.Empty,
+            Success = false
+        };
+
+        if (string.IsNullOrWhiteSpace(learnerId))
+        {
+            response.Message = "Learner is required.";
+            return response;
+        }
+
+        var normalizedModuleId = NormalizeModuleKey(request?.ModuleId);
+        if (string.IsNullOrWhiteSpace(normalizedModuleId))
+        {
+            response.Message = "moduleId is required.";
+            return response;
+        }
+
+        var catalogue = SampleModules().ToList();
+        var lookup = BuildModuleLookup(catalogue, out _);
+        if (!lookup.TryGetValue(normalizedModuleId, out var module))
+        {
+            response.Message = "Module not found.";
+            return response;
+        }
+
+        var saved = await SaveModuleSelectionAsync(learnerId, module.ModuleId);
+        if (!saved)
+        {
+            response.Message = "Unable to save module selection.";
+            return response;
+        }
+
+        var snapshot = await BuildModuleSnapshotAsync(learnerId);
+        response.Success = true;
+        response.ModuleId = module.ModuleId;
+        response.ActiveModules = snapshot.ActiveModules;
+        return response;
+    }
+
+    public async Task<ModuleSelectionResponse> RemoveModuleSelectionAsync(string learnerId, string moduleId)
+    {
+        var response = new ModuleSelectionResponse
+        {
+            ModuleId = moduleId ?? string.Empty,
+            Success = false
+        };
+
+        if (string.IsNullOrWhiteSpace(learnerId))
+        {
+            response.Message = "Learner is required.";
+            return response;
+        }
+
+        var normalizedModuleId = NormalizeModuleKey(moduleId);
+        if (string.IsNullOrWhiteSpace(normalizedModuleId))
+        {
+            response.Message = "moduleId is required.";
+            return response;
+        }
+
+        var removed = await DeleteModuleSelectionAsync(learnerId, normalizedModuleId);
+        if (!removed)
+        {
+            response.Message = "Unable to remove module selection.";
+            return response;
+        }
+
+        var snapshot = await BuildModuleSnapshotAsync(learnerId);
+        response.Success = true;
+        response.ActiveModules = snapshot.ActiveModules;
+        response.ModuleId = normalizedModuleId;
+        return response;
+    }
+
+    public async Task<ModuleProgressResponse> LogModuleProgressAsync(string learnerId, ModuleProgressLogRequest request)
+    {
+        var response = new ModuleProgressResponse
+        {
+            ModuleId = request?.ModuleId ?? string.Empty,
+            UnitId = request?.UnitId ?? string.Empty,
+            Status = request?.Status ?? "completed",
+            Success = false
+        };
+
+        if (string.IsNullOrWhiteSpace(learnerId))
+        {
+            response.Message = "Learner is required.";
+            return response;
+        }
+
+        var normalizedModuleId = NormalizeModuleKey(request?.ModuleId);
+        var normalizedUnitId = NormalizeModuleKey(request?.UnitId);
+        if (string.IsNullOrWhiteSpace(normalizedModuleId) || string.IsNullOrWhiteSpace(normalizedUnitId))
+        {
+            response.Message = "moduleId and unitId are required.";
+            return response;
+        }
+
+        var catalogue = SampleModules().ToList();
+        var lookup = BuildModuleLookup(catalogue, out _);
+        if (!lookup.TryGetValue(normalizedModuleId, out var module))
+        {
+            response.Message = "Module not found.";
+            return response;
+        }
+
+        var unitExists = module.Units.Any(unit =>
+            NormalizeModuleKey(unit.UnitId) == normalizedUnitId ||
+            NormalizeModuleKey(unit.UnitId) == request?.UnitId?.Trim().ToLowerInvariant());
+        if (!unitExists)
+        {
+            response.Message = "Unit not found in module.";
+            return response;
+        }
+
+        var saved = await UpsertTopicProgressAsync(learnerId, normalizedModuleId, normalizedUnitId, request?.Status, request?.ScorePercent, request?.DurationSeconds);
+        if (!saved)
+        {
+            response.Message = "Unable to log progress.";
+            return response;
+        }
+
+        var snapshot = await BuildModuleSnapshotAsync(learnerId);
+        response.Success = true;
+        response.ActiveModules = snapshot.ActiveModules;
+        response.ModuleId = normalizedModuleId;
+        response.UnitId = normalizedUnitId;
+        response.Status = request?.Status ?? "completed";
+        return response;
     }
 
     public async Task<LearnerProfilePayload> GetProfileAsync(string learnerId)
@@ -1070,6 +1351,240 @@ public class LearnerService : ILearnerService
         }
     }
 
+    private static DateTime NormalizeTimestamp(DateTime? timestamp)
+    {
+        return NormalizeTimestamp(timestamp ?? DateTime.UtcNow);
+    }
+
+    private static DateTime NormalizeTimestamp(DateTime timestamp)
+    {
+        return timestamp.Kind switch
+        {
+            DateTimeKind.Utc => timestamp,
+            DateTimeKind.Local => timestamp.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(timestamp, DateTimeKind.Utc)
+        };
+    }
+
+    private static DateTime NormalizeActivityDate(DateTime timestampUtc)
+    {
+        return DateTime.SpecifyKind(timestampUtc.Date, DateTimeKind.Utc);
+    }
+
+    private static int NormalizeXpAward(int? requested, int fallback)
+    {
+        if (!requested.HasValue)
+        {
+            return Math.Max(0, Math.Min(MaxActivityXp, fallback));
+        }
+
+        var value = requested.Value;
+        if (value <= 0)
+        {
+            return 0;
+        }
+
+        return Math.Max(0, Math.Min(MaxActivityXp, value));
+    }
+
+    private static string Truncate(string? value, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(value) || value.Length <= maxLength)
+        {
+            return value?.Trim() ?? string.Empty;
+        }
+
+        return value.Trim()[..maxLength];
+    }
+
+    private static string BuildPaperSlug(string? slug, string title)
+    {
+        if (!string.IsNullOrWhiteSpace(slug))
+        {
+            return slug.Trim().ToLowerInvariant();
+        }
+
+        var cleaned = title
+            .ToLowerInvariant()
+            .Select(ch => char.IsLetterOrDigit(ch) ? ch : '-')
+            .ToArray();
+        var normalized = new string(cleaned);
+        while (normalized.Contains("--"))
+        {
+            normalized = normalized.Replace("--", "-");
+        }
+
+        normalized = normalized.Trim('-');
+        return string.IsNullOrWhiteSpace(normalized) ? "pastpaper-session" : normalized;
+    }
+
+    private async Task<LearnerStreakDto> BuildStreakSnapshotAsync(string learnerId)
+    {
+        var record = await FetchLearnerAsync(learnerId);
+        var profile = await FetchProfileDtoAsync(learnerId, record);
+        return await FetchStreakDtoAsync(learnerId, profile);
+    }
+
+    private async Task<StreakUpdateResult> ApplyStudyActivityAsync(string learnerId, DateTime occurredAtUtc, string source, int xpAwarded)
+    {
+        var normalizedMoment = NormalizeTimestamp(occurredAtUtc);
+        var activityDate = NormalizeActivityDate(normalizedMoment);
+        var state = await FetchStreakStateAsync(learnerId) ?? new LearnerStreakState();
+
+        var result = new StreakUpdateResult
+        {
+            ActivityDate = activityDate,
+            Counted = false,
+            Message = "Already logged for today."
+        };
+
+        var lastDate = state.LastActivityOn.HasValue ? NormalizeActivityDate(state.LastActivityOn.Value) : (DateTime?)null;
+        var newCurrent = state.Current;
+
+        if (lastDate == activityDate)
+        {
+            // Already counted today; keep current streak.
+        }
+        else if (lastDate == activityDate.AddDays(-1))
+        {
+            newCurrent = Math.Max(1, state.Current) + 1;
+            result.Counted = true;
+            result.Message = $"Streak extended to {newCurrent} day(s).";
+        }
+        else
+        {
+            newCurrent = 1;
+            result.Counted = true;
+            result.Message = "Streak restarted at 1 day.";
+        }
+
+        if (state.Current == 0 && result.Counted && newCurrent == 1)
+        {
+            result.Message = "Streak started.";
+        }
+
+        state.Current = newCurrent;
+        state.Longest = Math.Max(state.Longest, newCurrent);
+        state.XpToNextLevel = Math.Max(0, state.XpToNextLevel - Math.Max(0, xpAwarded));
+        state.LastActivityOn = activityDate;
+        state.LastActivitySource = source ?? string.Empty;
+
+        await SaveStreakStateAsync(learnerId, state);
+        return result;
+    }
+
+    private async Task<LearnerStreakState?> FetchStreakStateAsync(string learnerId)
+    {
+        const string sql = @"SELECT current_streak, longest_streak, xp_to_next_level, last_activity_on, last_activity_source
+                             FROM learner_streak
+                             WHERE uid = @Uid
+                             LIMIT 1";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return null;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new LearnerStreakState
+                {
+                    Current = SafeToInt(reader["current_streak"], 0),
+                    Longest = SafeToInt(reader["longest_streak"], 0),
+                    XpToNextLevel = SafeToInt(reader["xp_to_next_level"], 1000),
+                    LastActivityOn = reader["last_activity_on"] is DateTime dt ? dt : null,
+                    LastActivitySource = reader["last_activity_source"]?.ToString() ?? string.Empty
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to fetch learner_streak for {learnerId}: {ex.Message}");
+        }
+
+        return null;
+    }
+
+    private async Task SaveStreakStateAsync(string learnerId, LearnerStreakState state)
+    {
+        const string sql = @"INSERT INTO learner_streak (uid, current_streak, longest_streak, xp_to_next_level, last_activity_on, last_activity_source)
+                             VALUES (@Uid, @Current, @Longest, @Xp, @LastActivity, @Source)
+                             ON DUPLICATE KEY UPDATE current_streak = @Current, longest_streak = @Longest, xp_to_next_level = @Xp, last_activity_on = @LastActivity, last_activity_source = @Source";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@Current", state.Current);
+            command.Parameters.AddWithValue("@Longest", state.Longest);
+            command.Parameters.AddWithValue("@Xp", Math.Max(0, state.XpToNextLevel));
+            command.Parameters.AddWithValue("@LastActivity", state.LastActivityOn);
+            command.Parameters.AddWithValue("@Source", state.LastActivitySource ?? string.Empty);
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to save learner_streak for {learnerId}: {ex.Message}");
+        }
+    }
+
+    private async Task MarkModuleQuizLogAppliedAsync(long logId)
+    {
+        const string sql = @"UPDATE learner_module_quiz_log SET streak_applied = 1 WHERE id = @Id";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Id", logId);
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to mark module quiz log {logId} as applied: {ex.Message}");
+        }
+    }
+
+    private async Task MarkPastPaperLogAppliedAsync(long logId)
+    {
+        const string sql = @"UPDATE learner_pastpaper_log SET streak_applied = 1 WHERE id = @Id";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Id", logId);
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to mark past paper log {logId} as applied: {ex.Message}");
+        }
+    }
+
     private static int SafeToInt(object? value, int fallback)
     {
         if (value == null || value == DBNull.Value)
@@ -1349,7 +1864,7 @@ public class LearnerService : ILearnerService
             Longest = 0,
             XpToNextLevel = Math.Max(0, 1000 - profile.Xp),
             Status = "Start your streak",
-            LevelLabel = $"Level {profile.Level} • {profile.Xp} XP"
+            LevelLabel = $"Level {profile.Level} - {profile.Xp} XP"
         };
 
         const string sql = @"SELECT current_streak, longest_streak, xp_to_next_level
@@ -1381,8 +1896,8 @@ public class LearnerService : ILearnerService
             Console.WriteLine($"[LearnerService] Failed to load learner_streak for {learnerId}: {ex.Message}");
         }
 
-        streak.Status = streak.Current > 0 ? $"🔥 {streak.Current}-day streak" : "Ready to start your streak";
-        streak.LevelLabel = $"Level {profile.Level} • {profile.Xp} XP";
+        streak.Status = streak.Current > 0 ? $"{streak.Current}-day streak" : "Ready to start your streak";
+        streak.LevelLabel = $"Level {profile.Level} - {profile.Xp} XP";
 
         return streak;
     }
@@ -1390,43 +1905,48 @@ public class LearnerService : ILearnerService
     private async Task<LearnerModuleSnapshot> BuildModuleSnapshotAsync(string learnerId)
     {
         var catalogue = SampleModules().ToList();
+        var moduleLookup = BuildModuleLookup(catalogue, out var allModules);
         var progress = await FetchModuleProgressAsync(learnerId);
-        var allModules = new List<ModuleCardDto>();
+        var topicProgress = await FetchTopicProgressAsync(learnerId);
 
-        foreach (var section in catalogue)
+        foreach (var module in allModules)
         {
-            foreach (var module in section.Modules)
+            var keys = new List<string?>
             {
-                var keys = new List<string>
-                {
-                    module.Link ?? string.Empty,
-                    module.Number,
-                    $"{section.Grade?.Replace(" ", string.Empty).ToLowerInvariant()}-{module.Number}"
-                };
+                module.ModuleId,
+                module.Link,
+                module.Number,
+                string.IsNullOrWhiteSpace(module.Grade) || string.IsNullOrWhiteSpace(module.Number)
+                    ? null
+                    : $"{module.Grade.Replace(" ", string.Empty).ToLowerInvariant()}-{module.Number}"
+            };
 
-                foreach (var key in keys.Where(k => !string.IsNullOrWhiteSpace(k)))
+            foreach (var key in keys.Where(k => !string.IsNullOrWhiteSpace(k)))
+            {
+                if (progress.TryGetValue(key!, out var state))
                 {
-                    if (progress.TryGetValue(key, out var state))
-                    {
-                        module.ProgressPercent = state.ProgressPercent;
-                        break;
-                    }
+                    module.ProgressPercent = state.ProgressPercent;
+                    break;
                 }
+            }
 
-                allModules.Add(module);
+            var topicPercent = CalculateModuleProgress(module, topicProgress);
+            if (topicPercent.HasValue)
+            {
+                module.ProgressPercent = topicPercent.Value;
             }
         }
 
-        var activeModules = allModules
-            .Where(m => (m.ProgressPercent ?? 0) > 0)
-            .OrderByDescending(m => m.ProgressPercent)
-            .ThenBy(m => m.Number)
-            .Take(3)
+        var selections = await FetchModuleSelectionsAsync(learnerId);
+        var activeModules = selections
+            .Select(selection => moduleLookup.TryGetValue(selection.ModuleId, out var module) ? module : null)
+            .Where(module => module != null)
+            .Cast<ModuleCardDto>()
             .ToList();
 
         if (!activeModules.Any())
         {
-            activeModules = allModules.Take(3).ToList();
+            activeModules = new List<ModuleCardDto>();
         }
 
         return new LearnerModuleSnapshot
@@ -1434,6 +1954,306 @@ public class LearnerService : ILearnerService
             ActiveModules = activeModules,
             Catalogue = catalogue
         };
+    }
+
+    private Dictionary<string, ModuleCardDto> BuildModuleLookup(List<ModuleCatalogueSectionDto> catalogue, out List<ModuleCardDto> flatModules)
+    {
+        var lookup = new Dictionary<string, ModuleCardDto>(StringComparer.OrdinalIgnoreCase);
+        flatModules = new List<ModuleCardDto>();
+
+        foreach (var section in catalogue)
+        {
+            foreach (var module in section.Modules)
+            {
+                module.Grade = section.Grade ?? string.Empty;
+                var moduleId = EnsureModuleIdentifier(section, module);
+                foreach (var key in BuildModuleKeys(section, module, moduleId))
+                {
+                    if (string.IsNullOrWhiteSpace(key))
+                    {
+                        continue;
+                    }
+                    lookup[key] = module;
+                }
+
+                flatModules.Add(module);
+            }
+        }
+
+        return lookup;
+    }
+
+    private static string EnsureModuleIdentifier(ModuleCatalogueSectionDto section, ModuleCardDto module)
+    {
+        if (!string.IsNullOrWhiteSpace(module.ModuleId))
+        {
+            module.ModuleId = module.ModuleId.Trim();
+            return module.ModuleId;
+        }
+
+        var gradeKey = NormalizeGradeKey(section.Grade);
+        var number = module.Number?.Trim() ?? string.Empty;
+        var identifier = !string.IsNullOrWhiteSpace(gradeKey) && !string.IsNullOrWhiteSpace(number)
+            ? $"{gradeKey}-{number}"
+            : number;
+
+        if (string.IsNullOrWhiteSpace(identifier))
+        {
+            identifier = Guid.NewGuid().ToString("N");
+        }
+
+        module.ModuleId = identifier.ToLowerInvariant();
+        return module.ModuleId;
+    }
+
+    private static IEnumerable<string?> BuildModuleKeys(ModuleCatalogueSectionDto section, ModuleCardDto module, string moduleId)
+    {
+        var gradeKey = NormalizeGradeKey(section.Grade);
+        yield return moduleId;
+        yield return NormalizeModuleKey(moduleId);
+        yield return module.Link;
+        yield return module.Number;
+        if (!string.IsNullOrWhiteSpace(gradeKey) && !string.IsNullOrWhiteSpace(module.Number))
+        {
+            yield return $"{gradeKey}-{module.Number}";
+        }
+    }
+
+    private async Task<List<LearnerModuleSelectionRecord>> FetchModuleSelectionsAsync(string learnerId)
+    {
+        var selections = new List<LearnerModuleSelectionRecord>();
+        const string sql = @"SELECT module_id, display_order
+                             FROM learner_module_selection
+                             WHERE uid = @Uid AND (status IS NULL OR status = 'active')
+                             ORDER BY display_order ASC, module_id ASC";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return selections;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var moduleId = NormalizeModuleKey(reader["module_id"]?.ToString());
+                if (string.IsNullOrWhiteSpace(moduleId))
+                {
+                    continue;
+                }
+
+                selections.Add(new LearnerModuleSelectionRecord
+                {
+                    ModuleId = moduleId,
+                    DisplayOrder = SafeToInt(reader["display_order"], selections.Count + 1)
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_module_selection for {learnerId}: {ex.Message}");
+        }
+
+        return selections;
+    }
+
+    private async Task<bool> SaveModuleSelectionAsync(string learnerId, string moduleId)
+    {
+        const string orderSql = @"SELECT COALESCE(MAX(display_order), 0) + 1
+                                  FROM learner_module_selection
+                                  WHERE uid = @Uid";
+        const string insertSql = @"INSERT INTO learner_module_selection (uid, module_id, display_order, status)
+                                   VALUES (@Uid, @ModuleId, @DisplayOrder, 'active')
+                                   ON DUPLICATE KEY UPDATE status = 'active'";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return false;
+            }
+
+            var displayOrder = 1;
+            await using (var orderCommand = new MySqlCommand(orderSql, connection))
+            {
+                orderCommand.Parameters.AddWithValue("@Uid", learnerId);
+                var result = await orderCommand.ExecuteScalarAsync();
+                if (result != null && int.TryParse(result.ToString(), out var nextOrder) && nextOrder > 0)
+                {
+                    displayOrder = nextOrder;
+                }
+            }
+
+            await using var command = new MySqlCommand(insertSql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@ModuleId", NormalizeModuleKey(moduleId));
+            command.Parameters.AddWithValue("@DisplayOrder", displayOrder);
+            await command.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to save learner_module_selection for {learnerId}: {ex.Message}");
+        }
+
+        return false;
+    }
+
+    private async Task<bool> DeleteModuleSelectionAsync(string learnerId, string moduleId)
+    {
+        const string sql = @"DELETE FROM learner_module_selection
+                             WHERE uid = @Uid AND module_id = @ModuleId";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return false;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@ModuleId", moduleId);
+            var affected = await command.ExecuteNonQueryAsync();
+            return affected > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to delete learner_module_selection for {learnerId}: {ex.Message}");
+        }
+
+        return false;
+    }
+
+    private async Task<Dictionary<string, Dictionary<string, TopicProgressState>>> FetchTopicProgressAsync(string learnerId)
+    {
+        var progress = new Dictionary<string, Dictionary<string, TopicProgressState>>(StringComparer.OrdinalIgnoreCase);
+        const string sql = @"SELECT module_id, unit_id, status, score_percent
+                             FROM learner_topic_progress
+                             WHERE uid = @Uid";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return progress;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var moduleId = NormalizeModuleKey(reader["module_id"]?.ToString());
+                var unitId = NormalizeModuleKey(reader["unit_id"]?.ToString());
+                if (string.IsNullOrWhiteSpace(moduleId) || string.IsNullOrWhiteSpace(unitId))
+                {
+                    continue;
+                }
+
+                if (!progress.TryGetValue(moduleId, out var unitMap))
+                {
+                    unitMap = new Dictionary<string, TopicProgressState>(StringComparer.OrdinalIgnoreCase);
+                    progress[moduleId] = unitMap;
+                }
+
+                unitMap[unitId] = new TopicProgressState
+                {
+                    Status = reader["status"]?.ToString() ?? "in_progress",
+                    ScorePercent = reader["score_percent"] == DBNull.Value ? (int?)null : SafeToInt(reader["score_percent"], 0)
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load learner_topic_progress for {learnerId}: {ex.Message}");
+        }
+
+        return progress;
+    }
+
+    private async Task<bool> UpsertTopicProgressAsync(string learnerId, string moduleId, string unitId, string? status, int? scorePercent, int? durationSeconds)
+    {
+        const string sql = @"INSERT INTO learner_topic_progress (uid, module_id, unit_id, status, score_percent, updated_at)
+                             VALUES (@Uid, @ModuleId, @UnitId, @Status, @ScorePercent, CURRENT_TIMESTAMP)
+                             ON DUPLICATE KEY UPDATE status = @Status, score_percent = @ScorePercent, updated_at = CURRENT_TIMESTAMP";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return false;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@ModuleId", moduleId);
+            command.Parameters.AddWithValue("@UnitId", unitId);
+            command.Parameters.AddWithValue("@Status", string.IsNullOrWhiteSpace(status) ? "completed" : status.Trim().ToLowerInvariant());
+            if (scorePercent.HasValue)
+            {
+                command.Parameters.AddWithValue("@ScorePercent", scorePercent.Value);
+            }
+            else
+            {
+                command.Parameters.AddWithValue("@ScorePercent", DBNull.Value);
+            }
+
+            await command.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to upsert learner_topic_progress for {learnerId}: {ex.Message}");
+        }
+
+        return false;
+    }
+
+    private static int? CalculateModuleProgress(ModuleCardDto module, Dictionary<string, Dictionary<string, TopicProgressState>> topicProgress)
+    {
+        var units = module.Units ?? new List<ModuleUnitDto>();
+        var trackedUnits = units.Where(u => !string.IsNullOrWhiteSpace(u.UnitId)).ToList();
+        if (!trackedUnits.Any())
+        {
+            return null;
+        }
+
+        if (!topicProgress.TryGetValue(module.ModuleId, out var unitMap))
+        {
+            return 0;
+        }
+
+        var completed = trackedUnits.Count(unit =>
+        {
+            var unitKey = NormalizeModuleKey(unit.UnitId);
+            return unitMap.TryGetValue(unitKey, out var state) &&
+                   string.Equals(state.Status, "completed", StringComparison.OrdinalIgnoreCase);
+        });
+
+        return (int)Math.Round((double)completed / trackedUnits.Count * 100);
+    }
+
+    private static string NormalizeModuleKey(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim().ToLowerInvariant();
+    }
+
+    private static string NormalizeGradeKey(string? grade)
+    {
+        return string.IsNullOrWhiteSpace(grade)
+            ? string.Empty
+            : grade.Replace(" ", string.Empty).ToLowerInvariant();
     }
 
     private async Task<Dictionary<string, ModuleProgressState>> FetchModuleProgressAsync(string learnerId)
@@ -2531,6 +3351,34 @@ public class LearnerService : ILearnerService
         public int ProgressPercent { get; set; }
         public string Status { get; set; } = string.Empty;
     }
+
+    private sealed class TopicProgressState
+    {
+        public string Status { get; set; } = string.Empty;
+        public int? ScorePercent { get; set; }
+    }
+
+    private sealed class LearnerModuleSelectionRecord
+    {
+        public string ModuleId { get; set; } = string.Empty;
+        public int DisplayOrder { get; set; }
+    }
+
+    private sealed class LearnerStreakState
+    {
+        public int Current { get; set; }
+        public int Longest { get; set; }
+        public int XpToNextLevel { get; set; } = 1000;
+        public DateTime? LastActivityOn { get; set; }
+        public string LastActivitySource { get; set; } = string.Empty;
+    }
+
+    private sealed class StreakUpdateResult
+    {
+        public bool Counted { get; set; }
+        public DateTime ActivityDate { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
 }
 
 #region DTOs
@@ -2577,6 +3425,16 @@ public class LearnerStreakDto
     public string LevelLabel { get; set; } = string.Empty;
 }
 
+public class StudyActivityResultDto
+{
+    public string Source { get; set; } = string.Empty;
+    public DateTime ActivityDate { get; set; } = DateTime.UtcNow;
+    public bool Logged { get; set; }
+    public bool StreakUpdated { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public LearnerStreakDto? Streak { get; set; }
+}
+
 public class LearnerHighlightStat
 {
     public string Label { get; set; } = string.Empty;
@@ -2590,6 +3448,24 @@ public class LearnerModuleSnapshot
 {
     public IEnumerable<ModuleCardDto> ActiveModules { get; set; } = new List<ModuleCardDto>();
     public IEnumerable<ModuleCatalogueSectionDto> Catalogue { get; set; } = new List<ModuleCatalogueSectionDto>();
+}
+
+public class ModuleSelectionResponse
+{
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string ModuleId { get; set; } = string.Empty;
+    public IEnumerable<ModuleCardDto> ActiveModules { get; set; } = new List<ModuleCardDto>();
+}
+
+public class ModuleProgressResponse
+{
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string ModuleId { get; set; } = string.Empty;
+    public string UnitId { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public IEnumerable<ModuleCardDto> ActiveModules { get; set; } = new List<ModuleCardDto>();
 }
 
 public class ModuleCatalogueSectionDto
@@ -2616,6 +3492,7 @@ public class ModuleCardDto
     public string ModuleId { get; set; } = string.Empty;
     public string Number { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
+    public string Grade { get; set; } = string.Empty;
     public List<string> Lessons { get; set; } = new();
     public string Link { get; set; } = string.Empty;
     public int? ProgressPercent { get; set; }
@@ -2945,3 +3822,5 @@ public class NotificationPreferenceDto
 }
 
 #endregion
+
+

@@ -35,6 +35,7 @@
 
   const timerSessions = [];
   let activeTip = null;
+  let lastLogMessage = "";
 
   const formatTimer = seconds => {
     const safeSeconds = Math.max(0, seconds);
@@ -71,6 +72,40 @@
     const minutesPart = mins ? `${mins}m` : "";
     return `${hoursPart}${hrs && mins ? " " : ""}${minutesPart}`.trim();
   };
+
+  const buildTimerContext = () => {
+    const filters = getFilters();
+    const typeLabel = filters.type || "All types";
+    const yearLabel = filters.year || "Any year";
+    return {
+      slug: `timer-${(filters.type || "all").toLowerCase()}-${filters.year || "any"}`,
+      title: `Timer session (${typeLabel}, ${yearLabel})`
+    };
+  };
+
+  async function logPastPaperSession(durationSeconds, reason) {
+    if (!window.kiraActivity || typeof window.kiraActivity.logPastPaper !== "function") {
+      return;
+    }
+    const { slug, title } = buildTimerContext();
+    const payload = {
+      paperSlug: slug,
+      paperTitle: title,
+      mode: reason === "complete" ? "timed" : "review",
+      durationMinutes: Math.max(1, Math.round(Math.max(1, durationSeconds) / 60)),
+      reflection: reason === "complete" ? "Completed timer session" : "Stopped timer early",
+      xpAwarded: reason === "complete" ? 120 : 80
+    };
+    try {
+      const response = await window.kiraActivity.logPastPaper(payload);
+      if (response && response.message) {
+        lastLogMessage = response.message;
+        renderTip();
+      }
+    } catch (error) {
+      console.error("Unable to log past paper session", error);
+    }
+  }
 
   const getSelectedDurationMinutes = () => {
     const select = document.querySelector(selectors.timerDuration);
@@ -139,6 +174,7 @@
     if (timerSessions.length > timerConfig.maxSessions) {
       timerSessions.shift();
     }
+    logPastPaperSession(safeElapsed, reason);
     renderTip();
   };
 
@@ -310,7 +346,7 @@
     }
     if (timerSessions.length) {
       const last = timerSessions[timerSessions.length - 1];
-      badge.textContent = `Timer logged · ${formatSessionDuration(last.durationSeconds)}`;
+      badge.textContent = lastLogMessage || `Timer logged - ${formatSessionDuration(last.durationSeconds)}`;
       return;
     }
     if (payload?.badge) {

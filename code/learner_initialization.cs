@@ -32,8 +32,8 @@ public static class LearnerInitialization
 
     private static async Task CreateLearnerStreakAsync(MySqlConnection connection, string learnerId)
     {
-        const string sql = @"INSERT IGNORE INTO learner_streak (uid, current_streak, longest_streak, xp_to_next_level)
-                             VALUES (@Uid, 0, 0, 1000)";
+        const string sql = @"INSERT IGNORE INTO learner_streak (uid, current_streak, longest_streak, xp_to_next_level, last_activity_on, last_activity_source)
+                             VALUES (@Uid, 0, 0, 1000, NULL, NULL)";
         
         await using var command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@Uid", learnerId);

@@ -27,8 +27,13 @@
     missionMood: "#missionMood",
     missionChips: "#missionChips",
     missionConfidence: "#missionConfidence",
-    missionAction: "#missionActionBtn"
+    missionAction: "#missionActionBtn",
+    coursePickerTrigger: "[data-action='open-course-picker']",
+    modulePickerModal: "#modulePickerModal",
+    modulePickerList: "#modulePickerList"
   };
+
+  window.kiraActiveModules = Array.isArray(window.kiraActiveModules) ? window.kiraActiveModules : [];
 
   const getEl = selector => document.querySelector(selector);
 
@@ -44,6 +49,261 @@
     if (card && state) {
       card.dataset.state = state;
     }
+  };
+
+  const modulePickerState = {
+    catalogue: [],
+    modal: null,
+    list: null,
+    isOpen: false,
+    keydownBound: false,
+    selectedIds: new Set()
+  };
+
+  const ensureModulePickerRefs = () => {
+    if (!modulePickerState.modal) {
+      modulePickerState.modal = getEl(selectors.modulePickerModal);
+    }
+    if (!modulePickerState.list) {
+      modulePickerState.list = getEl(selectors.modulePickerList);
+    }
+  };
+
+  const deriveModuleId = (section, module) => {
+    if (!module) {
+      return "";
+    }
+    if (module.moduleId) {
+      return module.moduleId;
+    }
+    if (module.link) {
+      const match = module.link.match(/module=([^&]+)/i);
+      if (match) {
+        return match[1];
+      }
+      return module.link.replace(/\.html?$/i, "").replace(/^\.?\//, "");
+    }
+    if (section?.grade && module.number) {
+      const digits = section.grade.match(/\d+/);
+      if (digits) {
+        return `form${digits[0]}-${module.number}`;
+      }
+    }
+    return module.number || "";
+  };
+
+  const notifyCourseMapUnavailable = () => {
+    console.warn("Modules are still syncing. Please use the Continue button on a course to open it.");
+  };
+
+  const dispatchModulesUpdated = () => {
+    document.dispatchEvent(
+      new CustomEvent("kira:modules-ready", {
+        detail: {
+          catalogue: modulePickerState.catalogue.length ? modulePickerState.catalogue : window.kiraModules || [],
+          activeModules: window.kiraActiveModules || []
+        }
+      })
+    );
+  };
+
+  const addModuleSelection = async moduleId => {
+    if (!moduleId) {
+      return;
+    }
+    const session = window.kiraLearnerSession;
+    if (!session) {
+      notifyCourseMapUnavailable();
+      return;
+    }
+    try {
+      const response = await session.fetch("modules/selection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ moduleId })
+      });
+      if (!response.ok) {
+        throw new Error(`Module selection failed with status ${response.status}`);
+      }
+      const payload = await response.json();
+      if (payload?.activeModules) {
+        window.kiraActiveModules = payload.activeModules;
+        renderModulePicker();
+        dispatchModulesUpdated();
+      }
+    } catch (error) {
+      console.error("Unable to add module selection", error);
+      notifyCourseMapUnavailable();
+    }
+  };
+
+  const removeModuleSelection = async moduleId => {
+    if (!moduleId) {
+      return;
+    }
+    const session = window.kiraLearnerSession;
+    if (!session) {
+      notifyCourseMapUnavailable();
+      return;
+    }
+    try {
+      const response = await session.fetch(`modules/selection/${encodeURIComponent(moduleId)}`, {
+        method: "DELETE"
+      });
+      if (!response.ok) {
+        throw new Error(`Module removal failed with status ${response.status}`);
+      }
+      const payload = await response.json();
+      if (payload?.activeModules) {
+        window.kiraActiveModules = payload.activeModules;
+        renderModulePicker();
+        dispatchModulesUpdated();
+      }
+    } catch (error) {
+      console.error("Unable to remove module selection", error);
+      notifyCourseMapUnavailable();
+    }
+  };
+
+  const closeModulePicker = () => {
+    ensureModulePickerRefs();
+    if (!modulePickerState.modal) {
+      return;
+    }
+    modulePickerState.isOpen = false;
+    modulePickerState.modal.classList.remove("is-open");
+    modulePickerState.modal.setAttribute("aria-hidden", "true");
+  };
+
+  const openModulePicker = () => {
+    ensureModulePickerRefs();
+    if (!modulePickerState.modal) {
+      notifyCourseMapUnavailable();
+      return;
+    }
+    modulePickerState.isOpen = true;
+    modulePickerState.modal.classList.add("is-open");
+    modulePickerState.modal.setAttribute("aria-hidden", "false");
+  };
+
+  const renderModulePicker = () => {
+    ensureModulePickerRefs();
+    const container = modulePickerState.list;
+    if (!container) {
+      return;
+    }
+    if (!modulePickerState.catalogue.length && Array.isArray(window.kiraModules)) {
+      modulePickerState.catalogue = window.kiraModules;
+    }
+    const catalogue = modulePickerState.catalogue;
+    if (!Array.isArray(catalogue) || !catalogue.length) {
+      container.innerHTML = '<p class="muted">Modules are loading. Please refresh.</p>';
+      return;
+    }
+    const selectedIds = new Set(
+      (window.kiraActiveModules || [])
+        .map(module => (module?.moduleId || "").toLowerCase())
+        .filter(Boolean)
+    );
+    modulePickerState.selectedIds = selectedIds;
+    container.innerHTML = catalogue
+      .map(section => {
+        const modules = Array.isArray(section.modules) ? section.modules : [];
+        const list = modules
+          .map(module => {
+            const lessons = Array.isArray(module.lessons) ? module.lessons.join(", ") : "";
+            const moduleId = deriveModuleId(section, module);
+            const normalizedId = (moduleId || "").toLowerCase();
+            const alreadyAdded = normalizedId && selectedIds.has(normalizedId);
+            const buttonLabel = alreadyAdded ? "Remove" : "Add";
+            const buttonClass = alreadyAdded ? "btn btn--ghost btn--small" : "btn btn--primary btn--small";
+            const buttonAction = alreadyAdded ? "remove" : "add";
+            return `
+              <li>
+                <div>
+                  <strong>${module.title}</strong>
+                  ${lessons ? `<small>${lessons}</small>` : ""}
+                </div>
+                <button class="${buttonClass}" type="button" data-module-id="${moduleId}" data-module-action="${buttonAction}">${buttonLabel}</button>
+              </li>
+            `;
+          })
+          .join("");
+        return `
+          <article class="module-picker-section">
+            <header>
+              <p class="eyebrow">${section.grade}</p>
+              <h3>${section.title}</h3>
+            </header>
+            <ul>
+              ${list}
+            </ul>
+          </article>
+        `;
+      })
+      .join("");
+
+    container.querySelectorAll("[data-module-id]").forEach(button => {
+      button.addEventListener("click", event => {
+        const moduleId = event.currentTarget.getAttribute("data-module-id");
+        const action = event.currentTarget.getAttribute("data-module-action");
+        if (!moduleId) {
+          return;
+        }
+        if (action === "remove") {
+          removeModuleSelection(moduleId);
+        } else {
+          addModuleSelection(moduleId);
+        }
+      });
+    });
+  };
+
+  const wireModulePicker = () => {
+    if (!modulePickerState.catalogue.length && Array.isArray(window.kiraModules)) {
+      modulePickerState.catalogue = window.kiraModules;
+    }
+    const trigger = getEl(selectors.coursePickerTrigger);
+    if (trigger && !trigger.dataset.wired) {
+      trigger.addEventListener("click", () => {
+        if (!modulePickerState.catalogue.length && Array.isArray(window.kiraModules)) {
+          modulePickerState.catalogue = window.kiraModules;
+        }
+        if (!modulePickerState.catalogue.length) {
+          notifyCourseMapUnavailable();
+          return;
+        }
+        openModulePicker();
+      });
+      trigger.dataset.wired = "true";
+    }
+
+    ensureModulePickerRefs();
+    document.querySelectorAll("[data-module-picker-close]").forEach(button => {
+      if (!button.dataset.wired) {
+        button.addEventListener("click", closeModulePicker);
+        button.dataset.wired = "true";
+      }
+    });
+
+    if (modulePickerState.modal && !modulePickerState.modal.dataset.wired) {
+      modulePickerState.modal.addEventListener("click", event => {
+        if (event.target === modulePickerState.modal) {
+          closeModulePicker();
+        }
+      });
+      modulePickerState.modal.dataset.wired = "true";
+    }
+
+    if (!modulePickerState.keydownBound) {
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && modulePickerState.isOpen) {
+          closeModulePicker();
+        }
+      });
+      modulePickerState.keydownBound = true;
+    }
+    renderModulePicker();
   };
 
   const updateProfile = (profile, streak) => {
@@ -132,12 +392,18 @@
       return;
     }
     const catalogue = modulesSnapshot.catalogue || [];
+    const activeModules = Array.isArray(modulesSnapshot.activeModules) ? modulesSnapshot.activeModules : [];
     window.kiraModules = catalogue;
     window.kiraModulesMap = catalogue.reduce((map, section) => {
       map[section.grade] = section;
       return map;
     }, {});
-    document.dispatchEvent(new CustomEvent("kira:modules-ready", { detail: catalogue }));
+    window.kiraActiveModules = activeModules;
+    modulePickerState.catalogue = catalogue;
+    renderModulePicker();
+    document.dispatchEvent(
+      new CustomEvent("kira:modules-ready", { detail: { catalogue, activeModules } })
+    );
   };
 
   const broadcastBadges = badges => {
@@ -203,14 +469,18 @@
     }
   };
 
-  document.addEventListener("DOMContentLoaded", fetchDashboard);
+  const startDashboard = () => {
+    wireModulePicker();
+    fetchDashboard();
+  };
+
   document.addEventListener("kira:learner-missing", () => {
     showDashboardError("Please log in to view your learner dashboard.");
   });
-  if (document.readyState === "complete" || document.readyState === "interactive") {
-  fetchDashboard();
-} else {
-  document.addEventListener("DOMContentLoaded", fetchDashboard);
-}
 
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startDashboard);
+  } else {
+    startDashboard();
+  }
 })();

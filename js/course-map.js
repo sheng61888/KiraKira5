@@ -61,6 +61,17 @@
   };
 
   const normalizeId = value => (value || "").toString().trim().toLowerCase();
+  const deriveModuleId = (section, module) => {
+    if (!module) {
+      return "";
+    }
+    return (
+      module.moduleId ||
+      module.ModuleId ||
+      normalizeId(module.link || module.Link || "") ||
+      `form${section?.grade?.match(/\d+/)?.[0] || ""}-${module.number || ""}`
+    ).trim();
+  };
 
   const findModule = moduleId => {
     const target = normalizeId(moduleId);
@@ -144,7 +155,7 @@
       title.textContent = unit.title || `Unit ${index + 1}`;
       const meta = document.createElement("small");
       const duration = unit.duration || unit.Duration || "Self paced";
-      meta.textContent = `${formatType(unit.type || unit.Type)} · ${duration}`;
+      meta.textContent = `${formatType(unit.type || unit.Type)} Â· ${duration}`;
 
       info.appendChild(title);
       info.appendChild(meta);
@@ -240,7 +251,7 @@
 
   const updateHeader = entry => {
     const { section, module } = entry;
-    const gradeLabel = section?.grade ? `${section.grade} · Module ${module.number}` : "Module";
+    const gradeLabel = section?.grade ? `${section.grade} Â· Module ${module.number}` : "Module";
     const summary =
       module.description ||
       module.Description ||
@@ -329,12 +340,8 @@
   };
 
   const init = () => {
-    if (state.moduleId) {
-      hydrateModule();
-      return;
-    }
     const params = new URLSearchParams(window.location.search);
-    state.moduleId = params.get("module") || "form4-01";
+    state.moduleId = params.get("module") || state.moduleId || "form4-01";
     hydrateModule();
   };
 

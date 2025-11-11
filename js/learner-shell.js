@@ -8,6 +8,8 @@
     heroName: "#username",
     avatar: ".profile .avatar"
   };
+  let cachedProfile = null;
+  let cachedStreak = null;
 
   const getEl = selector => document.querySelector(selector);
   const setText = (selector, text) => {
@@ -43,6 +45,8 @@
 
   const updateSidebar = (profile, streak) => {
     const name = profile?.name?.trim() || "Learner";
+    cachedProfile = profile || cachedProfile || { name };
+    cachedStreak = streak || cachedStreak;
     setText(selectors.username, name);
     setAvatarImage(profile?.avatarUrl);
 
@@ -100,5 +104,13 @@
   document.addEventListener("DOMContentLoaded", hydrateSidebar);
   document.addEventListener("kira:learner-missing", () => {
     showSidebarError("Please sign in");
+  });
+  document.addEventListener("kira:streak-updated", event => {
+    const streak = event?.detail;
+    if (!streak) {
+      return;
+    }
+    cachedStreak = streak;
+    updateSidebar(cachedProfile || {}, streak);
   });
 })();
