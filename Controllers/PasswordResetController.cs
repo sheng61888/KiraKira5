@@ -92,7 +92,7 @@ namespace KiraKira5.Controllers
         }
 
         /// <summary>
-        /// Approve password reset and update user password
+        /// Approve password reset request
         /// </summary>
         [HttpPost("approve")]
         public async Task<IActionResult> ApprovePasswordReset([FromBody] ApproveResetRequest request)
@@ -102,14 +102,85 @@ namespace KiraKira5.Controllers
                 using var connection = new MySqlConnection(connectionString);
                 await connection.OpenAsync();
 
-                var getEmailCmd = new MySqlCommand(
-                    "SELECT email FROM password_reset_requests WHERE request_id = @RequestId", connection);
-                getEmailCmd.Parameters.AddWithValue("@RequestId", request.RequestId);
-                var email = (await getEmailCmd.ExecuteScalarAsync())?.ToString();
+                var cmd = new MySqlCommand(
+                    "UPDATE password_reset_requests SET status = @Status WHERE request_id = @RequestId", connection);
+                cmd.Parameters.AddWithValue("@Status", "Approved");
+                cmd.Parameters.AddWithValue("@RequestId", request.RequestId);
+                await cmd.ExecuteNonQueryAsync();
 
-                if (string.IsNullOrEmpty(email))
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Check if user has approved reset request
+        /// </summary>
+        [HttpGet("status/{email}")]
+        public async Task<IActionResult> CheckResetStatus(string email)
+        {
+            try
+            {
+                using var connection = new MySqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                var cmd = new MySqlCommand(
+                    "SELECT request_id, status FROM password_reset_requests WHERE email = @Email ORDER BY request_date DESC LIMIT 1", 
+                    connection);
+                cmd.Parameters.AddWithValue("@Email", email);
+
+                using var reader = await cmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
                 {
-                    return Ok(new { success = false, message = "Request not found" });
+                    return Ok(new 
+                    { 
+                        success = true, 
+                        requestId = reader.GetInt32("request_id"),
+                        status = reader.GetString("status")
+                    });
+                }
+
+                return Ok(new { success = false, message = "No request found" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Submit new password after approval
+        /// </summary>
+        [HttpPost("submit")]
+        public async Task<IActionResult> SubmitNewPassword([FromBody] SubmitPasswordRequest request)
+        {
+            try
+            {
+                using var connection = new MySqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                var checkCmd = new MySqlCommand(
+                    "SELECT email, status FROM password_reset_requests WHERE request_id = @RequestId", connection);
+                checkCmd.Parameters.AddWithValue("@RequestId", request.RequestId);
+
+                string email;
+                string status;
+                using (var reader = await checkCmd.ExecuteReaderAsync())
+                {
+                    if (!await reader.ReadAsync())
+                    {
+                        return Ok(new { success = false, message = "Request not found" });
+                    }
+                    email = reader.GetString("email");
+                    status = reader.GetString("status");
+                }
+
+                if (status != "Approved")
+                {
+                    return Ok(new { success = false, message = "Request not approved" });
                 }
 
                 var updatePasswordCmd = new MySqlCommand(
@@ -120,7 +191,7 @@ namespace KiraKira5.Controllers
 
                 var updateStatusCmd = new MySqlCommand(
                     "UPDATE password_reset_requests SET status = @Status WHERE request_id = @RequestId", connection);
-                updateStatusCmd.Parameters.AddWithValue("@Status", "Approved");
+                updateStatusCmd.Parameters.AddWithValue("@Status", "Completed");
                 updateStatusCmd.Parameters.AddWithValue("@RequestId", request.RequestId);
                 await updateStatusCmd.ExecuteNonQueryAsync();
 
@@ -156,6 +227,30 @@ namespace KiraKira5.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Delete password reset request
+        /// </summary>
+        [HttpDelete("delete/{requestId}")]
+        public async Task<IActionResult> DeletePasswordReset(int requestId)
+        {
+            try
+            {
+                using var connection = new MySqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                var cmd = new MySqlCommand(
+                    "DELETE FROM password_reset_requests WHERE request_id = @RequestId", connection);
+                cmd.Parameters.AddWithValue("@RequestId", requestId);
+                await cmd.ExecuteNonQueryAsync();
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
     }
 
     public class PasswordResetRequest
@@ -164,6 +259,11 @@ namespace KiraKira5.Controllers
     }
 
     public class ApproveResetRequest
+    {
+        public int RequestId { get; set; }
+    }
+
+    public class SubmitPasswordRequest
     {
         public int RequestId { get; set; }
         public string NewPassword { get; set; }

@@ -40,7 +40,9 @@ function displayRequests(requests) {
                         ${status === 'Pending' ? `
                             <button class="btn btn--primary" onclick="approveReset(${requestId}, '${email}')">Approve</button>
                             <button class="btn btn--ghost" onclick="rejectReset(${requestId})">Reject</button>
-                        ` : ''}
+                        ` : `
+                            <button class="btn btn--ghost" onclick="deleteRequest(${requestId})">Delete</button>
+                        `}
                     </div>
                 </div>
             </div>
@@ -66,19 +68,18 @@ function clearSearch() {
 }
 
 async function approveReset(requestId, email) {
-    const newPassword = prompt(`Enter new password for ${email}:`);
-    if (!newPassword) return;
+    if (!confirm(`Approve password reset for ${email}?`)) return;
     
     try {
         const response = await fetch('/api/passwordreset/approve', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ requestId, newPassword })
+            body: JSON.stringify({ requestId })
         });
         
         const result = await response.json();
         if (result.success) {
-            alert('Password reset approved successfully!');
+            alert('Password reset approved! User can now set their new password.');
             loadPasswordResetRequests();
         } else {
             alert('Failed to approve reset: ' + result.message);
@@ -104,6 +105,26 @@ async function rejectReset(requestId) {
             loadPasswordResetRequests();
         } else {
             alert('Failed to reject: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function deleteRequest(requestId) {
+    if (!confirm('Are you sure you want to delete this request?')) return;
+    
+    try {
+        const response = await fetch(`/api/passwordreset/delete/${requestId}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('Request deleted.');
+            loadPasswordResetRequests();
+        } else {
+            alert('Failed to delete: ' + result.message);
         }
     } catch (error) {
         alert('Error: ' + error.message);
