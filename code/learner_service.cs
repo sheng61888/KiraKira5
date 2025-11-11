@@ -814,9 +814,10 @@ public class LearnerService : ILearnerService
                         ModuleId = "form4-01",
                         Units = BuildQuadraticUnits()
                     },
-                    new ModuleCardDto("02", "Number Bases", new List<string> { "Number Bases" }, "lesson-form4-02.html", 62)
+                    new ModuleCardDto("02", "Number Bases", new List<string> { "Number Bases" }, "course-map.html?module=form4-02", 0)
                     {
-                        ModuleId = "form4-02"
+                        ModuleId = "form4-02",
+                        Units = BuildNumberBasesUnits()
                     },
                     new ModuleCardDto("03", "Logical Reasoning", new List<string> { "Statements", "Arguments" }, "lesson-form4-03.html", 35)
                     {
@@ -1070,6 +1071,119 @@ public class LearnerService : ILearnerService
                     Label = "Open practice set",
                     Link = "../docs/module01-practice.pdf",
                     Kind = "download"
+                }
+            }
+        };
+    }
+
+    private static List<ModuleUnitDto> BuildNumberBasesUnits()
+    {
+        return new List<ModuleUnitDto>
+        {
+            new ModuleUnitDto
+            {
+                UnitId = "nb-overview",
+                Title = "Module overview",
+                Type = "overview",
+                Duration = "2 min",
+                Summary = "See how base-10 links to binary, octal, and hexadecimal systems.",
+                Objectives = new List<string>
+                {
+                    "Recall the place value idea behind every base",
+                    "Spot where number bases show up in exam questions"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "nb-place-values",
+                Title = "Lesson 1 · Place values in any base",
+                Type = "lesson",
+                Duration = "5 min",
+                Summary = "Expand numbers in base-2, base-5, and base-8 using positional notation.",
+                Objectives = new List<string>
+                {
+                    "Write expanded form for a given base",
+                    "Explain why base-2 only uses digits 0 and 1"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "nb-convert-to10",
+                Title = "Lesson 2 · Convert to base-10",
+                Type = "lesson",
+                Duration = "6 min",
+                Summary = "Convert binary/octal/hex numbers to base-10 using expanded form.",
+                Objectives = new List<string>
+                {
+                    "Translate any base up to 16 into base-10",
+                    "Check answers quickly with a calculator-free method"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "nb-convert-from10",
+                Title = "Lesson 3 · Convert from base-10",
+                Type = "lesson",
+                Duration = "6 min",
+                Summary = "Use repeated division (or subtraction) to move from base-10 to another base.",
+                Objectives = new List<string>
+                {
+                    "Perform repeated division to reach binary",
+                    "Write the digits in the correct order"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "nb-arithmetic",
+                Title = "Lesson 4 · Arithmetic across bases",
+                Type = "lesson",
+                Duration = "6 min",
+                Summary = "Add and subtract numbers in base-2 and base-8 while tracking carries.",
+                Objectives = new List<string>
+                {
+                    "Add binary numbers with carries",
+                    "Explain why subtraction borrows look different in octal"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "nb-quiz-core",
+                Title = "Quick check · Core conversions",
+                Type = "quiz",
+                Duration = "4 min",
+                Summary = "Convert between base-2/base-10/base-8 within a timer.",
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Attempt conversion quiz",
+                    Link = "../docs/module02-quiz-core.pdf",
+                    Kind = "quiz"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "nb-application",
+                Title = "Lesson 5 · Application and code tables",
+                Type = "lesson",
+                Duration = "5 min",
+                Summary = "Connect hexadecimal to RGB codes and simple ASCII representations.",
+                Objectives = new List<string>
+                {
+                    "Map a hex value to RGB intensity",
+                    "Explain why computers prefer base-2 and base-16"
+                }
+            },
+            new ModuleUnitDto
+            {
+                UnitId = "nb-master-check",
+                Title = "Mastery check",
+                Type = "assessment",
+                Duration = "8 min",
+                Summary = "Six mixed conversions and two application prompts to seal the module.",
+                Cta = new ModuleUnitCtaDto
+                {
+                    Label = "Take mastery check",
+                    Link = "../docs/module02-mastery.pdf",
+                    Kind = "quiz"
                 }
             }
         };
@@ -2563,6 +2677,22 @@ public class LearnerService : ILearnerService
         catch (Exception ex)
         {
             Console.WriteLine($"[LearnerService] Failed to load learner_topics_progress for {learnerId}: {ex.Message}");
+        }
+
+        if (!topics.Any())
+        {
+            var snapshot = await BuildModuleSnapshotAsync(learnerId);
+            var fallbackModules = snapshot.ActiveModules.Any()
+                ? snapshot.ActiveModules
+                : snapshot.Catalogue.SelectMany(section => section.Modules).ToList();
+
+            topics = fallbackModules
+                .Take(5)
+                .Select(module => new TopicProgressDto(
+                    module.Title,
+                    module.ProgressPercent ?? 0,
+                    module.Lessons != null ? string.Join(", ", module.Lessons) : string.Empty))
+                .ToList();
         }
 
         return topics;

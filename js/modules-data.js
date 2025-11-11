@@ -135,7 +135,71 @@ window.kiraModules = [
         number: "02",
         title: "Number Bases",
         lessons: ["Number Bases"],
-        link: "lesson-form4-02.html"
+        link: "course-map.html?module=form4-02",
+        units: [
+          {
+            id: "nb-overview",
+            title: "Module overview",
+            type: "overview",
+            duration: "2 min",
+            summary: "Preview why binary, octal, and hexadecimal show up in exams and computing."
+          },
+          {
+            id: "nb-place-values",
+            title: "Lesson 1 · Place values in any base",
+            type: "lesson",
+            duration: "5 min",
+            summary: "Expand numbers in unfamiliar bases to cement positional notation.",
+            objectives: [
+              "Write expanded form for bases 2, 5, and 8",
+              "Explain why the digit set changes with each base"
+            ]
+          },
+          {
+            id: "nb-convert-to10",
+            title: "Lesson 2 · Convert to base-10",
+            type: "lesson",
+            duration: "6 min",
+            summary: "Use expanded form to translate binary/octal/hex to base-10 quickly."
+          },
+          {
+            id: "nb-convert-from10",
+            title: "Lesson 3 · Convert from base-10",
+            type: "lesson",
+            duration: "6 min",
+            summary: "Apply repeated division to move from base-10 to another base."
+          },
+          {
+            id: "nb-arithmetic",
+            title: "Lesson 4 · Arithmetic across bases",
+            type: "lesson",
+            duration: "6 min",
+            summary: "Add and subtract binary/oct numbers while tracking carries and borrows."
+          },
+          {
+            id: "nb-quiz-core",
+            title: "Quick check · Core conversions",
+            type: "quiz",
+            duration: "4 min",
+            summary: "Fast conversion drill between base-2, base-8, and base-10.",
+            cta: { label: "Attempt conversion quiz", link: "../docs/module02-quiz-core.pdf", kind: "quiz" }
+          },
+          {
+            id: "nb-application",
+            title: "Lesson 5 · Application and code tables",
+            type: "lesson",
+            duration: "5 min",
+            summary: "Tie hexadecimal to RGB/ASCII contexts for richer exam explanations."
+          },
+          {
+            id: "nb-master-check",
+            title: "Mastery check",
+            type: "assessment",
+            duration: "8 min",
+            summary: "Six mixed conversions plus two application prompts at exam speed.",
+            cta: { label: "Take mastery check", link: "../docs/module02-mastery.pdf", kind: "quiz" }
+          }
+        ]
       },
       {
         moduleId: "form4-03",

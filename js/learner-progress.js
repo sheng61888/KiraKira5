@@ -34,14 +34,16 @@
       return;
     }
     container.innerHTML = topics
-      .map(
-        topic => `
+      .map(topic => {
+        const percent = Math.max(0, Number(topic.percent) || 0);
+        const note = topic.note || (percent === 0 ? "Module added • not started yet" : "");
+        return `
         <div class="topic">
-          <span>${topic.title} <strong>${topic.percent}%</strong></span>
-          <div class="meter progress-bar"><span style="width:${topic.percent}%"></span></div>
-          ${topic.note ? `<small>${topic.note}</small>` : ""}
-        </div>`
-      )
+          <span>${topic.title} <strong>${percent}%</strong></span>
+          <div class="meter progress-bar"><span style="width:${percent}%"></span></div>
+          ${note ? `<small>${note}</small>` : ""}
+        </div>`;
+      })
       .join("");
   };
 

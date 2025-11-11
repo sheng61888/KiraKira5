@@ -86,7 +86,7 @@
       number.textContent = `Module ${module.number}`;
 
       const title = document.createElement("h3");
-      title.textContent = module.title;
+      title.innerHTML = module.link ? `<a href="${module.link}">${module.title}</a>` : module.title;
 
       const lessonsLabel = document.createElement("p");
       lessonsLabel.className = "muted";
@@ -107,12 +107,12 @@
 
       const chip = document.createElement("span");
       chip.className = meta.chipClass;
-      chip.textContent = meta.label;
+      chip.textContent = `${progressValue}% done`;
 
       const button = document.createElement("button");
       button.className = "btn btn--primary";
       button.type = "button";
-      button.textContent = progressValue >= 95 ? "Review" : progressValue >= 35 ? "Continue" : "Preview";
+      button.textContent = progressValue >= 95 ? "Review" : "Continue";
       wireButtonNavigation(button, module.link);
 
       footer.appendChild(chip);
