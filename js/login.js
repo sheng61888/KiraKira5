@@ -87,7 +87,7 @@ signinForm.addEventListener('submit', async (e) => {
 			} else if (userRole === 'learner') {
 				window.location.href = 'learner-home.html';
 			} else if (userRole === 'teacher') {
-				window.location.href = 'teacher-dashboard.html';
+				window.location.href = 'teacher-dashboard.php';
 			}
 		} else {
 			console.log('Login failed:', result.message);
