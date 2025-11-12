@@ -44,8 +44,7 @@
         </div>
 
         <div class="heading-actions">
-          <button class="btn btn--ghost" type="button">View weekly plan</button>
-          <button class="btn btn--primary" type="button">Resume warm-up</button>
+          <button class="btn btn--primary" type="button" id="resumeModuleBtn" disabled>Resume module</button>
           <button class="btn btn--ghost" type="button" onclick="if (window.kiraLearnerSession) { window.kiraLearnerSession.logout('login_signup.html'); } else { window.location.href='login_signup.html'; }">Logout</button>
         </div>
       </header>
@@ -57,7 +56,6 @@
             <p class="eyebrow">Active courses</p>
             <h2 id="courses-title">Your journeys</h2>
           </div>
-          <button class="btn btn--ghost" type="button" data-action="open-course-picker">See course map</button>
         </div>
 
         <div class="course-grid" data-role="course-grid" data-grade="Form 4" data-limit="12">
