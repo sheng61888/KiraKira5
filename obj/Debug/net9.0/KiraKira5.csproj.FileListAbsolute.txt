@@ -328,4 +328,3 @@ C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\refin
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.pdb
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.genruntimeconfig.cache
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\ref\KiraKira5.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\kdf18owrj7-ku353accjc.gz
