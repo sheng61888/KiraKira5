@@ -545,6 +545,7 @@ public class LearnerService : ILearnerService
         var streak = await FetchStreakDtoAsync(learnerId, profile);
         var notifications = await FetchNotificationPreferencesAsync(learnerId);
         var badges = await BuildBadgeStatsAsync(learnerId, profile, streak);
+        var mission = await FetchMissionDtoAsync(learnerId, profile);
 
         return new LearnerProfilePayload
         {
@@ -559,7 +560,8 @@ public class LearnerService : ILearnerService
                 Year = string.IsNullOrWhiteSpace(profile.GradeYear) ? "Year not set" : profile.GradeYear
             },
             Notifications = notifications,
-            Badges = badges
+            Badges = badges,
+            Mission = mission
         };
     }
 
@@ -4020,6 +4022,7 @@ public class LearnerProfilePayload
     public SchoolInfoDto School { get; set; } = new();
     public IEnumerable<NotificationPreferenceDto> Notifications { get; set; } = new List<NotificationPreferenceDto>();
     public LearnerBadgeStatsDto Badges { get; set; } = new();
+    public LearnerMissionDto Mission { get; set; } = new();
 }
 
 public class ContactInfoDto
