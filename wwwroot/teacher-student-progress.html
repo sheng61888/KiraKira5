@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Progress - KiraKira Teacher</title>
+    <link rel="stylesheet" href="../css/learner.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="../images/logo transparent.png" alt="KiraKira Logo">
+            </div>
+            <nav class="nav">
+                <a href="teacher-dashboard.html">Dashboard</a>
+                <a href="teacher-dashboard.html">Assignments</a>
+                <a href="teacher-my-classes.html">My Classes</a>
+                <a href="teacher-student-progress.html" aria-current="page">Student Progress</a>
+                <a href="login_signup.html" onclick="sessionStorage.clear();">Sign Out</a>
+            </nav>
+            </aside>
+
+        <main class="main">
+            <header class="page-heading">
+                <div>
+                    <p class="eyebrow">Teacher Panel</p>
+                    <h1>Student Progress</h1>
+                    <p>View analytics for students in your classes.</p>
+                </div>
+            </header>
+
+            </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/teacher-progress.js"></script>
+</body>
+</html>
