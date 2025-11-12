@@ -101,7 +101,7 @@
       const grid = document.createElement('div');
       grid.className = 'badge-grid';
 
-      collection.rewards.forEach(reward => {
+      [...collection.rewards].sort((a, b) => a.value - b.value).forEach(reward => {
         const unlocked = metricValue >= reward.value;
         grid.appendChild(createBadgeCard(collection, reward, unlocked));
       });

@@ -110,6 +110,43 @@
       }, '🌙')
     },
     {
+      id: 'moduleMastery',
+      title: 'Module Mastery',
+      description: 'Master modules to unlock special rewards.',
+      metric: 'moduleMastery',
+      style: 'mastery',
+      rewards: [
+        {
+          value: 1,
+          label: 'Butter Smooth',
+          image: '../images/module%20mastery/Butter.png',
+          hint: 'Complete your first module.',
+          description: 'Smooth progress on your first module!'
+        },
+        {
+          value: 3,
+          label: 'Nyum Nyum',
+          image: '../images/module%20mastery/Nyum.png',
+          hint: 'Master three modules.',
+          description: 'Delicious knowledge acquired!'
+        },
+        {
+          value: 5,
+          label: 'EEEEEEE',
+          image: '../images/module%20mastery/EEEEEEE.png',
+          hint: 'Complete five modules.',
+          description: 'Excitement overload!'
+        },
+        {
+          value: 8,
+          label: 'DESPAIRRRRR',
+          image: '../images/module%20mastery/DESPAIRRRRR.png',
+          hint: 'Master eight challenging modules.',
+          description: 'You conquered the hardest challenges!'
+        }
+      ]
+    },
+    {
       id: 'hidden',
       title: 'Hidden Relics',
       description: 'Unique challenges that only appear when you do something special.',
@@ -121,7 +158,7 @@
           value: 1,
           label: 'Bronze Whisper',
           lockedLabel: 'Bronze Secret',
-          image: '../images/hidden/bronze.png',
+          image: '../images/level/bronze.png',
           hint: 'Complete onboarding in under 90 seconds.',
           description: 'You sprinted through onboarding with flawless focus.'
         },
@@ -129,7 +166,7 @@
           value: 2,
           label: 'Silver Echo',
           lockedLabel: 'Silver Secret',
-          image: '../images/hidden/silver.png',
+          image: '../images/level/silver.png',
           hint: 'Finish three missions without breaking your streak.',
           description: 'Consistency unlocked this silver companion.'
         },
@@ -137,7 +174,7 @@
           value: 3,
           label: 'Gold Whisper',
           lockedLabel: 'Gold Secret',
-          image: '../images/hidden/gold.png',
+          image: '../images/level/gold.png',
           hint: 'Score 95%+ on a timed mastery quiz.',
           description: 'Your mastery run earned you the golden whisper.'
         },
@@ -145,7 +182,7 @@
           value: 4,
           label: 'Rainbow Myth',
           lockedLabel: 'Mystery Relic',
-          image: '../images/hidden/rare.png',
+          image: '../images/level/rainbow.png',
           hint: 'Complete a rescue plan and share a reflection.',
           description: 'A rare badge gifted for balancing grit with reflection.'
         }
