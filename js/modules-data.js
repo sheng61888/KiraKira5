@@ -54,6 +54,23 @@ window.kiraModules = [
               "Identify the vertex and axis of symmetry",
               "Predict how parameter changes move the curve"
             ],
+            videos: [
+              {
+                title: "Quadratic explainer 1",
+                description: "Orient yourself with why parabolas open up or down.",
+                src: "/videos/quadratic 1.mp4"
+              },
+              {
+                title: "Quadratic explainer 2",
+                description: "Vertex form demo that pins down turning points.",
+                src: "/videos/quadratic 2.mp4"
+              },
+              {
+                title: "Quadratic explainer 3",
+                description: "Connect roots, stretching, and exam-style prompts.",
+                src: "/videos/quadratic 3.mp4"
+              }
+            ],
             cta: {
               label: "Open lesson",
               link: "/html/lessons/lesson-quadratic-functions.html",

@@ -113,6 +113,80 @@
     return getUnits(module).filter(unit => wantsVideos || !(unit.rescueOnly || unit.RescueOnly));
   };
 
+  const setupVideoPlaylist = (wrapperEl, playlist) => {
+    if (!wrapperEl || !Array.isArray(playlist) || !playlist.length) {
+      return;
+    }
+    const videoEl = wrapperEl.querySelector("video");
+    if (!videoEl) {
+      return;
+    }
+    const sourceEl = videoEl.querySelector("source") || videoEl.appendChild(document.createElement("source"));
+    const statusEl = wrapperEl.querySelector("[data-video-status]");
+    const titleEl = wrapperEl.querySelector("[data-video-title]");
+    const prevBtn = wrapperEl.querySelector("[data-video-prev]");
+    const nextBtn = wrapperEl.querySelector("[data-video-next]");
+
+    let index = 0;
+
+    const updateMeta = clip => {
+      if (titleEl) {
+        titleEl.textContent = clip?.title || `Clip ${index + 1}`;
+      }
+      if (statusEl) {
+        statusEl.textContent = `${index + 1} of ${playlist.length}`;
+      }
+      if (prevBtn) {
+        prevBtn.disabled = index === 0;
+      }
+      if (nextBtn) {
+        nextBtn.disabled = index === playlist.length - 1;
+      }
+    };
+
+    const loadClip = (clipIndex, autoplay = false) => {
+      const clip = playlist[clipIndex];
+      if (!clip) {
+        return;
+      }
+      index = clipIndex;
+      sourceEl.src = clip.src || clip.link || "";
+      sourceEl.type = clip.type || "video/mp4";
+      videoEl.load();
+      updateMeta(clip);
+      if (autoplay) {
+        const playPromise = videoEl.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {});
+        }
+      }
+    };
+
+    const goPrevious = () => {
+      if (index === 0) {
+        return;
+      }
+      loadClip(index - 1, true);
+    };
+
+    const goNext = () => {
+      if (index >= playlist.length - 1) {
+        return;
+      }
+      loadClip(index + 1, true);
+    };
+
+    videoEl.addEventListener("ended", goNext);
+    if (prevBtn) {
+      prevBtn.addEventListener("click", goPrevious);
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", goNext);
+    }
+
+    loadClip(0);
+  };
+
   const selectUnit = unitId => {
     const units = state.units || [];
     if (!units.length) {
@@ -180,8 +254,9 @@
     const durationChip = `<span class="chip">${unit.duration || unit.Duration || "Self paced"}</span>`;
     const summary = unit.summary || unit.Summary || "";
     const body = unit.body || unit.Body || "";
-    const objectives = unit.objectives || unit.Objectives || [];
-    const resources = unit.resources || unit.Resources || [];
+    const objectives = Array.isArray(unit.objectives || unit.Objectives) ? unit.objectives || unit.Objectives : [];
+    const resources = Array.isArray(unit.resources || unit.Resources) ? unit.resources || unit.Resources : [];
+    const videos = Array.isArray(unit.videos || unit.Videos) ? unit.videos || unit.Videos : [];
     const cta = unit.cta || unit.Cta;
 
     const objList = objectives.length
@@ -214,6 +289,24 @@
         </ul>`
       : "";
 
+    const hasVideos = videos.length > 0;
+    const videoSection = hasVideos
+      ? `<div class="unit-video-player-wrap">
+           <video class="unit-video-player" controls playsinline preload="metadata" aria-label="Lesson video playlist">
+             <source>
+             Sorry, your browser doesn't support embedded videos.
+           </video>
+           <div class="unit-video-controls">
+             <button type="button" class="btn btn--ghost btn--video-nav" data-video-prev>Previous video</button>
+             <div class="unit-video-meta">
+               <strong data-video-title>&nbsp;</strong>
+               <span class="muted" data-video-status></span>
+             </div>
+             <button type="button" class="btn btn--ghost btn--video-nav" data-video-next>Next video</button>
+           </div>
+         </div>`
+      : "";
+
     const actionButton =
       cta && cta.link
         ? `<a class="btn btn--primary" href="${cta.link}" target="_blank" rel="noopener noreferrer">${cta.label || "Open resource"}</a>`
@@ -232,6 +325,7 @@
       ${summary ? `<p class="unit-summary">${summary}</p>` : ""}
       ${body ? `<p class="unit-body">${body}</p>` : ""}
       ${objList}
+      ${videoSection}
       ${resources.length ? `<h3>Resources</h3>${resourceList}` : ""}
       ${actionButton ? `<div class="unit-cta">${actionButton}</div>` : ""}
       <div class="unit-next">
@@ -240,6 +334,11 @@
         }>${nextLabel}</button>
       </div>
     `;
+
+    if (hasVideos) {
+      const playerWrap = panel.querySelector(".unit-video-player-wrap");
+      setupVideoPlaylist(playerWrap, videos);
+    }
 
     if (nextUnit) {
       const button = panel.querySelector("[data-next-unit]");

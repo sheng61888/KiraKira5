@@ -963,6 +963,39 @@ ul {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
+.lesson-media {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.lesson-video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.lesson-video-card {
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  box-shadow: var(--shadow-card);
+}
+
+.lesson-video-card video {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #05070f;
+  display: block;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
 .lesson-summary ul {
   padding-left: 1.2rem;
   margin: 0.6rem 0 0.8rem;
@@ -2226,6 +2259,51 @@ ul {
 
 .unit-objectives li {
   margin-bottom: 0.35rem;
+}
+
+.unit-video-player-wrap {
+  margin: 1.25rem 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.unit-video-player {
+  display: block;
+  width: 100%;
+  background: #05070f;
+  aspect-ratio: 16 / 9;
+}
+
+.unit-video-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn--video-nav {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.9rem;
+}
+
+.unit-video-meta {
+  flex: 1;
+  text-align: center;
+}
+
+.unit-video-meta strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.unit-video-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .unit-resource-list {
