@@ -5,25 +5,26 @@ using System.Text.Json;
 [Route("api/[controller]")]
 public class TeacherController : ControllerBase
 {
-    private readonly AssignmentService _assignmentService;
+    private readonly TeacherService _teacherService;
 
     public TeacherController(IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("KiraKiraDB");
-        _assignmentService = new AssignmentService(connectionString);
+        _teacherService = new TeacherService(connectionString);
     }
 
-    [HttpGet("students")]
-    public async Task<IActionResult> GetAvailableStudents()
+    [HttpGet("classes")]
+    public async Task<IActionResult> GetTeacherClasses()
     {
         try
         {
-            var students = await _assignmentService.GetAvailableStudentsAsync();
-            return Ok(students);
+            var teacherId = GetCurrentTeacherId(); // Implement this based on your auth
+            var classes = await _teacherService.GetTeacherClassesAsync(teacherId);
+            return Ok(classes);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Error retrieving students", error = ex.Message });
+            return StatusCode(500, new { message = "Error retrieving classes", error = ex.Message });
         }
     }
 
@@ -32,7 +33,7 @@ public class TeacherController : ControllerBase
     {
         try
         {
-            var courses = await _assignmentService.GetAvailableCoursesAsync();
+            var courses = await _teacherService.GetAvailableCoursesAsync();
             return Ok(courses);
         }
         catch (Exception ex)
@@ -41,12 +42,13 @@ public class TeacherController : ControllerBase
         }
     }
 
-    [HttpGet("{teacherId}/assignments")]
-    public async Task<IActionResult> GetTeacherAssignments(string teacherId)
+    [HttpGet("assignments")]
+    public async Task<IActionResult> GetTeacherAssignments()
     {
         try
         {
-            var assignments = await _assignmentService.GetTeacherAssignmentsAsync(teacherId);
+            var teacherId = GetCurrentTeacherId();
+            var assignments = await _teacherService.GetTeacherAssignmentsAsync(teacherId);
             return Ok(assignments);
         }
         catch (Exception ex)
@@ -55,66 +57,56 @@ public class TeacherController : ControllerBase
         }
     }
 
-    [HttpPost("assign")]
-    public async Task<IActionResult> AssignCourse([FromBody] AssignCourseRequest request)
+    [HttpPost("assignments")]
+    public async Task<IActionResult> CreateAssignment([FromBody] CreateAssignmentRequest request)
     {
         try
         {
-            bool result;
-            
-            if (request.StudentIds.Count == 1)
+            var assignment = new TeacherAssignmentDto
             {
-                result = await _assignmentService.AssignCourseToStudentAsync(
-                    request.TeacherId, 
-                    request.StudentIds[0], 
-                    request.CourseId, 
-                    request.Deadline
-                );
-            }
-            else
-            {
-                result = await _assignmentService.AssignCourseToMultipleStudentsAsync(
-                    request.TeacherId, 
-                    request.StudentIds, 
-                    request.CourseId, 
-                    request.Deadline
-                );
-            }
+                TeacherId = GetCurrentTeacherId(),
+                ClassId = request.ClassId,
+                Title = request.Title,
+                CourseName = request.CourseName,
+                Deadline = request.Deadline
+            };
 
+            var result = await _teacherService.CreateAssignmentAsync(assignment);
+            
             if (result)
             {
-                return Ok(new { message = "Course assigned successfully" });
+                return Ok(new { message = "Assignment created successfully" });
             }
             else
             {
-                return BadRequest(new { message = "Failed to assign course" });
+                return BadRequest(new { message = "Failed to create assignment" });
             }
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Error assigning course", error = ex.Message });
+            return StatusCode(500, new { message = "Error creating assignment", error = ex.Message });
         }
     }
 
-    [HttpPut("assignments/{assignmentId}/deadline")]
-    public async Task<IActionResult> UpdateDeadline(int assignmentId, [FromBody] UpdateDeadlineRequest request)
+    [HttpPut("assignments/{assignmentId}/status")]
+    public async Task<IActionResult> UpdateAssignmentStatus(int assignmentId, [FromBody] UpdateStatusRequest request)
     {
         try
         {
-            var result = await _assignmentService.UpdateAssignmentDeadlineAsync(assignmentId, request.NewDeadline);
+            var result = await _teacherService.UpdateAssignmentStatusAsync(assignmentId, request.Status);
             
             if (result)
             {
-                return Ok(new { message = "Deadline updated successfully" });
+                return Ok(new { message = "Assignment status updated successfully" });
             }
             else
             {
-                return BadRequest(new { message = "Failed to update deadline" });
+                return BadRequest(new { message = "Failed to update assignment status" });
             }
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Error updating deadline", error = ex.Message });
+            return StatusCode(500, new { message = "Error updating assignment status", error = ex.Message });
         }
     }
 
@@ -123,7 +115,7 @@ public class TeacherController : ControllerBase
     {
         try
         {
-            var result = await _assignmentService.DeleteAssignmentAsync(assignmentId);
+            var result = await _teacherService.DeleteAssignmentAsync(assignmentId);
             
             if (result)
             {
@@ -139,17 +131,24 @@ public class TeacherController : ControllerBase
             return StatusCode(500, new { message = "Error deleting assignment", error = ex.Message });
         }
     }
+
+    private string GetCurrentTeacherId()
+    {
+        // Implement based on your authentication system
+        // This could come from JWT token, session, etc.
+        return "teacher123"; // Placeholder - replace with actual implementation
+    }
 }
 
-public class AssignCourseRequest
+public class CreateAssignmentRequest
 {
-    public string TeacherId { get; set; }
-    public List<string> StudentIds { get; set; }
-    public int CourseId { get; set; }
+    public string ClassId { get; set; }
+    public string Title { get; set; }
+    public string CourseName { get; set; }
     public DateTime Deadline { get; set; }
 }
 
-public class UpdateDeadlineRequest
+public class UpdateStatusRequest
 {
-    public DateTime NewDeadline { get; set; }
+    public string Status { get; set; }
 }

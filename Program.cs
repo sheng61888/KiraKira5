@@ -13,6 +13,8 @@ builder.Services.AddScoped<ILearnerService, LearnerService>();
 builder.Services.AddScoped<CourseService>(sp => 
     new CourseService(builder.Configuration.GetConnectionString("KiraKiraDB")));
 builder.Services.AddCors(options =>
+builder.Services.AddScoped<TeacherService>(sp => 
+    new TeacherService(builder.Configuration.GetConnectionString("KiraKiraDB")));
 {
     options.AddDefaultPolicy(policy =>
     {
