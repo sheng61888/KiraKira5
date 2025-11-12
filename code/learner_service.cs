@@ -30,6 +30,7 @@ public interface ILearnerService
     Task<ModuleSelectionResponse> AddModuleSelectionAsync(string learnerId, ModuleSelectionRequest request);
     Task<ModuleSelectionResponse> RemoveModuleSelectionAsync(string learnerId, string moduleId);
     Task<ModuleProgressResponse> LogModuleProgressAsync(string learnerId, ModuleProgressLogRequest request);
+    Task<LiveProgressSnapshotDto> GetLiveProgressSnapshotAsync();
 }
 
 /// <summary>
@@ -465,6 +466,76 @@ public class LearnerService : ILearnerService
         response.UnitId = normalizedUnitId;
         response.Status = request?.Status ?? "completed";
         return response;
+    }
+
+    public async Task<LiveProgressSnapshotDto> GetLiveProgressSnapshotAsync()
+    {
+        var snapshot = new LiveProgressSnapshotDto
+        {
+            AccuracyWindowLabel = "Last 7 days",
+            AssignmentsWindowLabel = "All time",
+            StreakWindowLabel = "This week"
+        };
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return snapshot;
+            }
+
+            const string streakSql = @"SELECT
+                                            COALESCE(AVG(current_streak), 0) AS avg_streak,
+                                            SUM(CASE WHEN last_activity_on >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS active_learners
+                                       FROM learner_streak";
+
+            await using (var streakCommand = new MySqlCommand(streakSql, connection))
+            await using (var streakReader = await streakCommand.ExecuteReaderAsync())
+            {
+                if (await streakReader.ReadAsync())
+                {
+                    snapshot.AverageStreakDays = SafeToDouble(streakReader["avg_streak"], snapshot.AverageStreakDays);
+                    snapshot.ActiveLearnerCount = SafeToInt(streakReader["active_learners"], snapshot.ActiveLearnerCount);
+                }
+            }
+
+            const string accuracySql = @"SELECT
+                                            COALESCE(AVG(score_percent), 0) AS avg_score,
+                                            COUNT(*) AS attempts
+                                         FROM learner_module_quiz_log
+                                         WHERE module_id LIKE 'form5-%'
+                                           AND completed_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)";
+
+            await using (var accuracyCommand = new MySqlCommand(accuracySql, connection))
+            await using (var accuracyReader = await accuracyCommand.ExecuteReaderAsync())
+            {
+                if (await accuracyReader.ReadAsync())
+                {
+                    snapshot.Form5AccuracyPercent = SafeToDouble(accuracyReader["avg_score"], snapshot.Form5AccuracyPercent);
+                    snapshot.Form5AttemptCount = SafeToInt(accuracyReader["attempts"], snapshot.Form5AttemptCount);
+                }
+            }
+
+            const string assignmentsSql = @"SELECT
+                                                SUM(CASE WHEN completion_percent >= 100 THEN 1 ELSE 0 END) AS completed
+                                            FROM learner_assignments";
+
+            await using (var assignmentsCommand = new MySqlCommand(assignmentsSql, connection))
+            await using (var assignmentsReader = await assignmentsCommand.ExecuteReaderAsync())
+            {
+                if (await assignmentsReader.ReadAsync())
+                {
+                    snapshot.AssignmentsCompleted = SafeToInt(assignmentsReader["completed"], snapshot.AssignmentsCompleted);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to build live progress snapshot: {ex.Message}");
+        }
+
+        return snapshot;
     }
 
     public async Task<LearnerProfilePayload> GetProfileAsync(string learnerId)
@@ -1707,6 +1778,21 @@ public class LearnerService : ILearnerService
         }
 
         if (int.TryParse(value.ToString(), out var parsed))
+        {
+            return parsed;
+        }
+
+        return fallback;
+    }
+
+    private static double SafeToDouble(object? value, double fallback)
+    {
+        if (value == null || value == DBNull.Value)
+        {
+            return fallback;
+        }
+
+        if (double.TryParse(value.ToString(), out var parsed))
         {
             return parsed;
         }
@@ -3596,6 +3682,18 @@ public class ModuleProgressResponse
     public string UnitId { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public IEnumerable<ModuleCardDto> ActiveModules { get; set; } = new List<ModuleCardDto>();
+}
+
+public class LiveProgressSnapshotDto
+{
+    public double AverageStreakDays { get; set; }
+    public int ActiveLearnerCount { get; set; }
+    public double Form5AccuracyPercent { get; set; }
+    public int Form5AttemptCount { get; set; }
+    public int AssignmentsCompleted { get; set; }
+    public string StreakWindowLabel { get; set; } = string.Empty;
+    public string AccuracyWindowLabel { get; set; } = string.Empty;
+    public string AssignmentsWindowLabel { get; set; } = string.Empty;
 }
 
 public class ModuleCatalogueSectionDto
