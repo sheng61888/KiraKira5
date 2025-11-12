@@ -69,7 +69,21 @@
 
     const grade = grid.dataset.grade || "Form 4";
     const limit = parseInt(grid.dataset.limit || "3", 10);
-    const selectedModules = activeModules().filter(Boolean);
+    const selectedModules = activeModules()
+      .filter(Boolean)
+      .sort((a, b) => {
+        const gradeA = (a.grade || "").toLowerCase();
+        const gradeB = (b.grade || "").toLowerCase();
+        if (gradeA !== gradeB) {
+          return gradeA.localeCompare(gradeB);
+        }
+        const numA = parseInt(a.number, 10);
+        const numB = parseInt(b.number, 10);
+        if (Number.isFinite(numA) && Number.isFinite(numB)) {
+          return numA - numB;
+        }
+        return String(a.number || "").localeCompare(String(b.number || ""));
+      });
 
     if (!selectedModules.length) {
       grid.innerHTML = '<p class="muted">No courses added yet. Use "See course map" to add topics to your dashboard.</p>';
@@ -83,7 +97,9 @@
 
       const number = document.createElement("span");
       number.className = "module-number";
-      number.textContent = `Module ${module.number}`;
+      const gradeLabel = (module.grade || grade).replace(/\s+/g, " ").trim() || "Form";
+      const moduleNo = String(module.number || "").padStart(2, "0");
+      number.textContent = `${gradeLabel.toUpperCase()} - MODULE ${moduleNo}`;
 
       const title = document.createElement("h3");
       title.innerHTML = module.link ? `<a href="${module.link}">${module.title}</a>` : module.title;

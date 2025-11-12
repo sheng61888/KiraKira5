@@ -50,43 +50,6 @@
         </div>
       </header>
 
-      <section class="card mission-card" id="missionCard" aria-live="polite">
-        <div>
-          <p class="eyebrow" id="missionBadge">Preparing your path</p>
-          <h2 id="missionTitle">Loading mission briefing...</h2>
-          <p class="mood" id="missionMood">Hang tight while we fetch the latest guidance.</p>
-          <div class="mission-chip-stack" id="missionChips">
-            <span class="chip">Syncing...</span>
-          </div>
-        </div>
-        <div class="mission-actions">
-          <strong id="missionConfidence">0%</strong>
-          <small>SPM readiness</small>
-          <button class="btn btn--primary" type="button" id="missionActionBtn">Loading...</button>
-        </div>
-      </section>
-
-      <!-- Daily Goal + Stats -->
-      <section class="card card--glow daily-goal" aria-labelledby="goal-title">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Today's goal</p>
-            <h2 id="goal-title">Set a goal to unlock guidance</h2>
-          </div>
-          <span class="chip chip--success" aria-live="polite">Waiting for update</span>
-        </div>
-        <p>Goals appear here once your plan or coach sets a target.</p>
-        <div class="goal-meta">
-          <span>Progress</span>
-          <strong aria-live="polite">0%</strong>
-        </div>
-        <div class="meter goal-bar"><span style="width:0%"></span></div>
-      </section>
-
-      <section class="grid stats-grid" aria-label="Learning stats">
-        <p class="muted">Learning stats will appear here once your dashboard loads.</p>
-      </section>
-
       <!-- Courses Section -->
       <section class="card courses" aria-labelledby="courses-title">
         <div class="section-head">
@@ -97,12 +60,30 @@
           <button class="btn btn--ghost" type="button" data-action="open-course-picker">See course map</button>
         </div>
 
-        <div class="course-grid" data-role="course-grid" data-grade="Form 4" data-limit="3">
+        <div class="course-grid" data-role="course-grid" data-grade="Form 4" data-limit="12">
           <p class="muted">Loading your modules.</p>
         </div>
         <noscript>
           <p class="muted">JavaScript is required to see your current modules.</p>
         </noscript>
+      </section>
+
+      <!-- Learning stats -->
+      <section class="grid stats-grid" aria-label="Learning stats">
+        <p class="muted">Learning stats will appear here once your dashboard loads.</p>
+      </section>
+
+      <!-- Notifications -->
+      <section class="card notification-panel" aria-labelledby="notification-title">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Updates</p>
+            <h2 id="notification-title">Notification center</h2>
+          </div>
+          <button class="btn btn--ghost" type="button" data-action="clear-notifications">Clear all</button>
+        </div>
+        <p class="muted notification-empty" data-role="notification-empty">No notifications yet. Complete a lesson, extend your streak, or unlock a badge to see updates here.</p>
+        <ul class="notification-list" id="notificationList" aria-live="polite"></ul>
       </section>
 
       <section class="card achievements">
@@ -145,5 +126,7 @@
       </div>
     </div>
   </div>
+
+  <div class="notification-toast-stack" id="notificationToasts" aria-live="assertive" aria-atomic="false"></div>
 </body>
 </html>

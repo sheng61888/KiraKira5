@@ -16,7 +16,11 @@
     editMottoBtn: "#editMottoBtn",
     editInfoBtn: "#editInfoBtn",
     infoForm: "#personalInfoForm",
-    infoActions: "[data-info-actions]"
+    infoActions: "[data-info-actions]",
+    introToggle: "#introVideosToggle",
+    introLabel: "#introVideosLabel",
+    introHint: "#introVideosHint",
+    introStatus: "[data-intro-status]"
   };
 
   const state = {
@@ -28,7 +32,8 @@
       email: ""
     },
     editingMotto: false,
-    editingInfo: false
+    editingInfo: false,
+    mission: null
   };
 
   const resolveAvatarUrl = value => {
@@ -126,6 +131,96 @@
     });
     resetInfoButtonLabel();
   }
+
+  const setIntroStatus = (text, tone = "info") => {
+    const chip = document.querySelector(selectors.introStatus);
+    if (!chip) {
+      return;
+    }
+    chip.textContent = text;
+    chip.classList.remove("chip--success", "chip--info");
+    chip.classList.add(tone === "success" ? "chip--success" : "chip--info");
+  };
+
+  const renderStudyPreferences = (mission, options = {}) => {
+    const toggle = document.querySelector(selectors.introToggle);
+    if (!toggle) {
+      return;
+    }
+    const wantsVideos = !!mission?.wantsVideos;
+    toggle.checked = wantsVideos;
+
+    const label = document.querySelector(selectors.introLabel);
+    if (label) {
+      label.textContent = wantsVideos ? "Intro videos on" : "Intro videos off";
+    }
+
+    const hint = document.querySelector(selectors.introHint);
+    if (hint) {
+      hint.textContent = wantsVideos
+        ? "We'll keep adding quick explainers before tricky drills."
+        : "We'll skip the intro explainers until you turn this back on.";
+    }
+
+    if (!options.skipStatus) {
+      setIntroStatus("Auto-saves");
+    }
+  };
+
+  const saveIntroPreference = async wantsVideos => {
+    setIntroStatus("Saving...");
+    const session = window.kiraLearnerSession;
+    if (!session) {
+      throw new Error("Session unavailable");
+    }
+    const learnerId = session.ensureId();
+    if (!learnerId) {
+      throw new Error("Missing learner");
+    }
+
+    const payload = {
+      grade: state.mission?.grade || "Form 4",
+      readiness: state.mission?.confidence ?? 50,
+      wantsVideos
+    };
+
+    const response = await session.fetch("mission", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      throw new Error(`Mission update failed with status ${response.status}`);
+    }
+    const mission = await response.json();
+    state.mission = mission;
+    renderStudyPreferences(mission);
+    setIntroStatus("Saved", "success");
+    window.setTimeout(() => setIntroStatus("Auto-saves"), 2500);
+  };
+
+  const bindStudyPreferenceToggle = () => {
+    const toggle = document.querySelector(selectors.introToggle);
+    if (!toggle || toggle.dataset.wired === "true") {
+      return;
+    }
+    toggle.dataset.wired = "true";
+    toggle.addEventListener("change", async event => {
+      if (!state.mission) {
+        state.mission = { grade: "Form 4", confidence: 50, wantsVideos: event.target.checked };
+      }
+      const wantsVideos = !!event.target.checked;
+      try {
+        await saveIntroPreference(wantsVideos);
+      } catch (error) {
+        console.error("Unable to update intro videos preference", error);
+        event.target.checked = !wantsVideos;
+        renderStudyPreferences(state.mission, { skipStatus: true });
+        setIntroStatus("Unable to save");
+        window.setTimeout(() => setIntroStatus("Auto-saves"), 2500);
+      }
+    });
+  };
 
   const updateInfoForm = (profile, contact, school) => {
     const nameField = document.querySelector(selectors.nameInput);
@@ -565,6 +660,8 @@
       updateInfoForm(data.profile, data.contact, data.school);
       renderNotifications(data.notifications);
       broadcastBadges(data.badges);
+      state.mission = data.mission || state.mission;
+      renderStudyPreferences(state.mission);
       checkPasswordResetStatus();
     } catch (error) {
       console.error("Unable to load learner profile", error);
@@ -576,6 +673,8 @@
     bindAvatarPicker();
     bindMottoEditor();
     bindInfoEditor();
+    bindStudyPreferenceToggle();
+    renderStudyPreferences(state.mission, { skipStatus: true });
     fetchProfile();
   });
 
