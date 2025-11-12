@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Teacher Dashboard | KiraKira</title>
     
-    <link rel="stylesheet" href="../css/style.css" /> 
+    <link rel="stylesheet" href="css/style.css" /> 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     
     <style>
+        /* This is the CSS from your PHP file, now in the HTML */
         body { font-family: 'Inter', sans-serif; background: #f9f9f9; }
         .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
         .header { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -93,11 +94,11 @@
 
     <header class="header">
         <nav class="container nav-container">
-            <a href="home.php" class="brand-logo">KiraKira</a>
+            <a href="home.html" class="brand-logo">KiraKira</a>
             <div class="nav-links">
-                <a href="teacher-dashboard.php">My Dashboard</a>
+                <a href="teacher-dashboard.html">My Dashboard</a>
                 <a href="catalogue-classes.html">Catalogue</a>
-                <a href="logout.html">Logout</a>
+                <a href="login_signup.html">Logout</a>
             </div>
         </nav>
     </header>
@@ -180,7 +181,16 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // This JavaScript will power the page
+        // THIS JAVASCRIPT IS DIFFERENT.
+        // It calls your new .NET API endpoints, not api.php.
+        
+        // Define the new API paths
+        const API_PATHS = {
+            getData: '/api/assignment-data',  // Gets courses, classes, assignments
+            create: '/api/assignments',       // POST to create
+            delete: '/api/assignments'        // DELETE to remove
+        };
+    
         $(document).ready(function() {
             loadInitialData();
             $('#assignCourse').on('change', function() { loadChapters($(this).val()); });
@@ -193,30 +203,24 @@
         async function loadInitialData() {
             statusOverlay.show().find('p').text('Loading Data...');
             try {
-                const [coursesRes, classesRes, assignmentsRes] = await Promise.all([
-                    fetch('api.php?action=get_courses_and_subchapters'),
-                    fetch('api.php?action=get_classes'),
-                    fetch('api.php?action=get_assignments')
-                ]);
-
-                const coursesData = await coursesRes.json();
-                const classesData = await classesRes.json();
-                const assignmentsData = await assignmentsRes.json();
+                // Fetch all data from our new C# endpoint
+                const response = await fetch(API_PATHS.getData);
+                const data = await response.json(); // Expects { courses: [], classes: [], assignments: [] }
 
                 const courseSelect = $('#assignCourse');
                 courseSelect.empty().append('<option value="">Select a course</option>');
-                window.allCoursesData = coursesData;
-                coursesData.forEach(course => {
+                window.allCoursesData = data.courses; // Store data
+                data.courses.forEach(course => {
                     courseSelect.append(`<option value="${course.course_id}">${course.title}</option>`);
                 });
 
                 const classSelect = $('#assignClass');
                 classSelect.empty().append('<option value="">Select a class</option>');
-                classesData.forEach(cls => {
+                data.classes.forEach(cls => {
                     classSelect.append(`<option value="${cls.class_id}">${cls.title}</option>`);
                 });
 
-                populateAssignmentsTable(assignmentsData);
+                populateAssignmentsTable(data.assignments);
             } catch (err) {
                 console.error(err);
                 alert('Error loading page data.');
@@ -224,7 +228,30 @@
                 statusOverlay.hide();
             }
         }
-
+        
+        function populateAssignmentsTable(assignments) {
+            const tableBody = $('#assignmentsTableBody').empty();
+            if (!assignments || assignments.length === 0) {
+                tableBody.append('<tr><td colspan="5">No assignments found.</td></tr>');
+                return;
+            }
+            assignments.forEach(a => {
+                const row = `
+                    <tr>
+                        <td>${a.title}</td>
+                        <td>${a.class_title}</td>
+                        <td>${a.content_title}</td>
+                        <td>${a.deadline}</td>
+                        <td class="actions">
+                            <button class="btn btn--danger" onclick="deleteAssignment(${a.assignment_id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.append(row);
+            });
+        }
+        
+        // --- These functions are unchanged ---
         function loadChapters(courseId) {
             const chapterSelect = $('#assignChapter').empty().append('<option value="">Assign whole course</option>');
             $('#assignSubchapter').empty().append('<option value="">Assign whole chapter</option>');
@@ -250,42 +277,21 @@
                 });
             }
         }
-
-        function populateAssignmentsTable(assignments) {
-            const tableBody = $('#assignmentsTableBody').empty();
-            if (!assignments || assignments.length === 0) {
-                tableBody.append('<tr><td colspan="5">No assignments found.</td></tr>');
-                return;
-            }
-            assignments.forEach(a => {
-                const row = `
-                    <tr>
-                        <td>${a.title}</td>
-                        <td>${a.class_title}</td>
-                        <td>${a.content_title}</td>
-                        <td>${a.deadline}</td>
-                        <td class="actions">
-                            <button class="btn btn--danger" onclick="deleteAssignment(${a.assignment_id})">Delete</button>
-                        </td>
-                    </tr>
-                `;
-                tableBody.append(row);
-            });
-        }
+        // --- End of unchanged functions ---
 
         async function createAssignment() {
             statusOverlay.show().find('p').text('Creating Assignment...');
             const assignmentData = {
                 title: $('#assignTitle').val(),
-                class_id: $('#assignClass').val(),
-                course_id: $('#assignCourse').val(),
-                chapter_id: $('#assignChapter').val() || null,
-                subchapter_id: $('#assignSubchapter').val() || null,
+                class_id: parseInt($('#assignClass').val()),
+                course_id: parseInt($('#assignCourse').val()),
+                chapter_id: parseInt($('#assignChapter').val()) || null,
+                subchapter_id: parseInt($('#assignSubchapter').val()) || null,
                 deadline: $('#assignDeadline').val()
             };
 
             try {
-                const response = await fetch('api.php?action=create_assignment', {
+                const response = await fetch(API_PATHS.create, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(assignmentData)
@@ -294,9 +300,14 @@
                 if (result.status === 'success') {
                     alert('Assignment created!');
                     $('#assignmentForm')[0].reset();
-                    const assignmentsRes = await fetch('api.php?action=get_assignments');
-                    const assignmentsData = await assignmentsRes.json();
-                    populateAssignmentsTable(assignmentsData);
+                    // Just add the new row locally to avoid a full reload
+                    const newAssignment = {
+                        ...assignmentData,
+                        assignment_id: result.new_id,
+                        class_title: $('#assignClass option:selected').text(),
+                        content_title: $('#assignSubchapter option:selected').text() || $('#assignChapter option:selected').text() || $('#assignCourse option:selected').text()
+                    };
+                    populateAssignmentsTable([newAssignment, ...window.allAssignments]);
                 } else {
                     throw new Error(result.error);
                 }
@@ -312,10 +323,8 @@
             if (!confirm('Are you sure you want to delete this assignment?')) return;
             statusOverlay.show().find('p').text('Deleting...');
             try {
-                const response = await fetch('api.php?action=delete_assignment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ assignment_id: assignmentId })
+                const response = await fetch(`${API_PATHS.delete}/${assignmentId}`, {
+                    method: 'DELETE'
                 });
                 const result = await response.json();
                 if (result.status === 'success') {
@@ -333,3 +342,79 @@
     </script>
 </body>
 </html>
+<section class="assignments-section" style="padding: 2rem 0;">
+    <div class="container">
+        <h2>Course Assignments</h2>
+        
+        <!-- Assignment Form -->
+        <div class="assignment-card" style="background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h3>Assign New Course</h3>
+            <form id="assignmentForm">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="courseSelect">Select Course:</label>
+                    <select id="courseSelect" class="form-control" required>
+                        <option value="">Choose a course...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="studentSelect">Select Students:</label>
+                    <select id="studentSelect" class="form-control" multiple style="height: 120px;">
+                    </select>
+                    <small class="text-muted">Hold Ctrl/Cmd to select multiple students</small>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="deadline">Deadline:</label>
+                    <input type="datetime-local" id="deadline" class="form-control" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Assign Course</button>
+            </form>
+        </div>
+
+        <!-- Current Assignments -->
+        <div class="assignments-list">
+            <h3>Current Assignments</h3>
+            <div id="assignmentsTable" class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Assigned Date</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignmentsBody">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Edit Deadline Modal -->
+<div id="editDeadlineModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Deadline</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editDeadlineForm">
+                    <input type="hidden" id="editAssignmentId">
+                    <div class="form-group">
+                        <label for="newDeadline">New Deadline:</label>
+                        <input type="datetime-local" id="newDeadline" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Deadline</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
