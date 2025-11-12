@@ -293,45 +293,6 @@ public class UserManagement
             return false;
         }
     }
-    
-    /// <summary>
-    /// Gets statistics for learners and teachers
-    /// </summary>
-    public static UserStats GetUserStats()
-    {
-        string connectionString = _configuration.GetConnectionString("KiraKiraDB");
-        
-        try
-        {
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                
-                string query = "SELECT COUNT(*) FROM usertable WHERE LOWER(usertype) = @Type";
-                
-                int learners = 0;
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Type", "learner");
-                    learners = Convert.ToInt32(command.ExecuteScalar());
-                }
-                
-                int teachers = 0;
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Type", "teacher");
-                    teachers = Convert.ToInt32(command.ExecuteScalar());
-                }
-                
-                return new UserStats { Learners = learners, Teachers = teachers };
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting user stats: {ex.Message}");
-            return new UserStats();
-        }
-    }
 }
 
 /// <summary>
@@ -344,13 +305,4 @@ public class User
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents user statistics
-/// </summary>
-public class UserStats
-{
-    public int Learners { get; set; }
-    public int Teachers { get; set; }
 }

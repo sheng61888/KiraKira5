@@ -100,16 +100,6 @@ public class UserController : ControllerBase
         var result = UserManagement.DeleteUser(id);
         return Ok(new { success = result });
     }
-    
-    /// <summary>
-    /// Gets statistics for learners and teachers
-    /// </summary>
-    [HttpGet("stats")]
-    public IActionResult GetStats()
-    {
-        var stats = UserManagement.GetUserStats();
-        return Ok(stats);
-    }
 }
 
 public class LoginRequest
