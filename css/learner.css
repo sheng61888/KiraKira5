@@ -1361,10 +1361,6 @@ ul {
   border-color: rgba(118, 210, 255, 0.8);
 }
 
-.badge-collection[data-style="mastery"] .badge-card.unlocked {
-  border-color: rgba(255, 154, 162, 0.8);
-}
-
 .badge-collection[data-style="hidden"] .badge-card {
   border-style: dashed;
 }
