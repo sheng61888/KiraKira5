@@ -204,4 +204,94 @@ public class AdminService
             return new List<object>();
         }
     }
+    
+    /// <summary>
+    /// Tracks a website visit
+    /// </summary>
+    public static async Task TrackVisitAsync(IConfiguration configuration)
+    {
+        string connectionString = configuration.GetConnectionString("KiraKiraDB");
+        
+        try
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                string query = "INSERT INTO website_visits (visit_date) VALUES (NOW())";
+                
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error tracking visit: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Gets website visit statistics grouped by date
+    /// </summary>
+    public static async Task<List<object>> GetVisitStatsAsync(IConfiguration configuration, string year = null, string month = null)
+    {
+        string connectionString = configuration.GetConnectionString("KiraKiraDB");
+        
+        try
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                string query = "SELECT DATE(visit_date) as date, COUNT(*) as count FROM website_visits WHERE 1=1";
+                
+                if (!string.IsNullOrEmpty(year))
+                {
+                    query += " AND YEAR(visit_date) = @year";
+                }
+                
+                if (!string.IsNullOrEmpty(month))
+                {
+                    query += " AND MONTH(visit_date) = @month";
+                }
+                
+                if (string.IsNullOrEmpty(year) && string.IsNullOrEmpty(month))
+                {
+                    query += " AND visit_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+                }
+                
+                query += " GROUP BY DATE(visit_date) ORDER BY date";
+                
+                var stats = new List<object>();
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    if (!string.IsNullOrEmpty(year))
+                    {
+                        command.Parameters.AddWithValue("@year", year);
+                    }
+                    if (!string.IsNullOrEmpty(month))
+                    {
+                        command.Parameters.AddWithValue("@month", month);
+                    }
+                    
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            stats.Add(new {
+                                date = reader.GetDateTime(0).ToString("yyyy-MM-dd"),
+                                count = reader.GetInt32(1)
+                            });
+                        }
+                    }
+                }
+                return stats;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting visit stats: {ex.Message}");
+            return new List<object>();
+        }
+    }
 }
