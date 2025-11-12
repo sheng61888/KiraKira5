@@ -124,6 +124,26 @@ function closeModal() {
 }
 
 // Admin Dashboard JavaScript
+if (!sessionStorage.getItem('systemStartTime')) {
+    sessionStorage.setItem('systemStartTime', Date.now());
+}
+
+function updateSystemUptime() {
+    const startTime = parseInt(sessionStorage.getItem('systemStartTime'));
+    const uptime = Date.now() - startTime;
+    const days = Math.floor(uptime / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((uptime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((uptime % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((uptime % (1000 * 60)) / 1000);
+    
+    let uptimeText = '';
+    if (days > 0) uptimeText += `${days}d `;
+    if (hours > 0 || days > 0) uptimeText += `${hours}h `;
+    uptimeText += `${minutes}m ${seconds}s`;
+    
+    document.getElementById('systemUptime').textContent = uptimeText;
+}
+
 async function loadDashboardStats() {
     try {
         const response = await fetch('/api/admin/total-users');
@@ -138,6 +158,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load dashboard stats if on dashboard page
     if (document.getElementById('totalUsers')) {
         loadDashboardStats();
+    }
+    
+    // Update system uptime if on dashboard page
+    if (document.getElementById('systemUptime')) {
+        updateSystemUptime();
+        setInterval(updateSystemUptime, 1000);
     }
     
     // Initialize user management if on that page

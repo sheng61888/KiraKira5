@@ -2,7 +2,7 @@ using MySql.Data.MySqlClient;
 
 public class DatabaseConnection
 {
-    private static string connectionString = "Server=0.tcp.ap.ngrok.io;Port=13075;Database=kirakiradb;Uid=root;Pwd=Sheng#0618;";
+    private static string connectionString = "Server=0.tcp.ap.ngrok.io;Port=16522;Database=kirakiradb;Uid=root;Pwd=Sheng#0618;";
     
     public static MySqlConnection GetConnection()
     {
