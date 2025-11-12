@@ -483,6 +483,133 @@ ul {
   margin-bottom: 0.4rem;
 }
 
+.notification-panel .section-head {
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.notification-panel .section-head .btn {
+  align-self: center;
+}
+
+.notification-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.notification-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.notification-item {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.notification-item[data-kind="level"],
+.notification-toast[data-kind="level"] {
+  border-left-color: var(--highlight);
+}
+
+.notification-item[data-kind="streak"],
+.notification-toast[data-kind="streak"] {
+  border-left-color: var(--success);
+}
+
+.notification-item[data-kind="badge"],
+.notification-toast[data-kind="badge"] {
+  border-left-color: var(--info);
+}
+
+.notification-item__body h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.notification-item__body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.notification-item__time {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.notification-toast-stack {
+  position: fixed;
+  top: clamp(0.75rem, 2vw, 1.5rem);
+  right: clamp(0.75rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: min(320px, 90vw);
+  z-index: 999;
+}
+
+.notification-toast {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  background: rgba(21, 24, 46, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow-card);
+  animation: toast-slide-in 0.25s ease forwards;
+}
+
+.notification-toast__content h4 {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+}
+
+.notification-toast__content p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.notification-toast button {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.notification-toast button:hover {
+  color: var(--text);
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .course-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -511,6 +638,53 @@ ul {
   margin: 0;
   font-size: 1.1rem;
   color: var(--highlight);
+}
+
+.card.courses {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid rgba(205, 179, 240, 0.35);
+  box-shadow:
+    0 0 0 2px rgba(205, 179, 240, 0.2),
+    0 0 30px rgba(118, 210, 255, 0.2);
+}
+
+.card.courses::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: inherit;
+  border: 1px solid rgba(205, 179, 240, 0.5);
+  filter: blur(12px);
+  opacity: 0.9;
+  z-index: 0;
+}
+
+.card.courses > * {
+  position: relative;
+  z-index: 1;
+}
+
+.study-preferences {
+  margin-top: var(--gap);
+}
+
+.study-preferences__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 1rem;
+  cursor: pointer;
+}
+
+.study-preferences__toggle .toggle-label {
+  font-weight: 600;
+}
+
+.study-preferences__note {
+  margin-top: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .course-card h3 a {
@@ -700,14 +874,23 @@ ul {
   text-align: center;
 }
 
-.mission-actions strong {
-  display: block;
-  font-size: 1.4rem;
+.mission-actions .mission-status {
+  font-weight: 600;
+  margin: 0;
   color: var(--highlight);
+}
+
+.mission-actions .mission-support {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 .mission-actions small {
   color: var(--muted);
+  display: block;
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
 }
 
 .mission-actions button {
@@ -1152,11 +1335,14 @@ ul {
 
 .badge-body strong {
   display: block;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .badge-body small {
   font-size: 0.85rem;
   color: var(--muted);
+  white-space: normal;
 }
 
 .badge-collection[data-style="level"] .badge-card.unlocked {

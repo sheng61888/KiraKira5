@@ -30,6 +30,7 @@ public interface ILearnerService
     Task<ModuleSelectionResponse> AddModuleSelectionAsync(string learnerId, ModuleSelectionRequest request);
     Task<ModuleSelectionResponse> RemoveModuleSelectionAsync(string learnerId, string moduleId);
     Task<ModuleProgressResponse> LogModuleProgressAsync(string learnerId, ModuleProgressLogRequest request);
+    Task<LiveProgressSnapshotDto> GetLiveProgressSnapshotAsync();
 }
 
 /// <summary>
@@ -467,6 +468,76 @@ public class LearnerService : ILearnerService
         return response;
     }
 
+    public async Task<LiveProgressSnapshotDto> GetLiveProgressSnapshotAsync()
+    {
+        var snapshot = new LiveProgressSnapshotDto
+        {
+            AccuracyWindowLabel = "Last 7 days",
+            AssignmentsWindowLabel = "All time",
+            StreakWindowLabel = "This week"
+        };
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return snapshot;
+            }
+
+            const string streakSql = @"SELECT
+                                            COALESCE(AVG(current_streak), 0) AS avg_streak,
+                                            SUM(CASE WHEN last_activity_on >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS active_learners
+                                       FROM learner_streak";
+
+            await using (var streakCommand = new MySqlCommand(streakSql, connection))
+            await using (var streakReader = await streakCommand.ExecuteReaderAsync())
+            {
+                if (await streakReader.ReadAsync())
+                {
+                    snapshot.AverageStreakDays = SafeToDouble(streakReader["avg_streak"], snapshot.AverageStreakDays);
+                    snapshot.ActiveLearnerCount = SafeToInt(streakReader["active_learners"], snapshot.ActiveLearnerCount);
+                }
+            }
+
+            const string accuracySql = @"SELECT
+                                            COALESCE(AVG(score_percent), 0) AS avg_score,
+                                            COUNT(*) AS attempts
+                                         FROM learner_module_quiz_log
+                                         WHERE module_id LIKE 'form5-%'
+                                           AND completed_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)";
+
+            await using (var accuracyCommand = new MySqlCommand(accuracySql, connection))
+            await using (var accuracyReader = await accuracyCommand.ExecuteReaderAsync())
+            {
+                if (await accuracyReader.ReadAsync())
+                {
+                    snapshot.Form5AccuracyPercent = SafeToDouble(accuracyReader["avg_score"], snapshot.Form5AccuracyPercent);
+                    snapshot.Form5AttemptCount = SafeToInt(accuracyReader["attempts"], snapshot.Form5AttemptCount);
+                }
+            }
+
+            const string assignmentsSql = @"SELECT
+                                                SUM(CASE WHEN completion_percent >= 100 THEN 1 ELSE 0 END) AS completed
+                                            FROM learner_assignments";
+
+            await using (var assignmentsCommand = new MySqlCommand(assignmentsSql, connection))
+            await using (var assignmentsReader = await assignmentsCommand.ExecuteReaderAsync())
+            {
+                if (await assignmentsReader.ReadAsync())
+                {
+                    snapshot.AssignmentsCompleted = SafeToInt(assignmentsReader["completed"], snapshot.AssignmentsCompleted);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to build live progress snapshot: {ex.Message}");
+        }
+
+        return snapshot;
+    }
+
     public async Task<LearnerProfilePayload> GetProfileAsync(string learnerId)
     {
         var record = await FetchLearnerAsync(learnerId);
@@ -474,6 +545,7 @@ public class LearnerService : ILearnerService
         var streak = await FetchStreakDtoAsync(learnerId, profile);
         var notifications = await FetchNotificationPreferencesAsync(learnerId);
         var badges = await BuildBadgeStatsAsync(learnerId, profile, streak);
+        var mission = await FetchMissionDtoAsync(learnerId, profile);
 
         return new LearnerProfilePayload
         {
@@ -488,7 +560,8 @@ public class LearnerService : ILearnerService
                 Year = string.IsNullOrWhiteSpace(profile.GradeYear) ? "Year not set" : profile.GradeYear
             },
             Notifications = notifications,
-            Badges = badges
+            Badges = badges,
+            Mission = mission
         };
     }
 
@@ -749,13 +822,13 @@ public class LearnerService : ILearnerService
     {
         return new LearnerBadgeStatsDto
         {
-            Stats = new Dictionary<string, int>
+            Stats = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
             {
-                { "level", 3 },
-                { "streak", 7 },
-                { "cats", 2 },
-                { "ghibli", 1 },
-                { "hidden", 0 }
+                { "level", 0 },
+                { "streak", 0 },
+                { "consistency", 0 },
+                { "moduleMastery", 0 },
+                { "paperWarrior", 0 }
             },
             Collections = BadgeLibrary()
         };
@@ -774,25 +847,120 @@ public class LearnerService : ILearnerService
                 Style = "level",
                 Rewards = new List<BadgeRewardDto>
                 {
-                    new BadgeRewardDto(1, "Bronze Paw", "../images/level/bronze.png"),
-                    new BadgeRewardDto(3, "Silver Whisker", "../images/level/silver.png"),
-                    new BadgeRewardDto(5, "Gold Guardian", "../images/level/gold.png"),
-                    new BadgeRewardDto(8, "Rainbow Sage", "../images/level/rainbow.png")
+                    new BadgeRewardDto(1, "Catthew", "../images/level/bronze.png"),
+                    new BadgeRewardDto(3, "Catrick", "../images/level/silver.png"),
+                    new BadgeRewardDto(5, "Reginald", "../images/level/gold.png"),
+                    new BadgeRewardDto(8, "Stinkbert da dookie man", "../images/level/rainbow.png")
                 }
             },
             new BadgeCollectionDto
             {
-                Id = "streak",
-                Title = "Streak Sparks",
+                Id = "module-mastery",
+                Title = "Module Mastery",
+                Description = "Complete full modules to adopt new meme cats.",
+                Metric = "moduleMastery",
+                Style = "module",
+                Rewards = new List<BadgeRewardDto>
+                {
+                    new BadgeRewardDto(1, "DESPAIRRRR", "../images/module mastery/bronze.png")
+                    {
+                        Hint = "Complete one module with 95% progress.",
+                        Requirement = "1 completed module"
+                    },
+                    new BadgeRewardDto(3, "Nyum", "../images/module mastery/silver.png")
+                    {
+                        Hint = "Keep momentum by finishing three modules.",
+                        Requirement = "3 completed modules"
+                    },
+                    new BadgeRewardDto(6, "Butter", "../images/module mastery/gold.png")
+                    {
+                        Hint = "Six full modules unlock gold fur.",
+                        Requirement = "6 completed modules"
+                    },
+                    new BadgeRewardDto(8, "EEEEEEE", "../images/module mastery/rare.png")
+                    {
+                        Hint = "Master almost every topic to meet the rare cat.",
+                        Requirement = "8 completed modules"
+                    }
+                }
+            },
+            new BadgeCollectionDto
+            {
+                Id = "paper-warrior",
+                Title = "Paper Warrior",
+                Description = "Log timed papers and grow your staff collection.",
+                Metric = "paperWarrior",
+                Style = "paper",
+                Rewards = new List<BadgeRewardDto>
+                {
+                    new BadgeRewardDto(1, "Wooden Stick", "../images/paper wizard/Wooden stick.png")
+                    {
+                        Requirement = "1 logged past-paper",
+                        Hint = "Log your first paper."
+                    },
+                    new BadgeRewardDto(3, "Wooden Staff", "../images/paper wizard/Wooden staff.png")
+                    {
+                        Requirement = "3 logged papers",
+                        Hint = "Keep practicing to upgrade your gear."
+                    },
+                    new BadgeRewardDto(5, "Silver Staff", "../images/paper wizard/Silver staff.png")
+                    {
+                        Requirement = "5 logged papers",
+                        Hint = "Silver arrives after five serious sessions."
+                    },
+                    new BadgeRewardDto(8, "Enchanted Staff", "../images/paper wizard/Enchanted staff.png")
+                    {
+                        Requirement = "8 logged papers",
+                        Hint = "Stay consistent to charge the staff."
+                    },
+                    new BadgeRewardDto(12, "Golden Staff", "../images/paper wizard/Golden staff.png")
+                    {
+                        Requirement = "12 logged papers",
+                        Hint = "A dozen papers forge the golden staff."
+                    }
+                }
+            },
+            new BadgeCollectionDto
+            {
+                Id = "consistency",
+                Title = "Consistency Sparks",
                 Description = "Keep the flame alive with consecutive study days.",
-                Metric = "streak",
+                Metric = "consistency",
                 Style = "streak",
                 Rewards = new List<BadgeRewardDto>
                 {
-                    new BadgeRewardDto(0, "Dormant Seed", "../images/streak/0.png"),
-                    new BadgeRewardDto(1, "Day 1 Sprout", "../images/streak/1.png"),
-                    new BadgeRewardDto(3, "Day 3 Leaves", "../images/streak/3.png"),
-                    new BadgeRewardDto(7, "Full Bloom", "../images/streak/7.png")
+                    new BadgeRewardDto(0, "Dormant Seed", "../images/streak/0.png")
+                    {
+                        Requirement = "0 day streak"
+                    },
+                    new BadgeRewardDto(3, "Day 1 Sprout", "../images/streak/1.png")
+                    {
+                        Requirement = "3 day streak"
+                    },
+                    new BadgeRewardDto(7, "Day 3 Leaves", "../images/streak/2.png")
+                    {
+                        Requirement = "7 day streak"
+                    },
+                    new BadgeRewardDto(14, "Full Bloom", "../images/streak/3.png")
+                    {
+                        Requirement = "14 day streak"
+                    },
+                    new BadgeRewardDto(30, "Radiant Torch", "../images/streak/4.png")
+                    {
+                        Requirement = "30 day streak"
+                    },
+                    new BadgeRewardDto(60, "Blazing Trail", "../images/streak/5.png")
+                    {
+                        Requirement = "60 day streak"
+                    },
+                    new BadgeRewardDto(90, "Everlight Bloom", "../images/streak/6.png")
+                    {
+                        Requirement = "90 day streak"
+                    },
+                    new BadgeRewardDto(100, "Centennial Flame", "../images/streak/7.png")
+                    {
+                        Requirement = "100 day streak"
+                    }
                 }
             }
         };
@@ -842,11 +1010,13 @@ public class LearnerService : ILearnerService
                 {
                     new ModuleCardDto("01", "Variation", new List<string> { "Direct Variation", "Inverse Variation", "Joint Variation" })
                     {
-                        ModuleId = "form5-01"
+                        ModuleId = "form5-01",
+                        Link = "course-map.html?module=form5-01"
                     },
                     new ModuleCardDto("02", "Matrices", new List<string> { "Matrices", "Basic Operations on Matrices" })
                     {
-                        ModuleId = "form5-02"
+                        ModuleId = "form5-02",
+                        Link = "course-map.html?module=form5-02"
                     },
                     new ModuleCardDto("03", "Consumer Mathematics: Insurance", new List<string> { "Risk and Insurance Protection" })
                     {
@@ -1714,6 +1884,21 @@ public class LearnerService : ILearnerService
         return fallback;
     }
 
+    private static double SafeToDouble(object? value, double fallback)
+    {
+        if (value == null || value == DBNull.Value)
+        {
+            return fallback;
+        }
+
+        if (double.TryParse(value.ToString(), out var parsed))
+        {
+            return parsed;
+        }
+
+        return fallback;
+    }
+
     private static long SafeToLong(object? value, long fallback)
     {
         if (value == null || value == DBNull.Value)
@@ -2450,36 +2635,94 @@ public class LearnerService : ILearnerService
     private async Task<LearnerBadgeStatsDto> BuildBadgeStatsAsync(string learnerId, LearnerProfileDto profile, LearnerStreakDto streak, LearnerModuleSnapshot? modules = null)
     {
         var badgeStats = SampleBadgeStats();
+        var stats = badgeStats.Stats;
 
-        badgeStats.Stats["level"] = profile.Level;
-        badgeStats.Stats["streak"] = streak.Current;
+        stats["level"] = profile.Level;
+        stats["streak"] = Math.Max(stats.TryGetValue("streak", out var longest) ? longest : 0, streak.Longest);
+        stats["consistency"] = streak.Current;
 
         if (modules != null)
         {
-            var completed = modules.Catalogue
-                .SelectMany(section => section.Modules)
-                .Count(module => (module.ProgressPercent ?? 0) >= 95);
-            var inProgress = modules.Catalogue
-                .SelectMany(section => section.Modules)
-                .Count(module => (module.ProgressPercent ?? 0) >= 35 && (module.ProgressPercent ?? 0) < 95);
-
-            badgeStats.Stats["cats"] = completed;
-            badgeStats.Stats["ghibli"] = inProgress;
+            stats["moduleMastery"] = CountCompletedModulesFromSnapshot(modules);
         }
+        else
+        {
+            stats["moduleMastery"] = await CountCompletedModulesAsync(learnerId);
+        }
+
+        stats["paperWarrior"] = await CountPastPaperSessionsAsync(learnerId);
 
         var earnedBadgeMetrics = await FetchLearnerBadgeMetricsAsync(learnerId);
         foreach (var kvp in earnedBadgeMetrics)
         {
-            var key = kvp.Key?.Trim().ToLowerInvariant();
-            if (string.IsNullOrWhiteSpace(key))
+            if (string.IsNullOrWhiteSpace(kvp.Key))
             {
                 continue;
             }
 
-            badgeStats.Stats[key] = kvp.Value;
+            stats[kvp.Key.Trim()] = kvp.Value;
         }
 
         return badgeStats;
+    }
+
+    private static int CountCompletedModulesFromSnapshot(LearnerModuleSnapshot? modules)
+    {
+        if (modules == null)
+        {
+            return 0;
+        }
+
+        return modules.Catalogue
+            .SelectMany(section => section.Modules)
+            .Count(module => (module.ProgressPercent ?? 0) >= 95);
+    }
+
+    private async Task<int> CountCompletedModulesAsync(string learnerId)
+    {
+        var progress = await FetchModuleProgressAsync(learnerId);
+        if (progress == null || progress.Count == 0)
+        {
+            return 0;
+        }
+
+        return progress.Values.Count(state =>
+            state.ProgressPercent >= 95 ||
+            string.Equals(state.Status, "completed", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private async Task<int> CountPastPaperSessionsAsync(string learnerId)
+    {
+        if (string.IsNullOrWhiteSpace(learnerId))
+        {
+            return 0;
+        }
+
+        const string sql = @"SELECT COUNT(*) FROM learner_pastpaper_log WHERE uid = @Uid";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return 0;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            var result = await command.ExecuteScalarAsync();
+            if (result == null || result == DBNull.Value)
+            {
+                return 0;
+            }
+
+            return Convert.ToInt32(result, CultureInfo.InvariantCulture);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to count past papers for {learnerId}: {ex.Message}");
+            return 0;
+        }
     }
 
     private async Task<Dictionary<string, int>> FetchLearnerBadgeMetricsAsync(string learnerId)
@@ -3598,6 +3841,18 @@ public class ModuleProgressResponse
     public IEnumerable<ModuleCardDto> ActiveModules { get; set; } = new List<ModuleCardDto>();
 }
 
+public class LiveProgressSnapshotDto
+{
+    public double AverageStreakDays { get; set; }
+    public int ActiveLearnerCount { get; set; }
+    public double Form5AccuracyPercent { get; set; }
+    public int Form5AttemptCount { get; set; }
+    public int AssignmentsCompleted { get; set; }
+    public string StreakWindowLabel { get; set; } = string.Empty;
+    public string AccuracyWindowLabel { get; set; } = string.Empty;
+    public string AssignmentsWindowLabel { get; set; } = string.Empty;
+}
+
 public class ModuleCatalogueSectionDto
 {
     public string Grade { get; set; } = string.Empty;
@@ -3660,7 +3915,7 @@ public class ModuleUnitCtaDto
 
 public class LearnerBadgeStatsDto
 {
-    public Dictionary<string, int> Stats { get; set; } = new();
+    public Dictionary<string, int> Stats { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public IEnumerable<BadgeCollectionDto> Collections { get; set; } = new List<BadgeCollectionDto>();
 }
 
@@ -3692,6 +3947,7 @@ public class BadgeRewardDto
     public string LockedLabel { get; set; } = string.Empty;
     public string Hint { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    public string Requirement { get; set; } = string.Empty;
     public string Image { get; set; } = string.Empty;
     public string Emoji { get; set; } = string.Empty;
 }
@@ -3922,6 +4178,7 @@ public class LearnerProfilePayload
     public SchoolInfoDto School { get; set; } = new();
     public IEnumerable<NotificationPreferenceDto> Notifications { get; set; } = new List<NotificationPreferenceDto>();
     public LearnerBadgeStatsDto Badges { get; set; } = new();
+    public LearnerMissionDto Mission { get; set; } = new();
 }
 
 public class ContactInfoDto

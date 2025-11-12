@@ -30,6 +30,13 @@ public class LearnerController : ControllerBase
         return Ok(data);
     }
 
+    [HttpGet("live-progress")]
+    public async Task<IActionResult> GetLiveProgressSnapshot()
+    {
+        var snapshot = await _learnerService.GetLiveProgressSnapshotAsync();
+        return Ok(snapshot);
+    }
+
     [HttpGet("{learnerId}/classes")]
     public async Task<IActionResult> GetClasses(string learnerId)
     {

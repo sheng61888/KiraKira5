@@ -42,6 +42,7 @@
           })
         );
       }
+      document.dispatchEvent(new CustomEvent("kira:activity-feedback", { detail: data }));
       return data;
     } catch (error) {
       console.error("[kiraActivity] Unable to sync activity", error);

@@ -9,7 +9,7 @@ window.kiraModules = [
         number: "01",
         title: "Quadratic Functions and Equations in One Variable",
         lessons: ["Quadratic Functions", "Quadratic Equations"],
-        link: "course-map.html?module=form4-01",
+        link: "lesson-form4-01.html",
         units: [
           {
             id: "overview",
@@ -152,7 +152,7 @@ window.kiraModules = [
         number: "02",
         title: "Number Bases",
         lessons: ["Number Bases"],
-        link: "course-map.html?module=form4-02",
+        link: "lesson-form4-02.html",
         units: [
           {
             id: "nb-overview",
@@ -294,14 +294,205 @@ window.kiraModules = [
         number: "01",
         title: "Variation",
         lessons: ["Direct Variation", "Inverse Variation", "Joint Variation"],
-        link: "lesson-form5-01.html"
+        link: "course-map.html?module=form5-01",
+        units: [
+          {
+            id: "overview",
+            title: "Module overview",
+            type: "overview",
+            duration: "2 min",
+            summary: "Map every KSSM Variation outcome and see how the formulas connect.",
+            body: "We compare direct, inverse, and joint variation using simple modelling prompts so you know which formula to reach for.",
+            objectives: [
+              "Tell the difference between direct, inverse, and joint variation statements",
+              "Translate real-world descriptions into variation equations",
+              "Preview the checkpoints and timed drills in this module"
+            ]
+          },
+          {
+            id: "lesson-direct-inverse",
+            title: "Lesson 1 · Direct & inverse relationships",
+            type: "lesson",
+            duration: "8 min",
+            summary: "Build intuition for y ∝ x and y ∝ 1/x before the algebra kicks in.",
+            body: "We sketch paired values, derive constants of variation, and keep a running table to show how one variable responds when the other doubles or halves.",
+            objectives: [
+              "Determine the constant of variation from tables or ordered pairs",
+              "Explain what happens when x scales up or down",
+              "Convert between verbal descriptions and equations"
+            ],
+            cta: {
+              label: "Open lesson",
+              link: "/html/lessons/lesson-form5-variation-direct.html",
+              kind: "lesson"
+            }
+          },
+          {
+            id: "lesson-joint",
+            title: "Lesson 2 · Joint & combined variation",
+            type: "lesson",
+            duration: "7 min",
+            summary: "Blend multiple variables inside one variation statement.",
+            body: "We take exam-style prompts that mix joint and partial variation, highlight keywords, and coach you to isolate the constant quickly.",
+            objectives: [
+              "Spot when a problem mixes direct and inverse components",
+              "Solve for the constant using any provided data pair",
+              "Formulate predictions once the constant is known"
+            ],
+            resources: [
+              {
+                label: "Joint variation template",
+                type: "worksheet",
+                detail: "Fill-in-the-blank practice sheet",
+                url: "/docs/form5-variation-template.pdf"
+              }
+            ]
+          },
+          {
+            id: "practice-models",
+            title: "Guided practice · Modelling drills",
+            type: "practice",
+            duration: "10 min",
+            summary: "Apply variation thinking to physics-style and commerce prompts.",
+            body: "Each card introduces a fresh context (elastic strings, pricing, resistors) and asks you to set up, solve, and justify the variation constant.",
+            objectives: [
+              "Identify the correct variation statement per context",
+              "Explain how units change the constant value",
+              "Check your work with dimensional reasoning"
+            ],
+            cta: {
+              label: "Download drills",
+              link: "/docs/form5-variation-drills.pdf",
+              kind: "download"
+            }
+          },
+          {
+            id: "quiz-variation",
+            title: "Quick check · Variation",
+            type: "quiz",
+            duration: "4 min",
+            summary: "Mix of MCQ + structured response rooted in variation stories.",
+            body: "You will write the variation equation, compute the unknown constant, and predict new values while explaining the reasoning.",
+            cta: {
+              label: "Take quiz",
+              link: "/html/lessons/quiz-variation.html",
+              kind: "quiz"
+            }
+          },
+          {
+            id: "project-variation",
+            title: "Mini project · Build a comparison chart",
+            type: "application",
+            duration: "15 min",
+            summary: "Create a single-pager that contrasts the three types of variation using your own examples.",
+            body: "Students pick contexts they care about (gaming rigs, sports stats, kitchen recipes) and outline how each variation behaves differently.",
+            objectives: [
+              "Curate real examples for each variation type",
+              "State the governing equation and constant",
+              "Write a short explanation that peers can follow"
+            ]
+          }
+        ]
       },
       {
         moduleId: "form5-02",
         number: "02",
         title: "Matrices",
         lessons: ["Matrix Basics", "Matrix Operations"],
-        link: "lesson-form5-02.html"
+        link: "course-map.html?module=form5-02",
+        units: [
+          {
+            id: "overview",
+            title: "Module overview",
+            type: "overview",
+            duration: "2 min",
+            summary: "Preview the three phases: notation, operations, and applications.",
+            body: "We point out the key SPM question formats so you know when to use row/column thinking versus determinants.",
+            objectives: [
+              "Recall how matrix order is defined",
+              "Identify which operations are allowed for given matrix sizes",
+              "See the checkpoints for transformations and word problems"
+            ]
+          },
+          {
+            id: "lesson-basics",
+            title: "Lesson 1 · Reading & building matrices",
+            type: "lesson",
+            duration: "7 min",
+            summary: "Turn tables into matrices and vice versa.",
+            body: "We practice naming elements, writing matrix order, and extracting row/column vectors in contexts like transport schedules and inventory tables.",
+            objectives: [
+              "State the size of a matrix using rows × columns",
+              "Reference individual entries using a_ij notation",
+              "Represent worded information as matrices"
+            ],
+            cta: {
+              label: "Open lesson",
+              link: "/html/lessons/lesson-form5-matrices-basics.html",
+              kind: "lesson"
+            }
+          },
+          {
+            id: "lesson-operations",
+            title: "Lesson 2 · Addition, subtraction, multiplication",
+            type: "lesson",
+            duration: "9 min",
+            summary: "Master the rules that decide when matrix operations are valid.",
+            body: "We walk through compatible dimensions, scalar multiplication, and 2×2 products before connecting to transformation matrices.",
+            objectives: [
+              "Confirm dimension compatibility before an operation",
+              "Carry out 2×2 and 2×3 matrix products",
+              "Explain why matrix multiplication is not commutative"
+            ],
+            resources: [
+              {
+                label: "Operation checklist",
+                type: "guide",
+                detail: "Printable reminder of dimension rules",
+                url: "/docs/form5-matrices-checklist.pdf"
+              }
+            ]
+          },
+          {
+            id: "lesson-inverse",
+            title: "Lesson 3 · Determinant & inverse",
+            type: "lesson",
+            duration: "8 min",
+            summary: "Use determinants to decide if an inverse exists and calculate it quickly.",
+            body: "We rehearse the 2×2 inverse formula, connect it to solving simultaneous equations, and point out common sign errors.",
+            objectives: [
+              "Compute determinants for 2×2 matrices",
+              "Form the adjoint and multiply by 1/det to obtain the inverse",
+              "Use inverses to solve simple linear systems"
+            ]
+          },
+          {
+            id: "practice-matrices",
+            title: "Guided practice · Matrix mash-up",
+            type: "practice",
+            duration: "10 min",
+            summary: "Alternate between quickfire drills and word problems.",
+            body: "Students toggle between dimension checks, calculator-free operations, and context problems (ticketing, resource allocation).",
+            cta: {
+              label: "Download practice set",
+              link: "/docs/form5-matrices-practice.pdf",
+              kind: "download"
+            }
+          },
+          {
+            id: "quiz-matrices",
+            title: "Quick check · Matrices",
+            type: "quiz",
+            duration: "5 min",
+            summary: "Mini assessment mixing procedural and conceptual prompts.",
+            body: "Expect question formats like 'Explain why this product is undefined', 'Compute the inverse', or 'Use matrices to describe a transformation'.",
+            cta: {
+              label: "Take quiz",
+              link: "/html/lessons/quiz-matrices.html",
+              kind: "quiz"
+            }
+          }
+        ]
       },
       {
         moduleId: "form5-03",

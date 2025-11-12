@@ -229,7 +229,7 @@
       title.textContent = unit.title || `Unit ${index + 1}`;
       const meta = document.createElement("small");
       const duration = unit.duration || unit.Duration || "Self paced";
-      meta.textContent = `${formatType(unit.type || unit.Type)} Â· ${duration}`;
+      meta.textContent = `${formatType(unit.type || unit.Type)} · ${duration}`;
 
       info.appendChild(title);
       info.appendChild(meta);
@@ -350,7 +350,7 @@
 
   const updateHeader = entry => {
     const { section, module } = entry;
-    const gradeLabel = section?.grade ? `${section.grade} Â· Module ${module.number}` : "Module";
+    const gradeLabel = section?.grade ? `${section.grade} · Module ${module.number}` : "Module";
     const summary =
       module.description ||
       module.Description ||

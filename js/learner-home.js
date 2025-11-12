@@ -26,11 +26,16 @@
     missionTitle: "#missionTitle",
     missionMood: "#missionMood",
     missionChips: "#missionChips",
-    missionConfidence: "#missionConfidence",
     missionAction: "#missionActionBtn",
+    missionStatus: "#missionStatusLabel",
+    missionSupport: "#missionSupportLabel",
     coursePickerTrigger: "[data-action='open-course-picker']",
     modulePickerModal: "#modulePickerModal",
-    modulePickerList: "#modulePickerList"
+    modulePickerList: "#modulePickerList",
+    notificationList: "#notificationList",
+    notificationEmpty: "[data-role='notification-empty']",
+    notificationClear: "[data-action='clear-notifications']",
+    notificationToasts: "#notificationToasts"
   };
 
   window.kiraActiveModules = Array.isArray(window.kiraActiveModules) ? window.kiraActiveModules : [];
@@ -59,6 +64,315 @@
     keydownBound: false,
     selectedIds: new Set()
   };
+
+  const notificationCenter = (() => {
+    const HISTORY_KEY = "kiraNotificationHistory";
+    const STATE_KEY = "kiraNotificationState";
+    const MAX_ITEMS = 25;
+    let history = [];
+    let refs = { level: 0, streak: 0, badges: 0 };
+    let baselineReady = false;
+    let initialized = false;
+
+    const safeRead = (key, fallback) => {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    };
+
+    const safeWrite = (key, value) => {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch {
+        /* ignore storage errors */
+      }
+    };
+
+    const countUnlockedBadges = payload => {
+      if (!payload || typeof payload !== "object") {
+        return 0;
+      }
+      const stats = payload.stats || {};
+      const collections = Array.isArray(payload.collections) ? payload.collections : [];
+      return collections.reduce((total, collection) => {
+        const metricValue = Number(stats?.[collection.metric]) || 0;
+        if (!Array.isArray(collection.rewards)) {
+          return total;
+        }
+        const unlocked = collection.rewards.filter(reward => {
+          const requirement = Number(reward.value);
+          if (!Number.isFinite(requirement)) {
+            return false;
+          }
+          return metricValue >= requirement;
+        }).length;
+        return total + unlocked;
+      }, 0);
+    };
+
+    const getElements = () => ({
+      list: getEl(selectors.notificationList),
+      empty: getEl(selectors.notificationEmpty),
+      clear: getEl(selectors.notificationClear),
+      toastStack: getEl(selectors.notificationToasts)
+    });
+
+    const formatTimestamp = iso => {
+      try {
+        const stamp = iso ? new Date(iso) : new Date();
+        if (Number.isNaN(stamp.getTime())) {
+          return "Just now";
+        }
+        return stamp.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      } catch {
+        return "Just now";
+      }
+    };
+
+    const renderHistory = () => {
+      const { list, empty, clear } = getElements();
+      if (!list) {
+        return;
+      }
+      list.innerHTML = "";
+      if (!history.length) {
+        if (empty) {
+          empty.hidden = false;
+        }
+        if (clear) {
+          clear.disabled = true;
+        }
+        return;
+      }
+      if (empty) {
+        empty.hidden = true;
+      }
+      if (clear) {
+        clear.disabled = false;
+      }
+      const fragment = document.createDocumentFragment();
+      history.forEach(entry => {
+        const item = document.createElement("li");
+        item.className = "notification-item";
+        item.dataset.kind = entry.kind || "info";
+
+        const body = document.createElement("div");
+        body.className = "notification-item__body";
+
+        const title = document.createElement("h4");
+        title.textContent = entry.title || "Update";
+
+        const detail = document.createElement("p");
+        detail.textContent = entry.body || "";
+
+        body.appendChild(title);
+        body.appendChild(detail);
+
+        const time = document.createElement("p");
+        time.className = "notification-item__time";
+        time.textContent = formatTimestamp(entry.timestamp);
+
+        item.appendChild(body);
+        item.appendChild(time);
+        fragment.appendChild(item);
+      });
+      list.appendChild(fragment);
+    };
+
+    const saveState = () => {
+      safeWrite(HISTORY_KEY, history);
+      safeWrite(STATE_KEY, refs);
+      baselineReady = true;
+    };
+
+    const showToast = entry => {
+      const { toastStack } = getElements();
+      if (!toastStack) {
+        return;
+      }
+      const toast = document.createElement("article");
+      toast.className = "notification-toast";
+      toast.dataset.kind = entry.kind || "info";
+
+      const content = document.createElement("div");
+      content.className = "notification-toast__content";
+
+      const title = document.createElement("h4");
+      title.textContent = entry.title || "Update";
+
+      const detail = document.createElement("p");
+      detail.textContent = entry.body || "";
+
+      content.appendChild(title);
+      content.appendChild(detail);
+
+      const dismiss = document.createElement("button");
+      dismiss.type = "button";
+      dismiss.setAttribute("aria-label", "Dismiss notification");
+      dismiss.textContent = "×";
+
+      toast.appendChild(content);
+      toast.appendChild(dismiss);
+      toastStack.appendChild(toast);
+
+      const removeToast = () => {
+        toast.remove();
+      };
+
+      const timeoutId = window.setTimeout(removeToast, 6000);
+      dismiss.addEventListener("click", () => {
+        window.clearTimeout(timeoutId);
+        removeToast();
+      });
+    };
+
+    const addNotification = (entry, options = {}) => {
+      const record = {
+        id: entry.id || `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        title: entry.title || "Update",
+        body: entry.body || "",
+        kind: entry.kind || "info",
+        timestamp: entry.timestamp || new Date().toISOString()
+      };
+      history = [record, ...history].slice(0, MAX_ITEMS);
+      saveState();
+      renderHistory();
+      if (!options.silent) {
+        showToast(record);
+      }
+    };
+
+    const ensureInit = () => {
+      if (initialized) {
+        return;
+      }
+      history = safeRead(HISTORY_KEY, []);
+      const storedRefs = safeRead(STATE_KEY, null);
+      if (storedRefs && typeof storedRefs === "object") {
+        refs = { ...refs, ...storedRefs };
+        baselineReady = true;
+      }
+      const { clear } = getElements();
+      if (clear && !clear.dataset.wired) {
+        clear.dataset.wired = "true";
+        clear.addEventListener("click", () => {
+          history = [];
+          saveState();
+          renderHistory();
+        });
+      }
+      renderHistory();
+      initialized = true;
+    };
+
+    const handleLevel = level => {
+      const value = Number(level);
+      if (!Number.isFinite(value)) {
+        return;
+      }
+      const next = Math.max(0, Math.floor(value));
+      if (!baselineReady) {
+        refs.level = next;
+        saveState();
+        renderHistory();
+        return;
+      }
+      if (next > refs.level) {
+        addNotification({
+          kind: "level",
+          title: `Level ${next} unlocked`,
+          body: "Your XP streak just pushed you to a new level."
+        });
+      }
+      if (next !== refs.level) {
+        refs.level = next;
+        saveState();
+      }
+    };
+
+    const handleStreak = streak => {
+      const current = Number(streak?.current);
+      if (!Number.isFinite(current)) {
+        return;
+      }
+      const next = Math.max(0, Math.floor(current));
+      if (!baselineReady) {
+        refs.streak = next;
+        saveState();
+        renderHistory();
+        return;
+      }
+      if (next > refs.streak) {
+        addNotification({
+          kind: "streak",
+          title: `${next}-day streak`,
+          body: next === 1 ? "Streak started. Keep the flame going tomorrow!" : "You kept the streak alive today."
+        });
+      }
+      if (next !== refs.streak) {
+        refs.streak = next;
+        saveState();
+      }
+    };
+
+    const handleBadges = badges => {
+      const total = countUnlockedBadges(badges);
+      if (!baselineReady) {
+        refs.badges = total;
+        saveState();
+        renderHistory();
+        return;
+      }
+      if (total > refs.badges) {
+        const diff = total - refs.badges;
+        addNotification({
+          kind: "badge",
+          title: diff > 1 ? `Unlocked ${diff} badges` : "New badge unlocked",
+          body: "Check the Milestones section in your Profile to see your reward."
+        });
+      }
+      if (total !== refs.badges) {
+        refs.badges = total;
+        saveState();
+      }
+    };
+
+    return {
+      init: () => ensureInit(),
+      evaluateDashboard: (profile, streak, badges) => {
+        ensureInit();
+        handleLevel(profile?.level);
+        handleStreak(streak);
+        handleBadges(badges);
+      },
+      handleActivity: payload => {
+        if (!payload) {
+          return;
+        }
+        ensureInit();
+        if (typeof payload.level === "number" || payload.levelUp) {
+          handleLevel(payload.level ?? refs.level + 1);
+        }
+        if (payload.streak) {
+          handleStreak(payload.streak);
+        }
+        if (payload.badges) {
+          handleBadges(payload.badges);
+        }
+      },
+      trackStreak: streak => {
+        ensureInit();
+        handleStreak(streak);
+      },
+      trackBadges: badges => {
+        ensureInit();
+        handleBadges(badges);
+      }
+    };
+  })();
 
   const ensureModulePickerRefs = () => {
     if (!modulePickerState.modal) {
@@ -342,7 +656,8 @@
     setText(selectors.missionBadge, mission.badge || "");
     setText(selectors.missionTitle, mission.title || "Today's focus");
     setText(selectors.missionMood, mission.mood || "");
-    setText(selectors.missionConfidence, `${confidence}%`);
+    setText(selectors.missionStatus, mission.mode || "Mission status");
+    setText(selectors.missionSupport, mission.wantsVideos ? "Intro videos on" : "Intro videos off");
 
     const chips = [
       mission.grade,
@@ -356,9 +671,9 @@
 
     const button = getEl(selectors.missionAction);
     if (button) {
-      button.textContent = confidence < 50 ? "Review rescue plan" : "Adjust plan";
+      button.textContent = "Manage plan";
       button.onclick = () => {
-        window.location.href = "learner-onboarding.html";
+        window.location.href = "learner-profile.html#study-preferences";
       };
     }
   };
@@ -368,7 +683,17 @@
     if (!grid) {
       return;
     }
-    if (!Array.isArray(stats) || !stats.length) {
+    const filtered = Array.isArray(stats)
+      ? stats.filter(stat => {
+          if (!stat) {
+            return false;
+          }
+          const valueText =
+            typeof stat.value === "string" ? stat.value.toLowerCase() : "";
+          return !valueText.includes("year not set");
+        })
+      : [];
+    if (!filtered.length) {
       grid.innerHTML = "<p class=\"muted\">No stats available yet. Complete a lesson to unlock insights.</p>";
       return;
     }
@@ -384,7 +709,7 @@
             : ""}
       </article>
     `;
-    grid.innerHTML = stats.map(template).join("");
+    grid.innerHTML = filtered.map(template).join("");
   };
 
   const broadcastModules = modulesSnapshot => {
@@ -440,6 +765,7 @@
     updateStats(data.highlightStats);
     broadcastModules(data.modules);
     broadcastBadges(data.badges);
+    notificationCenter.evaluateDashboard(data.profile, data.streak, data.badges);
   };
 
   const fetchDashboard = async () => {
@@ -470,9 +796,28 @@
   };
 
   const startDashboard = () => {
+    notificationCenter.init();
     wireModulePicker();
     fetchDashboard();
   };
+
+  document.addEventListener("kira:activity-feedback", event => {
+    if (event?.detail) {
+      notificationCenter.handleActivity(event.detail);
+    }
+  });
+
+  document.addEventListener("kira:streak-updated", event => {
+    if (event?.detail) {
+      notificationCenter.trackStreak(event.detail);
+    }
+  });
+
+  document.addEventListener("kira:badges-ready", event => {
+    if (event?.detail) {
+      notificationCenter.trackBadges(event.detail);
+    }
+  });
 
   document.addEventListener("kira:learner-missing", () => {
     showDashboardError("Please log in to view your learner dashboard.");
