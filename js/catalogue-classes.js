@@ -55,8 +55,27 @@
           lessonList.appendChild(lessonItem);
         });
 
+        const previewWrapper = createElement("a", "module-preview");
+        previewWrapper.href = "login_signup.html";
+        previewWrapper.setAttribute("aria-label", `Unlock ${module.title} by signing up`);
+        const previewImage = document.createElement("img");
+        previewImage.src = module.preview || "../images/wapppicmodule.jpg";
+        previewImage.alt = `Sample preview for ${module.title}`;
+        previewImage.loading = "lazy";
+
+        const overlay = createElement("div", "preview-overlay");
+        overlay.innerHTML = `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M17 9V7a5 5 0 0 0-10 0v2H5v12h14V9h-2zm-2 0H9V7a3 3 0 0 1 6 0v2z"/>
+          </svg>
+          <span>Unlock by signing up</span>
+        `;
+        previewWrapper.appendChild(previewImage);
+        previewWrapper.appendChild(overlay);
+
         moduleEl.appendChild(moduleHeading);
         moduleEl.appendChild(lessonList);
+        moduleEl.appendChild(previewWrapper);
         modulesWrapper.appendChild(moduleEl);
       });
 

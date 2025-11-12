@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -35,7 +35,7 @@
             <!-- Navigation Links -->
             <div class="nav-links">
                 <a href="about.html">About Us</a>
-                <a href="catalogue-classes.html">Learner Classes</a>
+                <a href="catalogue-classes.html">Browse Classes</a>
                 <a href="login_signup.html">Login</a>
                 <div class="nav-cta">
                     <a href="login_signup.html" class="btn btn-primary">
@@ -54,27 +54,53 @@
     <main>
         <!-- Hero Section -->
         <section class="hero-section">
-            <div class="container hero-container">
-                <h1>
-                    Master SPM Mathematics
-                </h1>
-                <p class="subtitle">
-                    Your all-in-one resource for SPM Add Math & Modern Math. Interactive notes, quizzes, and past year questions.
-                </p>
-                <a href="#spm-advantage" class="btn btn-primary btn-large">
-                    Explore Our SPM Advantage
-                </a>
+            <div class="container hero-container hero-with-progress">
+                <div class="hero-copy">
+                    <h1>
+                        Maths that finally clicks
+                    </h1>
+                    <p class="subtitle">
+                        Mathematics explained simply with animations, checkpoints, and “why it works” tips. Practice like the real exam, unlock hints when you find yourself stuck, and watch your weak topics flip green.
+                    </p>
+                    <a href="#spm-advantage" class="btn btn-primary btn-large">
+                        Explore Our SPM Advantage
+                    </a>
+                </div>
+                <aside class="hero-progress-card" aria-label="Live learner progress snapshot">
+                    <p class="eyebrow">Live Progress Statistics</p>
+                    <h3>Momentum this week</h3>
+                    <ul class="progress-metrics">
+                        <li>
+                            <span class="metric-label">Avg. weekly streak</span>
+                            <span class="metric-value">4.3 days</span>
+                            <span class="metric-meta">Across 812 active learners</span>
+                        </li>
+                        <li>
+                            <span class="metric-label">Form 5 quiz accuracy</span>
+                            <span class="metric-value">82%</span>
+                            <span class="metric-meta">Last 7 days · 1,240 attempts</span>
+                        </li>
+                        <li>
+                            <span class="metric-label">Assignments completed</span>
+                            <span class="metric-value">1,905</span>
+                            <span class="metric-meta">Since Monday</span>
+                        </li>
+                    </ul>
+                    <a class="btn btn-primary hero-progress-cta" href="login_signup.html">
+                        Start tracking your progress →
+                    </a>
+                </aside>
             </div>
         </section>
 
-        <!-- NEW SECTION: SPM ADVANTAGE -->
+        <!-- SPM ADVANTAGE -->
         <section id="spm-advantage" class="spm-advantage-section">
             <div class="container">
                 <h2 class="section-title" style="margin-bottom: 1rem;">
-                    The SPM Advantage
+                    The SPM Advantage: Fun First, Marks Guaranteed
                 </h2>
                 <p class="subtitle" style="text-align: center; max-width: 600px; margin: 0 auto 3rem auto;">
-                    We are laser-focused on the SPM format, ensuring every minute you spend learning translates directly to exam success.
+                    We follow KSSM and real SPM marking logic, but keep it light: quick notes, clickable examples, and snackable videos that turn tough topics into “ohhh got it.”
                 </p>
                 <div class="features-grid">
 
@@ -224,6 +250,28 @@
             </div>
         </section>
 
+        <!-- Testimonials Section -->
+        <section class="testimonials-section">
+            <div class="container">
+                <p class="eyebrow">What Learners Say</p>
+                <h2 class="section-title">Real wins from Malaysian students</h2>
+                <div class="testimonials-grid">
+                    <article class="testimonial-card">
+                        <p class="quote">“My school teacher said i will never be succesfull in life, but KiraKira gave me hope!”</p>
+                        <p class="student">Zahra · SMK Damansara Utama</p>
+                    </article>
+                    <article class="testimonial-card">
+                        <p class="quote">“The subway surfers video on the side calms my brain.”</p>
+                        <p class="student">Yingxin · Kolej Tingkatan 6 Seremban</p>
+                    </article>
+                    <article class="testimonial-card">
+                        <p class="quote">“Daily XP targets kept me revising even when i really wanted to sleep.”</p>
+                        <p class="student">Dylan · SMK St. Michael</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
     <!-- Modal -->
     <div id="topicsModal" class="modal">
         <div class="modal-content">
@@ -231,13 +279,11 @@
             <h2 id="modalTitle"></h2>
             <div id="modalBody"></div>
         </div>
-    </div>
-
-    <!-- Footer -->
+    </div>    <!-- Footer -->
     <footer class="footer">
         <div class="container footer-container">
-            <p>&copy; 2025 KiraKira. All rights reserved.</p>
-            <p class="footer-subtitle">Making SPM Math easy, one formula at a time.</p>
+            <p>&copy; 2025 KiraKira.<span id="current-year" style="display:none;"></span> All rights reserved.</p>
+            <p class="footer-subtitle">Memes Off, Methods On</p>
         </div>
     </footer>
 
@@ -345,3 +391,5 @@
     <script src="../js/theme.js"></script>
 </body>
 </html>
+
+

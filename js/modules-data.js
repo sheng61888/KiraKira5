@@ -9,7 +9,7 @@ window.kiraModules = [
         number: "01",
         title: "Quadratic Functions and Equations in One Variable",
         lessons: ["Quadratic Functions", "Quadratic Equations"],
-        link: "course-map.html?module=form4-01",
+        link: "lesson-form4-01.html",
         units: [
           {
             id: "overview",
@@ -152,7 +152,7 @@ window.kiraModules = [
         number: "02",
         title: "Number Bases",
         lessons: ["Number Bases"],
-        link: "course-map.html?module=form4-02",
+        link: "lesson-form4-02.html",
         units: [
           {
             id: "nb-overview",
