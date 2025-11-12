@@ -58,6 +58,48 @@
             <section class="card">
                 <div class="section-head">
                     <div>
+                        <p class="eyebrow">Registration Analytics</p>
+                        <h2>Registered Users</h2>
+                    </div>
+                    <div>
+                        <label for="roleFilter">Filter by Role:</label>
+                        <select id="roleFilter" onchange="applyFilter()">
+                            <option value="">All Roles</option>
+                            <option value="learner">Learner</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <label for="yearFilter" style="margin-left: 1rem;">Year:</label>
+                        <select id="yearFilter" onchange="applyFilter()">
+                            <option value="">All</option>
+                        </select>
+                        <label for="monthFilter" style="margin-left: 1rem;">Month:</label>
+                        <select id="monthFilter" onchange="applyFilter()">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Registration Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registeredUsersTable">
+                            <tr><td colspan="4" class="text-muted">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="section-head">
+                    <div>
                         <p class="eyebrow">Community Activity</p>
                         <h2>Community Engagement Statistics</h2>
                     </div>
