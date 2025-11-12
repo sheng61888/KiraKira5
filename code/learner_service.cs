@@ -1010,11 +1010,13 @@ public class LearnerService : ILearnerService
                 {
                     new ModuleCardDto("01", "Variation", new List<string> { "Direct Variation", "Inverse Variation", "Joint Variation" })
                     {
-                        ModuleId = "form5-01"
+                        ModuleId = "form5-01",
+                        Link = "course-map.html?module=form5-01"
                     },
                     new ModuleCardDto("02", "Matrices", new List<string> { "Matrices", "Basic Operations on Matrices" })
                     {
-                        ModuleId = "form5-02"
+                        ModuleId = "form5-02",
+                        Link = "course-map.html?module=form5-02"
                     },
                     new ModuleCardDto("03", "Consumer Mathematics: Insurance", new List<string> { "Risk and Insurance Protection" })
                     {
