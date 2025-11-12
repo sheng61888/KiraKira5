@@ -16,7 +16,47 @@
     moduleId: null,
     moduleEntry: null,
     selectedUnitId: null,
-    units: []
+    pendingUnitId: null,
+    units: [],
+    completedUnitIds: new Set()
+  };
+
+  const COURSE_MAP_PATH = (() => {
+    const path = window.location.pathname || "/html/course-map.html";
+    return path.endsWith("course-map.html") ? path : "/html/course-map.html";
+  })();
+
+  const buildCourseMapLink = (moduleId, unitId) => {
+    if (!moduleId) {
+      return COURSE_MAP_PATH;
+    }
+    const unitSegment = unitId ? `&unit=${encodeURIComponent(unitId)}` : "";
+    return `${COURSE_MAP_PATH}?module=${encodeURIComponent(moduleId)}${unitSegment}`;
+  };
+
+  const storageKey = moduleId => `kiraUnitProgress:${moduleId}`;
+
+  const loadUnitProgress = moduleId => {
+    if (!moduleId || typeof window === "undefined") {
+      return null;
+    }
+    try {
+      const raw = localStorage.getItem(storageKey(moduleId));
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const saveUnitProgress = (moduleId, payload) => {
+    if (!moduleId || typeof window === "undefined") {
+      return;
+    }
+    try {
+      localStorage.setItem(storageKey(moduleId), JSON.stringify(payload));
+    } catch {
+      /* ignore */
+    }
   };
 
   const getEl = selector => document.querySelector(selector);
@@ -187,6 +227,14 @@
     loadClip(0);
   };
 
+  const resolveUnitLink = (moduleId, unit) => {
+    const cta = unit?.cta || unit?.Cta;
+    if (cta?.link) {
+      return cta.link;
+    }
+    return buildCourseMapLink(moduleId, normalizeId(unit?.id || unit?.unitId || unit?.UnitId));
+  };
+
   const selectUnit = unitId => {
     const units = state.units || [];
     if (!units.length) {
@@ -195,7 +243,27 @@
     const fallbackId = units[0].id || units[0].unitId || units[0].UnitId || `unit-${0}`;
     const targetId = normalizeId(unitId) || normalizeId(fallbackId);
     const unit = units.find(u => normalizeId(u.id || u.unitId || u.UnitId) === targetId) || units[0];
-    state.selectedUnitId = normalizeId(unit.id || unit.unitId || unit.UnitId);
+    const normalizedId = normalizeId(unit.id || unit.unitId || unit.UnitId);
+    const previousId = state.selectedUnitId;
+    state.selectedUnitId = normalizedId;
+
+    if (previousId && previousId !== normalizedId) {
+      state.completedUnitIds.add(previousId);
+    }
+
+    const stored = loadUnitProgress(state.moduleId) || {};
+    const payload = {
+      ...stored,
+      moduleId: state.moduleId,
+      completed: Array.from(state.completedUnitIds),
+      lastUnitId: normalizedId,
+      lastTitle: unit.title || unit.Title || "",
+      lastUrl: resolveUnitLink(state.moduleId, unit),
+      courseMap: buildCourseMapLink(state.moduleId, normalizedId),
+      updatedAt: new Date().toISOString()
+    };
+    saveUnitProgress(state.moduleId, payload);
+
     renderUnitNav();
     renderUnitDetail(unit);
   };
@@ -218,6 +286,8 @@
       button.className = "unit-nav-item";
       if (id === state.selectedUnitId) {
         button.classList.add("is-active");
+      } else if (state.completedUnitIds.has(id)) {
+        button.classList.add("is-completed");
       }
 
       const order = document.createElement("span");
@@ -435,12 +505,18 @@
     }
     updateHeader(entry);
     updateMeta(entry.module, state.units);
-    selectUnit(state.units[0].id || state.units[0].unitId || state.units[0].UnitId);
+    const stored = loadUnitProgress(state.moduleId) || {};
+    state.completedUnitIds = new Set(
+      Array.isArray(stored.completed) ? stored.completed.map(normalizeId) : []
+    );
+    const initialUnitId = state.pendingUnitId || stored.lastUnitId;
+    selectUnit(initialUnitId || state.units[0].id || state.units[0].unitId || state.units[0].UnitId);
   };
 
   const init = () => {
     const params = new URLSearchParams(window.location.search);
     state.moduleId = params.get("module") || state.moduleId || "form4-01";
+    state.pendingUnitId = params.get("unit");
     hydrateModule();
   };
 

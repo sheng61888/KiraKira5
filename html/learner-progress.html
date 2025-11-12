@@ -42,10 +42,6 @@
           <h1>Track your learning momentum</h1>
           <p aria-live="polite">We will show your personalised stats as soon as they load.</p>
         </div>
-        <div class="heading-actions">
-          <button class="btn btn--ghost" type="button" id="downloadReportBtn" disabled>Preparing report...</button>
-          <button class="btn btn--primary" type="button">Share with coach</button>
-        </div>
       </header>
 
       <!-- Overall Progress -->
@@ -74,9 +70,12 @@
 
       <!-- Completion Message -->
       <section class="grid grid--two">
-        <article class="card motivation" id="motivation">
-          <h2 aria-live="polite">Hang tight!</h2>
-          <p>Your encouragement card updates after we fetch your data.</p>
+        <article class="card motivation motivation--with-image" id="motivation">
+          <div class="motivation__body">
+            <h2 aria-live="polite">Hang tight!</h2>
+            <p>Your encouragement card updates after we fetch your data.</p>
+          </div>
+          <img src="/images/my stats cat.png" alt="Cat reviewing stats" class="motivation__image">
         </article>
 
         <article class="card">
