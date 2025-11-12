@@ -132,5 +132,76 @@ public class AdminService
         }
     }
 
-
+    /// <summary>
+    /// Gets registered users with optional role, year, and month filters
+    /// </summary>
+    public static async Task<List<object>> GetRegisteredUsersAsync(IConfiguration configuration, string role = null, string year = null, string month = null)
+    {
+        string connectionString = configuration.GetConnectionString("KiraKiraDB");
+        
+        try
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                
+                string query = "SELECT username, name, email, usertype, registration_date FROM usertable WHERE 1=1";
+                
+                if (!string.IsNullOrEmpty(role))
+                {
+                    query += " AND usertype = @role";
+                }
+                
+                if (!string.IsNullOrEmpty(year))
+                {
+                    query += " AND YEAR(registration_date) = @year";
+                }
+                
+                if (!string.IsNullOrEmpty(month))
+                {
+                    query += " AND MONTH(registration_date) = @month";
+                }
+                
+                query += " ORDER BY registration_date DESC";
+                
+                var users = new List<object>();
+                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                {
+                    if (!string.IsNullOrEmpty(role))
+                    {
+                        cmd.Parameters.AddWithValue("@role", role);
+                    }
+                    if (!string.IsNullOrEmpty(year))
+                    {
+                        cmd.Parameters.AddWithValue("@year", year);
+                    }
+                    if (!string.IsNullOrEmpty(month))
+                    {
+                        cmd.Parameters.AddWithValue("@month", month);
+                    }
+                    
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            users.Add(new {
+                                username = reader.GetString(0),
+                                name = reader.GetString(1),
+                                email = reader.GetString(2),
+                                usertype = reader.GetString(3),
+                                registrationDate = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4)
+                            });
+                        }
+                    }
+                }
+                
+                return users;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting registered users: {ex.Message}");
+            return new List<object>();
+        }
+    }
 }

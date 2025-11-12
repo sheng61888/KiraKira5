@@ -148,5 +148,21 @@ public class AdminController : ControllerBase
         }
     }
 
-
+    /// <summary>
+    /// Gets registered users with optional role, year, and month filters
+    /// </summary>
+    [HttpGet("analytics/registered-users")]
+    public async Task<IActionResult> GetRegisteredUsers([FromQuery] string role = null, [FromQuery] string year = null, [FromQuery] string month = null)
+    {
+        try
+        {
+            var users = await AdminService.GetRegisteredUsersAsync(_configuration, role, year, month);
+            return Ok(users);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting registered users: {ex.Message}");
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
 }
