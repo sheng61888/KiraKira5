@@ -1,3 +1,4 @@
+// This is your js/teacher-dashboard.js file
 class TeacherDashboard {
     constructor() {
         this.teacherId = this.getCurrentTeacherId();
@@ -19,6 +20,7 @@ class TeacherDashboard {
 
     async loadClasses() {
         try {
+            // This URL calls your TeacherController
             const response = await fetch('/api/Teacher/classes');
             const classes = await response.json();
             
@@ -39,6 +41,7 @@ class TeacherDashboard {
 
     async loadCourses() {
         try {
+            // This URL calls your TeacherController
             const response = await fetch('/api/Teacher/courses');
             const courses = await response.json();
             
@@ -59,6 +62,7 @@ class TeacherDashboard {
 
     async loadAssignments() {
         try {
+            // This URL calls your TeacherController
             const response = await fetch('/api/Teacher/assignments');
             const assignments = await response.json();
             
@@ -89,12 +93,10 @@ class TeacherDashboard {
                         ${assignment.status}
                     </span>
                 </div>
-                
                 <div class="assignment-meta">
                     <span><strong>Deadline:</strong> ${new Date(assignment.deadline).toLocaleString()}</span>
                     <span><strong>Created:</strong> ${new Date(assignment.createdAt).toLocaleDateString()}</span>
                 </div>
-                
                 <div class="assignment-actions">
                     <button class="btn btn--ghost btn-sm" onclick="editAssignment(${assignment.assignmentId})">
                         Edit
@@ -140,13 +142,11 @@ class TeacherDashboard {
     }
 
     setupEventListeners() {
-        // Assignment form submission
         document.getElementById('assignmentForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.createAssignment();
         });
 
-        // Edit assignment form submission
         document.getElementById('editAssignmentForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.updateAssignment();
@@ -172,11 +172,10 @@ class TeacherDashboard {
                 deadline: new Date(deadline).toISOString()
             };
 
+            // This URL calls your TeacherController
             const response = await fetch('/api/Teacher/assignments', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(request)
             });
 
@@ -202,15 +201,14 @@ class TeacherDashboard {
         const status = document.getElementById('editStatus').value;
 
         try {
+            // This URL calls your TeacherController
             const response = await fetch(`/api/Teacher/assignments/${assignmentId}/status`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status: status
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: status })
             });
+            // Note: Your C# code also needs to be updated to save the new title and deadline.
+            // This example only saves status, as per your TeacherController.cs file.
 
             const result = await response.json();
 
@@ -228,23 +226,14 @@ class TeacherDashboard {
     }
 
     showMessage(message, type) {
-        // Create a temporary notification
         const notification = document.createElement('div');
         notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            z-index: 1000;
+            position: fixed; top: 20px; right: 20px; padding: 1rem 1.5rem;
+            border-radius: 8px; color: white; font-weight: 600; z-index: 1000;
             background-color: ${type === 'success' ? '#10b981' : '#ef4444'};
         `;
         notification.textContent = message;
-        
         document.body.appendChild(notification);
-        
         setTimeout(() => {
             document.body.removeChild(notification);
         }, 3000);
@@ -261,14 +250,10 @@ async function editAssignment(assignmentId) {
         if (assignment) {
             document.getElementById('editAssignmentId').value = assignment.assignmentId;
             document.getElementById('editTitle').value = assignment.title;
-            
-            // Format datetime for input field
             const deadlineDate = new Date(assignment.deadline);
             const formattedDate = deadlineDate.toISOString().slice(0, 16);
             document.getElementById('editDeadline').value = formattedDate;
-            
             document.getElementById('editStatus').value = assignment.status;
-            
             document.getElementById('editAssignmentModal').style.display = 'block';
         }
     } catch (error) {
@@ -281,27 +266,16 @@ function closeEditModal() {
 }
 
 async function updateAssignmentStatus(assignmentId, status) {
-    if (!confirm(`Are you sure you want to mark this assignment as ${status}?`)) {
-        return;
-    }
-
+    if (!confirm(`Are you sure you want to mark this assignment as ${status}?`)) return;
     try {
         const response = await fetch(`/api/Teacher/assignments/${assignmentId}/status`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                status: status
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: status })
         });
-
         const result = await response.json();
-
         if (response.ok) {
-            // Reload assignments to reflect changes
-            const dashboard = new TeacherDashboard();
-            await dashboard.loadAssignments();
+            dashboard.loadAssignments();
             dashboard.showMessage(`Assignment marked as ${status}`, 'success');
         } else {
             alert(result.message || 'Failed to update assignment status');
@@ -313,21 +287,15 @@ async function updateAssignmentStatus(assignmentId, status) {
 }
 
 async function deleteAssignment(assignmentId) {
-    if (!confirm('Are you sure you want to delete this assignment? This action cannot be undone.')) {
-        return;
-    }
-
+    if (!confirm('Are you sure you want to delete this assignment?')) return;
     try {
+        // This URL calls your TeacherController
         const response = await fetch(`/api/Teacher/assignments/${assignmentId}`, {
             method: 'DELETE'
         });
-
         const result = await response.json();
-
         if (response.ok) {
-            // Reload assignments to reflect changes
-            const dashboard = new TeacherDashboard();
-            await dashboard.loadAssignments();
+            dashboard.loadAssignments();
             dashboard.showMessage('Assignment deleted successfully', 'success');
         } else {
             alert(result.message || 'Failed to delete assignment');
@@ -338,10 +306,8 @@ async function deleteAssignment(assignmentId) {
     }
 }
 
-// Initialize dashboard when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    new TeacherDashboard();
-});
+// Initialize dashboard
+const dashboard = new TeacherDashboard();
 
 // Close modal when clicking outside
 window.onclick = function(event) {

@@ -6,7 +6,6 @@ $(document).ready(function() {
 async function loadStudentProgress() {
     const tableBody = $('#progressTableBody').empty().append('<tr><td colspan="4">Loading...</td></tr>');
     try {
-        // This URL calls your TeacherDataController
         const response = await fetch('/api/TeacherData/student-progress');
         const progressData = await response.json();
 

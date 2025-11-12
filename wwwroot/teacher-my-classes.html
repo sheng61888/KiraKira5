@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Classes - KiraKira Teacher</title>
+    <link rel="stylesheet" href="/css/learner.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/logo transparent.png" alt="KiraKira Logo">
+            </div>
+            <nav class="nav">
+                <a href="/teacher-dashboard.html">Dashboard</a>
+                <a href="/teacher-dashboard.html">Assignments</a>
+                <a href="/teacher-my-classes.html" aria-current="page">My Classes</a>
+                <a href="/teacher-student-progress.html">Student Progress</a>
+                <a href="/login_signup.html" onclick="sessionStorage.clear();">Sign Out</a>
+            </nav>
+            </aside>
+
+        <main class="main">
+            <header class="page-heading">
+                <div>
+                    <p class="eyebrow">Teacher Panel</p>
+                    <h1>My Classes</h1>
+                    <p>View your enrolled classes and student rosters.</p>
+                </div>
+            </header>
+
+            <section class="card">
+                <div class="section-head">
+                    <h2>Enrolled Classes</h2>
+                </div>
+                <div class="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Class ID</th>
+                                <th>Class Name</th>
+                                <th>Student Count</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classesTableBody">
+                            <tr><td colspan="4">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card" id="studentListCard" style="display:none;">
+                <div class="section-head">
+                    <h2 id="studentListHeader">Students in...</h2>
+                </div>
+                <div class="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/teacher-classes.js"></script>
+</body>
+</html>

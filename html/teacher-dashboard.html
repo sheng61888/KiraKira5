@@ -7,13 +7,13 @@
     <link rel="stylesheet" href="../css/learner.css">
     <link rel="stylesheet" href="../css/admin.css">
     <style>
+        /* These styles are from your teacher-dashboard.html */
         .assignments-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1.5rem;
             margin-top: 1.5rem;
         }
-        
         .assignment-card {
             background: white;
             border-radius: 8px;
@@ -21,56 +21,38 @@
             border-left: 4px solid #4f46e5;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
-        .assignment-card.overdue {
-            border-left-color: #ef4444;
-        }
-        
-        .assignment-card.completed {
-            border-left-color: #10b981;
-        }
-        
+        .assignment-card.overdue { border-left-color: #ef4444; }
+        .assignment-card.completed { border-left-color: #10b981; }
         .assignment-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 1rem;
         }
-        
-        .assignment-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
+        .assignment-actions { display: flex; gap: 0.5rem; }
         .assignment-meta {
             display: flex;
             gap: 1rem;
             color: #6b7280;
             font-size: 0.875rem;
         }
-        
         .status-badge {
             padding: 0.25rem 0.75rem;
             border-radius: 9999px;
             font-size: 0.75rem;
             font-weight: 600;
         }
-        
         .status-open { background: #dbeafe; color: #1e40af; }
         .status-upcoming { background: #fef3c7; color: #92400e; }
         .status-closed { background: #f3f4f6; color: #374151; }
         .status-completed { background: #d1fae5; color: #065f46; }
-        
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
-        
         @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
+            .form-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -82,9 +64,8 @@
             </div>
             <nav class="nav">
                 <a href="teacher-dashboard.html" aria-current="page">Dashboard</a>
-                <a href="teacher-assignments.html">Assignments</a>
-                <a href="teacher-classes.html">My Classes</a>
-                <a href="teacher-progress.html">Student Progress</a>
+                <a href="admin-UserManagement.html">Manage Students</a>
+                <a href="admin-CommunityManagement.html">Community</a>
                 <a href="../html/login_signup.html" onclick="return confirm('Are you sure you want to sign out?')">Sign Out</a>
             </nav>
         </aside>
@@ -96,12 +77,8 @@
                     <h1>Assignment Management</h1>
                     <p>Create and manage assignments for your classes</p>
                 </div>
-                <div class="heading-actions">
-                    <button class="btn btn--primary" onclick="openCreateAssignmentModal()">Create New Assignment</button>
-                </div>
             </header>
 
-            <!-- Quick Stats -->
             <section class="grid stats-grid">
                 <article class="card stat-block">
                     <h3>Total Assignments</h3>
@@ -125,7 +102,6 @@
                 </article>
             </section>
 
-            <!-- Create Assignment Form -->
             <section class="card">
                 <div class="section-head">
                     <div>
@@ -162,15 +138,11 @@
                 </form>
             </section>
 
-            <!-- Current Assignments -->
             <section class="card">
                 <div class="section-head">
-                    <div>
-                        <p class="eyebrow">Current Assignments</p>
-                        <h2>Recent Assignments</h2>
-                    </div>
+                    <h2>Recent Assignments</h2>
                     <div class="heading-actions">
-                        <button class="btn btn--ghost" onclick="loadAssignments()">Refresh</button>
+                        <button class="btn btn--ghost" onclick="dashboard.loadAssignments()">Refresh</button>
                     </div>
                 </div>
                 <div id="assignmentsContainer">
@@ -180,7 +152,6 @@
         </main>
     </div>
 
-    <!-- Edit Assignment Modal -->
     <div id="editAssignmentModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>

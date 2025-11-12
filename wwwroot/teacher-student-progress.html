@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Progress - KiraKira Teacher</title>
-    <link rel="stylesheet" href="../css/learner.css">
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="/css/learner.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
     <div class="app">
         <aside class="sidebar">
             <div class="logo">
-                <img src="../images/logo transparent.png" alt="KiraKira Logo">
+                <img src="/images/logo transparent.png" alt="KiraKira Logo">
             </div>
             <nav class="nav">
-                <a href="teacher-dashboard.html">Dashboard</a>
-                <a href="teacher-dashboard.html">Assignments</a>
-                <a href="teacher-my-classes.html">My Classes</a>
-                <a href="teacher-student-progress.html" aria-current="page">Student Progress</a>
-                <a href="login_signup.html" onclick="sessionStorage.clear();">Sign Out</a>
+                <a href="/teacher-dashboard.html">Dashboard</a>
+                <a href="/teacher-dashboard.html">Assignments</a>
+                <a href="/teacher-my-classes.html">My Classes</a>
+                <a href="/teacher-student-progress.html" aria-current="page">Student Progress</a>
+                <a href="/login_signup.html" onclick="sessionStorage.clear();">Sign Out</a>
             </nav>
             </aside>
 
@@ -30,9 +30,30 @@
                     <p>View analytics for students in your classes.</p>
                 </div>
             </header>
+
+            <section class="card">
+                <div class="section-head">
+                    <h2>Chapter Completion by Student</h2>
+                </div>
+                <div class="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Email</th>
+                                <th>Class</th>
+                                <th>Chapters Completed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="progressTableBody">
+                            <tr><td colspan="4">Loading progress...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </main>
-</div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="../js/teacher-progress.js"></script>
+    <script src="/js/teacher-progress.js"></script>
 </body>
 </html>

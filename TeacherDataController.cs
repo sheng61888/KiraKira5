@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using System.Data;
+using KiraKira5.Models; // Assuming your DTOs are here
 
 [ApiController]
 [Route("api/[controller]")]

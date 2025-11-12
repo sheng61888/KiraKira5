@@ -1,7 +1,8 @@
+// Program.cs
 using Microsoft.Extensions.FileProviders;
 using System.Text.Json;
 using KiraKira5.Services;
-using MySql.Data.MySqlClient; // Make sure this line is added
+using MySql.Data.MySqlClient; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +21,9 @@ builder.Services.AddTransient<MySqlConnection>(_ => new MySqlConnection(connecti
 
 // Add your custom services
 builder.Services.AddScoped<ILearnerService, LearnerService>();
-builder.Services.AddScoped<CourseService>(sp => new CourseService(connectionString));
-builder.Services.AddScoped<TeacherService>(sp => new TeacherService(connectionString)); // <-- This line is moved
+// --- ADD '!' TO FIX CS8604 WARNING ---
+builder.Services.AddScoped<CourseService>(sp => new CourseService(connectionString!));
+builder.Services.AddScoped<TeacherService>(sp => new TeacherService(connectionString!)); 
 
 // --- 3. Add CORS ---
 builder.Services.AddCors(options =>
@@ -38,12 +40,11 @@ var app = builder.Build();
 // --- 5. Configure the HTTP request pipeline ---
 app.UseCors();
 
-// This line tells .NET to serve files like teacher-dashboard.html
-// from a folder named "wwwroot".
+// This tells .NET to serve files from a "wwwroot" folder
 app.UseDefaultFiles(); 
 app.UseStaticFiles(); 
 
-// This line is from your original file, which lets you serve files from the root
+// This (from your file) serves from the root. Let's keep both.
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath)),
