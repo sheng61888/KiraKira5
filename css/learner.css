@@ -1335,11 +1335,14 @@ ul {
 
 .badge-body strong {
   display: block;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .badge-body small {
   font-size: 0.85rem;
   color: var(--muted);
+  white-space: normal;
 }
 
 .badge-collection[data-style="level"] .badge-card.unlocked {
