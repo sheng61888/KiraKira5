@@ -91,13 +91,25 @@
       }
     };
 
-    const computeBadgeTotal = stats => {
-      if (!stats || typeof stats !== "object") {
+    const countUnlockedBadges = payload => {
+      if (!payload || typeof payload !== "object") {
         return 0;
       }
-      return Object.values(stats).reduce((sum, value) => {
-        const parsed = Number(value);
-        return sum + (Number.isFinite(parsed) ? parsed : 0);
+      const stats = payload.stats || {};
+      const collections = Array.isArray(payload.collections) ? payload.collections : [];
+      return collections.reduce((total, collection) => {
+        const metricValue = Number(stats?.[collection.metric]) || 0;
+        if (!Array.isArray(collection.rewards)) {
+          return total;
+        }
+        const unlocked = collection.rewards.filter(reward => {
+          const requirement = Number(reward.value);
+          if (!Number.isFinite(requirement)) {
+            return false;
+          }
+          return metricValue >= requirement;
+        }).length;
+        return total + unlocked;
       }, 0);
     };
 
@@ -307,7 +319,7 @@
     };
 
     const handleBadges = badges => {
-      const total = computeBadgeTotal(badges?.stats);
+      const total = countUnlockedBadges(badges);
       if (!baselineReady) {
         refs.badges = total;
         saveState();
@@ -319,7 +331,7 @@
         addNotification({
           kind: "badge",
           title: diff > 1 ? `Unlocked ${diff} badges` : "New badge unlocked",
-          body: "Check the Milestones section to see your new reward."
+          body: "Check the Milestones section in your Profile to see your reward."
         });
       }
       if (total !== refs.badges) {

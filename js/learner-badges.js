@@ -1,23 +1,44 @@
 (() => {
-  const FALLBACK_STATS = { level: 3, streak: 7, cats: 2, ghibli: 1, hidden: 0 };
+  const FALLBACK_STATS = {
+    level: 0,
+    streak: 0,
+    moduleMastery: 0,
+    paperWarrior: 0,
+    consistency: 0
+  };
+
+  const mergeWithDefaults = stats => ({ ...FALLBACK_STATS, ...(stats || {}) });
 
   const loadStats = () => {
     if (window.kiraBadgeStats) {
-      return window.kiraBadgeStats;
+      return mergeWithDefaults(window.kiraBadgeStats);
     }
     if (window.kiraUserStats) {
-      return window.kiraUserStats;
+      return mergeWithDefaults(window.kiraUserStats);
     }
     try {
       const stored = localStorage.getItem("kiraUserStats");
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        return mergeWithDefaults(parsed);
       }
     } catch (error) {
       console.warn("Unable to parse stored stats", error);
     }
     localStorage.setItem("kiraUserStats", JSON.stringify(FALLBACK_STATS));
     return FALLBACK_STATS;
+  };
+
+  const prettifyMetric = value => {
+    if (typeof value !== "string" || !value.length) {
+      return "";
+    }
+    return value
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/\b\w/g, letter => letter.toUpperCase());
   };
 
   const createBadgeCard = (collection, reward, unlocked) => {
@@ -73,8 +94,9 @@
 
       const header = document.createElement('div');
       header.className = 'badge-collection-head';
+      const chipLabel = prettifyMetric(collection.metric);
       header.innerHTML = '<div><p class="eyebrow">' + collection.title + '</p><h3>' + collection.description + '</h3></div>' +
-        '<span class="chip">' + collection.metric + ': ' + metricDisplay + '</span>';
+        '<span class="chip">' + chipLabel + (chipLabel ? ': ' : '') + metricDisplay + '</span>';
 
       const grid = document.createElement('div');
       grid.className = 'badge-grid';
@@ -107,9 +129,10 @@
         window.kiraBadgeCollections = event.detail.collections;
       }
       if (event.detail.stats) {
-        window.kiraBadgeStats = event.detail.stats;
+        const merged = mergeWithDefaults(event.detail.stats);
+        window.kiraBadgeStats = merged;
         try {
-          localStorage.setItem('kiraUserStats', JSON.stringify(event.detail.stats));
+          localStorage.setItem('kiraUserStats', JSON.stringify(merged));
         } catch (error) {
           console.warn('Unable to store badge stats', error);
         }

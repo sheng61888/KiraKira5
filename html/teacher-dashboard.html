@@ -4,55 +4,98 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Teacher Dashboard | KiraKira</title>
+    
     <link rel="stylesheet" href="../css/style.css" /> 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
     <style>
-        /* Simple styles for the dashboard list */
         body { font-family: 'Inter', sans-serif; background: #f9f9f9; }
         .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
         .header { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .lesson-list {
+        .card {
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             padding: 1.5rem 2rem;
+            margin-top: 2rem;
         }
-        .lesson-list h1 { margin-top: 0; }
-        .lesson-group { margin-bottom: 2rem; }
-        .lesson-group h2 {
+        .section-head {
             border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 0.5rem;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
-        .lesson-item {
+        .section-head h2 { margin: 0; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .form-group {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .users-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .users-table th, .users-table td {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
             border-bottom: 1px solid #f0f0f0;
         }
-        .lesson-item:last-child { border-bottom: none; }
-        .lesson-item span { font-weight: 500; color: #333; }
-        .btn-edit {
+        .users-table th {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
             text-decoration: none;
+            display: inline-block;
+        }
+        .btn--primary {
             background-color: #4e54c8;
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: background-color 0.2s;
         }
-        .btn-edit:hover { background-color: #3b409a; }
+        .btn--danger {
+            background-color: #d9534f;
+            color: white;
+        }
+        .status-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8); display: none;
+            justify-content: center; align-items: center; font-size: 1.5rem;
+            font-weight: 600; color: #4e54c8; z-index: 1000;
+        }
     </style>
 </head>
 <body>
+    <div class="status-overlay" id="statusOverlay"><p>Loading...</p></div>
+
     <header class="header">
         <nav class="container nav-container">
-            <a href="home.html" class="brand-logo">KiraKira</a>
+            <a href="home.php" class="brand-logo">KiraKira</a>
             <div class="nav-links">
-                <a href="teacher-dashboard.html">My Dashboard</a>
+                <a href="teacher-dashboard.php">My Dashboard</a>
                 <a href="catalogue-classes.html">Catalogue</a>
                 <a href="logout.html">Logout</a>
             </div>
@@ -60,93 +103,233 @@
     </header>
 
     <main>
-        <div class="container">
-            <div class="lesson-list">
-                <h1>Manage Lessons</h1>
-                
-                <div class="lesson-group">
-                    <h2>Form 4</h2>
-                    <div class="lesson-item">
-                        <span>Lesson 01: Functions</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-01" class="btn-edit">Edit</a>
+        <div class="container" style="padding-top: 0;">
+            <section class="card">
+                <form id="assignmentForm">
+                    <div class="section-head">
+                        <h2>Create New Assignment</h2>
                     </div>
-                    <div class="lesson-item">
-                        <span>Lesson 02: Number Bases</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-02" class="btn-edit">Edit</a>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="assignTitle">Assignment Title</label>
+                            <input type="text" id="assignTitle" placeholder="e.g., Form 4 Algebra Review" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="assignClass">Assign to Class</label>
+                            <select id="assignClass" required>
+                                <option value="">Loading classes...</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="lesson-item">
-                        <span>Lesson 03: Logical Reasoning</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-03" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 04: Operations on Sets</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-04" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 05: Network in Graph Theory</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-05" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 06: Linear Inequalities</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-06" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 07: Graphs of Motion</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-07" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 08: Measures of Dispersion</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-08" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 09: Probability of Combined Events</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-09" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 10: Consumer Mathematics</span>
-                        <a href="teacher-lesson-edit.html?lesson=form4-10" class="btn-edit">Edit</a>
-                    </div>
-                </div>
 
-                <div class="lesson-group">
-                    <h2>Form 5</h2>
-                    <div class="lesson-item">
-                        <span>Lesson 01: Variation</span>
-                        <a href="teacher-lesson-edit.html?lesson=form5-01" class="btn-edit">Edit</a>
+                    <div class="form-grid" style="margin-top: 1.5rem;">
+                        <div class="form-group">
+                            <label for="assignCourse">Course</label>
+                            <select id="assignCourse" required>
+                                <option value="">Loading courses...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="assignChapter">Chapter (Optional)</label>
+                            <select id="assignChapter">
+                                <option value="">Assign whole course</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="assignSubchapter">Lesson (Optional)</label>
+                            <select id="assignSubchapter">
+                                <option value="">Assign whole chapter</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="assignDeadline">Deadline</label>
+                            <input type="date" id="assignDeadline" required>
+                        </div>
                     </div>
-                    <div class="lesson-item">
-                        <span>Lesson 02: Matrices</span>
-                        <a href="teacher-lesson-edit.html?lesson=form5-02" class="btn-edit">Edit</a>
+                    
+                    <div style="margin-top: 2rem;">
+                        <button class="btn btn--primary" type="submit">Create Assignment</button>
                     </div>
-                    <div class="lesson-item">
-                        <span>Lesson 03: Consumer Mathematics</span>
-                        <a href="teacher-lesson-edit.html?lesson=form5-03" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 04: Taxation</span>
-                        <a href="teacher-lesson-edit.html?lesson=form5-04" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 05: Congruency, Enlargement</span>
-                        <a href="teacher-lesson-edit.html?lesson=form5-05" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 06: Ratios of Trigonometric</span>
-                        <a href="teacher-lesson-edit.html?lesson=form5-06" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 07: Plans and Elevations</span>
-                        <a href="teacher-lesson-edit.html?lesson=form5-07" class="btn-edit">Edit</a>
-                    </div>
-                    <div class="lesson-item">
-                        <span>Lesson 08: Loci in Two Dimensions</span>
-                        <a href="teacher-lesson-edit.html?lesson=form5-08" class="btn-edit">Edit</a>
-                    </div>
-                </div>
+                </form>
+            </section>
 
-            </div>
+            <section class="card">
+                <div class="section-head">
+                    <h2>Current Assignments</h2>
+                </div>
+                <div class="users-table">
+                    <table id="assignmentsTable">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Class</th>
+                                <th>Assigned Content</th>
+                                <th>Deadline</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assignmentsTableBody">
+                            <tr><td colspan="5">Loading assignments...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     </main>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // This JavaScript will power the page
+        $(document).ready(function() {
+            loadInitialData();
+            $('#assignCourse').on('change', function() { loadChapters($(this).val()); });
+            $('#assignChapter').on('change', function() { loadSubchapters($(this).val()); });
+            $('#assignmentForm').on('submit', function(e) { e.preventDefault(); createAssignment(); });
+        });
+
+        const statusOverlay = $('#statusOverlay');
+
+        async function loadInitialData() {
+            statusOverlay.show().find('p').text('Loading Data...');
+            try {
+                const [coursesRes, classesRes, assignmentsRes] = await Promise.all([
+                    fetch('api.php?action=get_courses_and_subchapters'),
+                    fetch('api.php?action=get_classes'),
+                    fetch('api.php?action=get_assignments')
+                ]);
+
+                const coursesData = await coursesRes.json();
+                const classesData = await classesRes.json();
+                const assignmentsData = await assignmentsRes.json();
+
+                const courseSelect = $('#assignCourse');
+                courseSelect.empty().append('<option value="">Select a course</option>');
+                window.allCoursesData = coursesData;
+                coursesData.forEach(course => {
+                    courseSelect.append(`<option value="${course.course_id}">${course.title}</option>`);
+                });
+
+                const classSelect = $('#assignClass');
+                classSelect.empty().append('<option value="">Select a class</option>');
+                classesData.forEach(cls => {
+                    classSelect.append(`<option value="${cls.class_id}">${cls.title}</option>`);
+                });
+
+                populateAssignmentsTable(assignmentsData);
+            } catch (err) {
+                console.error(err);
+                alert('Error loading page data.');
+            } finally {
+                statusOverlay.hide();
+            }
+        }
+
+        function loadChapters(courseId) {
+            const chapterSelect = $('#assignChapter').empty().append('<option value="">Assign whole course</option>');
+            $('#assignSubchapter').empty().append('<option value="">Assign whole chapter</option>');
+            if (!courseId || !window.allCoursesData) return;
+            const course = window.allCoursesData.find(c => c.course_id == courseId);
+            if (course && course.chapters) {
+                course.chapters.forEach(chapter => {
+                    chapterSelect.append(`<option value="${chapter.chapter_id}">${chapter.title}</option>`);
+                });
+            }
+        }
+
+        function loadSubchapters(chapterId) {
+            const subchapterSelect = $('#assignSubchapter').empty().append('<option value="">Assign whole chapter</option>');
+            if (!chapterId || !window.allCoursesData) return;
+            const courseId = $('#assignCourse').val();
+            const course = window.allCoursesData.find(c => c.course_id == courseId);
+            if (!course) return;
+            const chapter = course.chapters.find(ch => ch.chapter_id == chapterId);
+            if (chapter && chapter.subchapters) {
+                chapter.subchapters.forEach(sub => {
+                    subchapterSelect.append(`<option value="${sub.subchapter_id}">${sub.title}</option>`);
+                });
+            }
+        }
+
+        function populateAssignmentsTable(assignments) {
+            const tableBody = $('#assignmentsTableBody').empty();
+            if (!assignments || assignments.length === 0) {
+                tableBody.append('<tr><td colspan="5">No assignments found.</td></tr>');
+                return;
+            }
+            assignments.forEach(a => {
+                const row = `
+                    <tr>
+                        <td>${a.title}</td>
+                        <td>${a.class_title}</td>
+                        <td>${a.content_title}</td>
+                        <td>${a.deadline}</td>
+                        <td class="actions">
+                            <button class="btn btn--danger" onclick="deleteAssignment(${a.assignment_id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.append(row);
+            });
+        }
+
+        async function createAssignment() {
+            statusOverlay.show().find('p').text('Creating Assignment...');
+            const assignmentData = {
+                title: $('#assignTitle').val(),
+                class_id: $('#assignClass').val(),
+                course_id: $('#assignCourse').val(),
+                chapter_id: $('#assignChapter').val() || null,
+                subchapter_id: $('#assignSubchapter').val() || null,
+                deadline: $('#assignDeadline').val()
+            };
+
+            try {
+                const response = await fetch('api.php?action=create_assignment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(assignmentData)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Assignment created!');
+                    $('#assignmentForm')[0].reset();
+                    const assignmentsRes = await fetch('api.php?action=get_assignments');
+                    const assignmentsData = await assignmentsRes.json();
+                    populateAssignmentsTable(assignmentsData);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error creating assignment: ' + err.message);
+            } finally {
+                statusOverlay.hide();
+            }
+        }
+
+        async function deleteAssignment(assignmentId) {
+            if (!confirm('Are you sure you want to delete this assignment?')) return;
+            statusOverlay.show().find('p').text('Deleting...');
+            try {
+                const response = await fetch('api.php?action=delete_assignment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ assignment_id: assignmentId })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    $(`button[onclick="deleteAssignment(${assignmentId})"]`).closest('tr').remove();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error deleting assignment: ' + err.message);
+            } finally {
+                statusOverlay.hide();
+            }
+        }
+    </script>
 </body>
 </html>
