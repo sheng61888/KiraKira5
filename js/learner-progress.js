@@ -4,8 +4,9 @@
     overallValue: ".big-progress strong",
     overallChip: ".overall-progress .chip",
     topicsContainer: "#topicProgressList",
-    checkpointsList: "#checkpointList",
     motivationCard: "#motivation",
+    motivationTitle: "#motivationTitle",
+    motivationBody: "#motivationBody",
     downloadBtn: "#downloadReportBtn"
   };
 
@@ -47,40 +48,20 @@
       .join("");
   };
 
-  const renderCheckpoints = checkpoints => {
-    const list = document.querySelector(selectors.checkpointsList);
-    if (!list) {
-      return;
-    }
-    if (!Array.isArray(checkpoints) || !checkpoints.length) {
-      list.innerHTML = "<li><div><strong>No checkpoints yet</strong><small>Complete a lesson to get recommended next steps.</small></div></li>";
-      return;
-    }
-    list.innerHTML = checkpoints
-      .map(checkpoint => {
-        const buttonClass = checkpoint.primary ? "btn btn--primary" : "btn btn--ghost";
-        return `
-          <li>
-            <div>
-              <strong>${checkpoint.title}</strong>
-              <small>${checkpoint.note || ""}</small>
-            </div>
-            <button class="${buttonClass}" type="button">${checkpoint.cta || "Open"}</button>
-          </li>`;
-      })
-      .join("");
-  };
-
   const renderMotivation = motivation => {
     const card = document.querySelector(selectors.motivationCard);
-    if (!card) {
+    const title = document.querySelector(selectors.motivationTitle);
+    const body = document.querySelector(selectors.motivationBody);
+    if (!card || !title || !body) {
       return;
     }
     if (!motivation) {
-      card.innerHTML = "<h2>Keep going!</h2><p>Your next study session will update this card.</p>";
+      title.textContent = "Keep going!";
+      body.textContent = "Your next study session will update this card.";
       return;
     }
-    card.innerHTML = `<h2>${motivation.title}</h2><p>${motivation.body}</p>`;
+    title.textContent = motivation.title || "Small steps, big gains";
+    body.textContent = motivation.body || "Line up one focused session today to push your progress forward.";
   };
 
   const wireDownloadButton = reportUrl => {
@@ -122,7 +103,6 @@
       const data = await response.json();
       updateOverall(data.overallPercent ?? 0, data.weeklyDelta ?? 0);
       renderTopics(data.topics);
-      renderCheckpoints(data.checkpoints);
       renderMotivation(data.motivation);
       wireDownloadButton(data.reportUrl);
     } catch (error) {

@@ -162,18 +162,41 @@
     if (!module) {
       return "";
     }
-    const raw =
+    const direct =
       module.moduleId ||
       module.ModuleId ||
       module.slug ||
-      module.Slug ||
-      module.number ||
-      (module.link || module.Link || "").replace(/\.html?$/i, "");
-    if (raw) {
-      return raw.toString().trim();
+      module.Slug;
+    if (direct) {
+      return direct.toString().trim();
     }
-    const gradeDigits = section?.grade?.match(/\d+/)?.[0];
-    return gradeDigits && module.number ? `form${gradeDigits}-${module.number}` : "";
+    const link = module.link || module.Link;
+    if (link) {
+      const match = link.match(/module=([^&]+)/i);
+      if (match && match[1]) {
+        try {
+          return decodeURIComponent(match[1]).trim();
+        } catch {
+          return match[1].trim();
+        }
+      }
+      const cleaned = link
+        .replace(/^https?:\/\/[^/]+/i, "")
+        .split(/[?#]/)[0]
+        .replace(/^\//, "")
+        .replace(/\.html?$/i, "")
+        .trim();
+      if (cleaned) {
+        return cleaned;
+      }
+    }
+    if (module.number && section?.grade) {
+      const digits = section.grade.match(/\d+/)?.[0];
+      if (digits) {
+        return `form${digits}-${module.number}`.trim();
+      }
+    }
+    return module.number ? module.number.toString().trim() : "";
   };
 
   const findModule = moduleId => {
@@ -183,6 +206,7 @@
     const target = normalizeId(moduleId);
     return flattenModules().find(entry => {
       const module = entry.module || {};
+      const derivedId = deriveModuleId(entry.section, module);
       const candidates = [
         module.moduleId,
         module.ModuleId,
@@ -190,6 +214,7 @@
         module.Slug,
         module.link,
         module.Link,
+        derivedId,
         module.number && entry.section?.grade
           ? `form${entry.section.grade.match(/\d+/)?.[0] || ""}-${module.number}`
           : null

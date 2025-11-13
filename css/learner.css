@@ -1572,6 +1572,29 @@ ul {
   box-shadow: var(--shadow-card);
 }
 
+.motivation {
+  display: flex;
+  gap: clamp(1rem, 2vw, 2rem);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.motivation__content {
+  flex: 1 1 220px;
+}
+
+.motivation__figure {
+  flex: 0 0 240px;
+  margin: 0;
+  max-width: min(260px, 40vw);
+}
+
+.motivation__figure img {
+  width: 100%;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+}
+
 .big-progress {
   width: 100%;
   max-width: 520px;

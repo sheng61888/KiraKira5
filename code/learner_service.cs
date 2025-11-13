@@ -45,6 +45,7 @@ public class LearnerService : ILearnerService
     private const int DefaultModuleQuizXp = 120;
     private const int DefaultPastPaperXp = 100;
     private const int MaxActivityXp = 500;
+    private const int BaseLevelXp = 1000;
     private const string DefaultAvatar = "/images/profile-cat.jpg";
     private static readonly HashSet<string> AllowedAvatars = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -1835,6 +1836,25 @@ public class LearnerService : ILearnerService
         return Math.Max(0, Math.Min(MaxActivityXp, value));
     }
 
+    private static int CalculateLevelFromXp(int totalXp)
+    {
+        if (totalXp <= 0)
+        {
+            return 1;
+        }
+        return Math.Max(1, (totalXp / BaseLevelXp) + 1);
+    }
+
+    private static int CalculateXpToNextLevel(int totalXp)
+    {
+        if (totalXp < 0)
+        {
+            return BaseLevelXp;
+        }
+        var remainder = totalXp % BaseLevelXp;
+        return remainder == 0 ? BaseLevelXp : BaseLevelXp - remainder;
+    }
+
     private static string Truncate(string? value, int maxLength)
     {
         if (string.IsNullOrWhiteSpace(value) || value.Length <= maxLength)
@@ -1878,6 +1898,12 @@ public class LearnerService : ILearnerService
         var normalizedMoment = NormalizeTimestamp(occurredAtUtc);
         var activityDate = NormalizeActivityDate(normalizedMoment);
         var state = await FetchStreakStateAsync(learnerId) ?? new LearnerStreakState();
+        LearnerXpSnapshot? xpSnapshot = null;
+
+        if (xpAwarded > 0)
+        {
+            xpSnapshot = await ApplyXpAwardAsync(learnerId, xpAwarded);
+        }
 
         var result = new StreakUpdateResult
         {
@@ -1913,12 +1939,80 @@ public class LearnerService : ILearnerService
 
         state.Current = newCurrent;
         state.Longest = Math.Max(state.Longest, newCurrent);
-        state.XpToNextLevel = Math.Max(0, state.XpToNextLevel - Math.Max(0, xpAwarded));
+        if (xpSnapshot != null)
+        {
+            state.XpToNextLevel = xpSnapshot.XpToNextLevel;
+        }
+        else
+        {
+            state.XpToNextLevel = Math.Max(0, state.XpToNextLevel - Math.Max(0, xpAwarded));
+        }
         state.LastActivityOn = activityDate;
         state.LastActivitySource = source ?? string.Empty;
 
         await SaveStreakStateAsync(learnerId, state);
         return result;
+    }
+
+    private async Task<LearnerXpSnapshot?> ApplyXpAwardAsync(string learnerId, int xpAwarded)
+    {
+        if (string.IsNullOrWhiteSpace(learnerId) || xpAwarded <= 0)
+        {
+            return null;
+        }
+
+        var currentXp = 0;
+        var currentLevel = 1;
+        const string selectSql = @"SELECT xp, level FROM learner_profile WHERE uid = @Uid LIMIT 1";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return null;
+            }
+
+            await using (var selectCmd = new MySqlCommand(selectSql, connection))
+            {
+                selectCmd.Parameters.AddWithValue("@Uid", learnerId);
+                await using var reader = await selectCmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    currentXp = SafeToInt(reader["xp"], currentXp);
+                    currentLevel = SafeToInt(reader["level"], currentLevel);
+                }
+            }
+
+            var totalXp = Math.Max(0, currentXp) + xpAwarded;
+            var level = CalculateLevelFromXp(totalXp);
+            var xpToNext = CalculateXpToNextLevel(totalXp);
+
+            const string upsertSql = @"INSERT INTO learner_profile (uid, xp, level)
+                                       VALUES (@Uid, @Xp, @Level)
+                                       ON DUPLICATE KEY UPDATE xp = @Xp, level = @Level";
+
+            await using (var upsertCmd = new MySqlCommand(upsertSql, connection))
+            {
+                upsertCmd.Parameters.AddWithValue("@Uid", learnerId);
+                upsertCmd.Parameters.AddWithValue("@Xp", totalXp);
+                upsertCmd.Parameters.AddWithValue("@Level", level);
+                await upsertCmd.ExecuteNonQueryAsync();
+            }
+
+            return new LearnerXpSnapshot
+            {
+                TotalXp = totalXp,
+                Level = level,
+                XpToNextLevel = xpToNext
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to apply XP for {learnerId}: {ex.Message}");
+        }
+
+        return null;
     }
 
     private async Task<LearnerStreakState?> FetchStreakStateAsync(string learnerId)
@@ -1972,6 +2066,11 @@ public class LearnerService : ILearnerService
             if (connection == null)
             {
                 return;
+            }
+
+            if (state.XpToNextLevel <= 0)
+            {
+                state.XpToNextLevel = BaseLevelXp;
             }
 
             await using var command = new MySqlCommand(sql, connection);
@@ -2325,7 +2424,7 @@ public class LearnerService : ILearnerService
         {
             Current = 0,
             Longest = 0,
-            XpToNextLevel = Math.Max(0, 1000 - profile.Xp),
+            XpToNextLevel = CalculateXpToNextLevel(profile.Xp),
             Status = "Start your streak",
             LevelLabel = $"Level {profile.Level} - {profile.Xp} XP"
         };
@@ -2352,6 +2451,10 @@ public class LearnerService : ILearnerService
                 streak.Current = SafeToInt(reader["current_streak"], streak.Current);
                 streak.Longest = SafeToInt(reader["longest_streak"], streak.Longest);
                 streak.XpToNextLevel = SafeToInt(reader["xp_to_next_level"], streak.XpToNextLevel);
+                if (streak.XpToNextLevel <= 0)
+                {
+                    streak.XpToNextLevel = CalculateXpToNextLevel(profile.Xp);
+                }
             }
         }
         catch (Exception ex)
@@ -3914,7 +4017,7 @@ public class LearnerService : ILearnerService
     {
         public int Current { get; set; }
         public int Longest { get; set; }
-        public int XpToNextLevel { get; set; } = 1000;
+        public int XpToNextLevel { get; set; } = BaseLevelXp;
         public DateTime? LastActivityOn { get; set; }
         public string LastActivitySource { get; set; } = string.Empty;
     }
@@ -3995,6 +4098,13 @@ public class LearnerModuleSnapshot
 {
     public IEnumerable<ModuleCardDto> ActiveModules { get; set; } = new List<ModuleCardDto>();
     public IEnumerable<ModuleCatalogueSectionDto> Catalogue { get; set; } = new List<ModuleCatalogueSectionDto>();
+}
+
+public class LearnerXpSnapshot
+{
+    public int TotalXp { get; set; }
+    public int Level { get; set; }
+    public int XpToNextLevel { get; set; }
 }
 
 public class LearnerFeaturedBadgeDto

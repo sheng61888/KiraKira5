@@ -42,10 +42,6 @@
           <h1>Track your learning momentum</h1>
           <p aria-live="polite">We will show your personalised stats as soon as they load.</p>
         </div>
-        <div class="heading-actions">
-          <button class="btn btn--ghost" type="button" id="downloadReportBtn" disabled>Preparing report...</button>
-          <button class="btn btn--primary" type="button">Share with coach</button>
-        </div>
       </header>
 
       <!-- Overall Progress -->
@@ -75,30 +71,35 @@
       <!-- Completion Message -->
       <section class="grid grid--two">
         <article class="card motivation" id="motivation">
-          <h2 aria-live="polite">Hang tight!</h2>
-          <p>Your encouragement card updates after we fetch your data.</p>
+          <div class="motivation__content">
+            <h2 aria-live="polite" id="motivationTitle">Hang tight!</h2>
+            <p id="motivationBody">Your encouragement card updates after we fetch your data.</p>
+          </div>
+          <figure class="motivation__figure">
+            <img src="../images/my cat stats.png" alt="Playful stat mockup featuring a cat dashboard" loading="lazy" decoding="async">
+          </figure>
         </article>
 
-        <article class="card">
+        <section class="card checklist-card" aria-labelledby="checklistTitle">
           <div class="section-head">
-            <h2>Next checkpoints</h2>
-            <span class="chip chip--info" aria-live="polite">Awaiting data</span>
+            <h2 id="checklistTitle">My Checklist</h2>
+            <button class="btn btn--ghost" type="button" data-action="clear-checklist">Clear completed</button>
           </div>
-          <ul class="recommended-list" id="checkpointList">
-            <li>
-              <div>
-                <strong>Loading checkpoints...</strong>
-                <small>We'll list your actionable steps here.</small>
-              </div>
-            </li>
-          </ul>
-        </article>
+          <form class="checklist-form" id="checklistForm" autocomplete="off">
+            <label class="sr-only" for="checklistInput">Add a goal</label>
+            <input id="checklistInput" name="goal" type="text" placeholder="Example: Finish variation quiz" maxlength="120" required />
+            <button class="btn btn--primary" type="submit">Add</button>
+          </form>
+          <p class="muted checklist-empty" data-role="checklist-empty">Add goals you want to tackle next.</p>
+          <ul class="checklist-list" id="checklistList" aria-live="polite"></ul>
+        </section>
       </section>
     </main>
   </div>
 
   <script src="../js/learner-session.js"></script>
   <script src="../js/learner-shell.js"></script>
+  <script src="../js/learner-checklist.js"></script>
   <script src="../js/learner-progress.js"></script>
 </body>
 </html>
