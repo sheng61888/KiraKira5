@@ -46,6 +46,7 @@ public class LearnerService : ILearnerService
     private const int DefaultPastPaperXp = 100;
     private const int MaxActivityXp = 500;
     private const int BaseLevelXp = 1000;
+    private const int XpPerUnitCompletion = 60;
     private const string DefaultAvatar = "/images/profile-cat.jpg";
     private static readonly HashSet<string> AllowedAvatars = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -455,7 +456,18 @@ public class LearnerService : ILearnerService
             return response;
         }
 
-        var saved = await UpsertTopicProgressAsync(learnerId, normalizedModuleId, normalizedUnitId, request?.Status, request?.ScorePercent, request?.DurationSeconds);
+        var normalizedStatus = string.IsNullOrWhiteSpace(request?.Status)
+            ? "completed"
+            : request.Status.Trim().ToLowerInvariant();
+        var priorState = await FetchUnitProgressAsync(learnerId, normalizedModuleId, normalizedUnitId);
+
+        var saved = await UpsertTopicProgressAsync(
+            learnerId,
+            normalizedModuleId,
+            normalizedUnitId,
+            normalizedStatus,
+            request?.ScorePercent,
+            request?.DurationSeconds);
         if (!saved)
         {
             response.Message = "Unable to log progress.";
@@ -467,7 +479,22 @@ public class LearnerService : ILearnerService
         response.ActiveModules = snapshot.ActiveModules;
         response.ModuleId = normalizedModuleId;
         response.UnitId = normalizedUnitId;
-        response.Status = request?.Status ?? "completed";
+        response.Status = normalizedStatus;
+
+        var newlyCompleted = string.Equals(normalizedStatus, "completed", StringComparison.OrdinalIgnoreCase) &&
+            (priorState == null || !string.Equals(priorState.Status, "completed", StringComparison.OrdinalIgnoreCase));
+
+        if (newlyCompleted)
+        {
+            var xpSnapshot = await ApplyXpAwardAsync(learnerId, XpPerUnitCompletion);
+            if (xpSnapshot != null)
+            {
+                await UpdateLearnerXpToNextLevelAsync(learnerId, xpSnapshot.XpToNextLevel);
+                response.XpSnapshot = xpSnapshot;
+                response.Streak = await BuildStreakSnapshotAsync(learnerId);
+            }
+        }
+
         return response;
     }
 
@@ -1649,15 +1676,17 @@ public class LearnerService : ILearnerService
         }
 
         profile.AvatarUrl = NormalizeAvatarPath(profile.AvatarUrl);
+        profile.Name = CoalesceProfileValue(profile.Name, identity?.Name ?? identity?.Username ?? "Learner");
         return profile;
     }
 
     private static LearnerProfileDto BuildProfile(string learnerId, LearnerRecord? record)
     {
+        var resolvedName = CoalesceProfileValue(record?.Name, record?.Username ?? "Learner");
         return new LearnerProfileDto
         {
             LearnerId = record?.LearnerId ?? learnerId,
-            Name = record?.Name ?? record?.Username ?? "Learner",
+            Name = string.IsNullOrWhiteSpace(resolvedName) ? "Learner" : resolvedName,
             AvatarUrl = DefaultAvatar,
             Motto = "Learning one formula at a time.",
             Level = 1,
@@ -1853,6 +1882,13 @@ public class LearnerService : ILearnerService
         }
         var remainder = totalXp % BaseLevelXp;
         return remainder == 0 ? BaseLevelXp : BaseLevelXp - remainder;
+    }
+
+    private async Task UpdateLearnerXpToNextLevelAsync(string learnerId, int xpToNextLevel)
+    {
+        var state = await FetchStreakStateAsync(learnerId) ?? new LearnerStreakState();
+        state.XpToNextLevel = xpToNextLevel;
+        await SaveStreakStateAsync(learnerId, state);
     }
 
     private static string Truncate(string? value, int maxLength)
@@ -2745,6 +2781,41 @@ public class LearnerService : ILearnerService
         }
 
         return progress;
+    }
+
+    private async Task<TopicProgressState?> FetchUnitProgressAsync(string learnerId, string moduleId, string unitId)
+    {
+        const string sql = @"SELECT status, score_percent
+                             FROM learner_topic_progress
+                             WHERE uid = @Uid AND module_id = @ModuleId AND unit_id = @UnitId
+                             LIMIT 1";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return null;
+            }
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Uid", learnerId);
+            command.Parameters.AddWithValue("@ModuleId", moduleId);
+            command.Parameters.AddWithValue("@UnitId", unitId);
+            await using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new TopicProgressState
+                {
+                    Status = reader["status"]?.ToString() ?? "in_progress",
+                    ScorePercent = reader["score_percent"] == DBNull.Value ? (int?)null : SafeToInt(reader["score_percent"], 0)
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to fetch unit progress for {learnerId}: {ex.Message}");
+        }
+        return null;
     }
 
     private async Task<bool> UpsertTopicProgressAsync(string learnerId, string moduleId, string unitId, string? status, int? scorePercent, int? durationSeconds)
@@ -4130,6 +4201,8 @@ public class ModuleProgressResponse
     public string UnitId { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public IEnumerable<ModuleCardDto> ActiveModules { get; set; } = new List<ModuleCardDto>();
+    public LearnerStreakDto? Streak { get; set; }
+    public LearnerXpSnapshot? XpSnapshot { get; set; }
 }
 
 public class LiveProgressSnapshotDto

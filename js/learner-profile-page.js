@@ -10,7 +10,6 @@
     emailInput: "#email",
     schoolInput: "#school",
     yearInput: "#year",
-    notificationList: "#notificationList",
     avatarOptions: "[data-avatar-options]",
     avatarStatus: "[data-avatar-status]",
     editMottoBtn: "#editMottoBtn",
@@ -623,31 +622,6 @@
     resetInfoEditingState();
   };
 
-  const renderNotifications = notifications => {
-    const list = document.querySelector(selectors.notificationList);
-    if (!list) {
-      return;
-    }
-    if (!Array.isArray(notifications) || !notifications.length) {
-      list.innerHTML = "<li><div><strong>No notification prefs yet</strong><small>We'll add options once you unlock reminders.</small></div></li>";
-      return;
-    }
-    list.innerHTML = notifications
-      .map(pref => {
-        const buttonClass = pref.primary ? "btn btn--primary" : "btn btn--ghost";
-        const actionLabel = pref.primary ? "Edit" : "Toggle";
-        return `
-          <li>
-            <div>
-              <strong>${pref.title}</strong>
-              <small>${pref.detail}</small>
-            </div>
-            <button class="${buttonClass}" type="button">${actionLabel}</button>
-          </li>`;
-      })
-      .join("");
-  };
-
   const broadcastBadges = badges => {
     if (!badges) {
       return;
@@ -697,7 +671,6 @@
     const data = await response.json();
     updateProfileCard(data.profile);
     updateInfoForm(data.profile, data.contact, data.school);
-    renderNotifications(data.notifications);
     broadcastBadges(data.badges);
     return data;
   };
@@ -1038,7 +1011,6 @@
       }
       updateProfileCard(data.profile);
       updateInfoForm(data.profile, data.contact, data.school);
-      renderNotifications(data.notifications);
       broadcastBadges(data.badges);
       state.mission = data.mission || state.mission;
       renderStudyPreferences(state.mission);

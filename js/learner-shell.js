@@ -5,7 +5,7 @@
     streak: ".profile .streak",
     levelLabel: ".profile small",
     xpBar: ".profile .xp-bar span",
-    heroName: "#username",
+    heroNames: "[data-learner-name]",
     avatar: ".profile .avatar"
   };
   let cachedProfile = null;
@@ -43,17 +43,22 @@
     avatar.style.backgroundColor = "transparent";
   };
 
+  const setHeroNames = name => {
+    document.querySelectorAll(selectors.heroNames).forEach(hero => {
+      if (hero.dataset.locked === "true") {
+        return;
+      }
+      hero.textContent = name;
+    });
+  };
+
   const updateSidebar = (profile, streak) => {
     const name = profile?.name?.trim() || "Learner";
     cachedProfile = profile || cachedProfile || { name };
     cachedStreak = streak || cachedStreak;
     setText(selectors.username, name);
     setAvatarImage(profile?.avatarUrl);
-
-    const hero = getEl(selectors.heroName);
-    if (hero && (!hero.dataset.locked || hero.dataset.locked !== "true")) {
-      hero.textContent = name;
-    }
+    setHeroNames(name);
 
     const streakLabel = streak?.status || (streak?.current ? `${streak.current}-day streak` : "Ready to study");
     setText(selectors.streak, streakLabel);

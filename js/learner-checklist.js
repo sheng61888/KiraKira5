@@ -7,6 +7,8 @@
     clear: "[data-action='clear-checklist']"
   };
 
+  const MAX_ITEMS = 10;
+
   const state = {
     items: [],
     wired: false,
@@ -95,6 +97,14 @@
     if (!trimmed) {
       return;
     }
+    if (state.items.length >= MAX_ITEMS) {
+      if (state.refs.input) {
+        state.refs.input.setCustomValidity(`You can track up to ${MAX_ITEMS} tasks. Complete or delete one to add more.`);
+        state.refs.input.reportValidity();
+        window.setTimeout(() => state.refs.input && state.refs.input.setCustomValidity(""), 2000);
+      }
+      return;
+    }
     const id = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `goal-${Date.now()}`;
     state.items.push({ id, text: trimmed, completed: false });
     save();
@@ -140,9 +150,9 @@
   };
 
   const handleListClick = event => {
-    const target = event.target;
-    if (target?.dataset?.action === "delete-checklist" && target.dataset.id) {
-      deleteItem(target.dataset.id);
+    const trigger = event.target?.closest("[data-action='delete-checklist']");
+    if (trigger && trigger.dataset.id) {
+      deleteItem(trigger.dataset.id);
     }
   };
 

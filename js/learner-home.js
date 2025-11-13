@@ -19,7 +19,7 @@
     dashboardStreak: ".page-heading .eyebrow strong",
     profileLevel: ".profile small",
     xpBar: ".profile .xp-bar span",
-    heroName: "#username",
+    heroNames: "[data-learner-name]",
     statsGrid: ".stats-grid",
     missionCard: "#missionCard",
     missionBadge: "#missionBadge",
@@ -48,6 +48,15 @@
     if (el) {
       el.textContent = text;
     }
+  };
+
+  const setHeroNames = text => {
+    if (!text) {
+      return;
+    }
+    document.querySelectorAll(selectors.heroNames).forEach(el => {
+      el.textContent = text;
+    });
   };
 
   const setMissionState = state => {
@@ -715,11 +724,11 @@
     const userName = sessionStorage.getItem("userName") || "Learner";
     if (!profile) {
       setText(selectors.profileName, userName);
-      setText(selectors.heroName, userName);
+      setHeroNames(userName);
       return;
     }
     setText(selectors.profileName, profile.name || userName);
-    setText(selectors.heroName, profile.name || userName);
+    setHeroNames(profile.name || userName);
     const streakLabel = streak
       ? streak.status || (streak.current ? `${streak.current}-day streak` : "Ready to study")
       : "Ready to study";
