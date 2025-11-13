@@ -129,6 +129,16 @@
   <script src="../js/learner-session.js"></script>
   <script src="../js/learner-shell.js"></script>
   <script src="../js/learner-community.js"></script>
+
+  <div class="profile-popover" data-profile-popover aria-hidden="true" hidden>
+    <div class="profile-popover__backdrop" data-profile-popover-close></div>
+    <div class="profile-popover__dialog" role="dialog" aria-modal="true" aria-labelledby="profilePopoverName">
+      <button class="profile-popover__close" type="button" aria-label="Close profile preview" data-profile-popover-close>&times;</button>
+      <div class="profile-popover__body" data-profile-popover-body>
+        <p class="muted">Select a learner to preview their profile.</p>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
 

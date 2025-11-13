@@ -21,10 +21,12 @@ public interface ILearnerService
     Task<LearnerProfileDto> UpdateAvatarAsync(string learnerId, string avatarUrl);
     Task<LearnerProfilePayload> UpdateProfileDetailsAsync(string learnerId, ProfileDetailsUpdateRequest request);
     Task<LearnerMissionDto> SaveMissionPreferencesAsync(string learnerId, LearnerMissionUpdateRequest request);
+    Task<LearnerFeaturedBadgeDto> SaveFeaturedBadgeAsync(string learnerId, LearnerFeaturedBadgeRequest request);
     Task<CommunityFeedDto> GetCommunityThreadsAsync(string learnerId, CommunityThreadQuery query);
     Task<CommunityThreadDto> CreateCommunityThreadAsync(string learnerId, CommunityThreadCreateRequest request);
     Task<CommunityReplyDto> CreateCommunityReplyAsync(string learnerId, long threadId, CommunityReplyCreateRequest request);
     Task<CommunityThreadDetailDto> GetCommunityThreadDetailAsync(string learnerId, long threadId, CommunityThreadDetailQuery query);
+    Task<CommunityProfileCardDto> GetCommunityProfileCardAsync(string learnerId);
     Task<StudyActivityResultDto> LogModuleQuizAsync(string learnerId, ModuleQuizLogRequest request);
     Task<StudyActivityResultDto> LogPastPaperAsync(string learnerId, PastPaperLogRequest request);
     Task<ModuleSelectionResponse> AddModuleSelectionAsync(string learnerId, ModuleSelectionRequest request);
@@ -649,6 +651,47 @@ public class LearnerService : ILearnerService
         return await FetchMissionDtoAsync(learnerId, profile);
     }
 
+    public async Task<LearnerFeaturedBadgeDto> SaveFeaturedBadgeAsync(string learnerId, LearnerFeaturedBadgeRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(learnerId) || request == null)
+        {
+            return new LearnerFeaturedBadgeDto();
+        }
+
+        var badgeId = (request.BadgeId ?? string.Empty).Trim();
+        var label = string.IsNullOrWhiteSpace(request.Label) ? string.Empty : request.Label.Trim();
+        var style = string.IsNullOrWhiteSpace(request.Style) ? "level" : request.Style.Trim();
+
+        const string sql = @"INSERT INTO learner_profile (uid, featured_badge_id, featured_badge_label, featured_badge_style)
+                             VALUES (@Uid, @BadgeId, @Label, @Style)
+                             ON DUPLICATE KEY UPDATE featured_badge_id = @BadgeId, featured_badge_label = @Label, featured_badge_style = @Style";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection != null)
+            {
+                await using var command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Uid", learnerId);
+                command.Parameters.AddWithValue("@BadgeId", badgeId);
+                command.Parameters.AddWithValue("@Label", label);
+                command.Parameters.AddWithValue("@Style", style);
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to save featured badge for {learnerId}: {ex.Message}");
+        }
+
+        return new LearnerFeaturedBadgeDto
+        {
+            BadgeId = badgeId,
+            Label = label,
+            Style = style
+        };
+    }
+
     public async Task<CommunityFeedDto> GetCommunityThreadsAsync(string learnerId, CommunityThreadQuery query)
     {
         var normalized = query ?? new CommunityThreadQuery();
@@ -816,6 +859,97 @@ public class LearnerService : ILearnerService
                 ? replies.Last().ReplyId.ToString()
                 : null
         };
+    }
+
+    public async Task<CommunityProfileCardDto> GetCommunityProfileCardAsync(string targetLearnerId)
+    {
+        if (string.IsNullOrWhiteSpace(targetLearnerId))
+        {
+            return BuildFallbackCommunityProfileCard();
+        }
+
+        try
+        {
+            var record = await FetchLearnerAsync(targetLearnerId);
+            var profile = await FetchProfileDtoAsync(targetLearnerId, record);
+            var streak = await FetchStreakDtoAsync(targetLearnerId, profile);
+            var badges = await BuildBadgeStatsAsync(targetLearnerId, profile, streak);
+            var featuredBadge = profile.FeaturedBadge ?? SelectFeaturedBadgeChip(badges);
+
+            return new CommunityProfileCardDto
+            {
+                LearnerId = targetLearnerId,
+                Name = profile.Name,
+                AvatarUrl = profile.AvatarUrl,
+                Motto = string.IsNullOrWhiteSpace(profile.Motto) ? "Learning maths" : profile.Motto,
+                Level = profile.Level,
+                Xp = profile.Xp,
+                Rank = "Learner",
+                StreakDays = streak?.Current ?? 0,
+                FeaturedBadge = featuredBadge
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load community profile card for {targetLearnerId}: {ex.Message}");
+            return BuildFallbackCommunityProfileCard();
+        }
+    }
+
+    private static CommunityProfileCardDto BuildFallbackCommunityProfileCard()
+    {
+        return new CommunityProfileCardDto
+        {
+            LearnerId = string.Empty,
+            Name = "Learner",
+            AvatarUrl = DefaultAvatar,
+            Motto = "Learning maths",
+            Level = 1,
+            Xp = 0,
+            Rank = "Learner",
+            StreakDays = 0,
+            FeaturedBadge = new BadgeChipDto
+            {
+                Id = "level-1",
+                Label = "Catthew",
+                Style = "level"
+            }
+        };
+    }
+
+    private static BadgeChipDto? SelectFeaturedBadgeChip(LearnerBadgeStatsDto? stats)
+    {
+        if (stats?.Collections == null || stats.Stats == null)
+        {
+            return null;
+        }
+
+        foreach (var collection in stats.Collections)
+        {
+            if (collection?.Rewards == null || string.IsNullOrWhiteSpace(collection.Metric))
+            {
+                continue;
+            }
+
+            var metricKey = collection.Metric;
+            stats.Stats.TryGetValue(metricKey, out var metricValue);
+            var unlocked = collection.Rewards
+                .Where(reward => reward != null && metricValue >= reward.Value)
+                .OrderByDescending(reward => reward.Value)
+                .FirstOrDefault();
+
+            if (unlocked != null)
+            {
+                return new BadgeChipDto
+                {
+                    Id = $"{(collection.Id ?? collection.Metric)}-{unlocked.Value}",
+                    Label = string.IsNullOrWhiteSpace(unlocked.Label) ? "Unlocked badge" : unlocked.Label,
+                    Style = string.IsNullOrWhiteSpace(collection.Style) ? "level" : collection.Style
+                };
+            }
+        }
+
+        return null;
     }
 
     private static LearnerBadgeStatsDto SampleBadgeStats()
@@ -1394,7 +1528,7 @@ public class LearnerService : ILearnerService
                 ReplyCount = 12,
                 LastReplyLabel = "10m ago",
                 CreatedLabel = "1h ago",
-                Author = new CommunityAuthorDto { Name = "Min", Username = "min-cat" }
+                Author = new CommunityAuthorDto { LearnerId = "min-cat", Name = "Min", Username = "min-cat" }
             },
             new CommunityThreadDto
             {
@@ -1407,7 +1541,7 @@ public class LearnerService : ILearnerService
                 ReplyCount = 5,
                 LastReplyLabel = "32m ago",
                 CreatedLabel = "2h ago",
-                Author = new CommunityAuthorDto { Name = "Akira", Username = "akira" }
+                Author = new CommunityAuthorDto { LearnerId = "akira", Name = "Akira", Username = "akira" }
             },
             new CommunityThreadDto
             {
@@ -1420,7 +1554,7 @@ public class LearnerService : ILearnerService
                 ReplyCount = 9,
                 LastReplyLabel = "1h ago",
                 CreatedLabel = "4h ago",
-                Author = new CommunityAuthorDto { Name = "Zara", Username = "zara" }
+                Author = new CommunityAuthorDto { LearnerId = "zara", Name = "Zara", Username = "zara" }
             }
         };
     }
@@ -1447,14 +1581,14 @@ public class LearnerService : ILearnerService
                 ReplyId = 501,
                 Body = "I break the questions into smaller steps and double-check units. Helps calm the panic.",
                 CreatedLabel = "2h ago",
-                Author = new CommunityAuthorDto { Name = "Coach Min", Username = "coachmin" }
+                Author = new CommunityAuthorDto { LearnerId = "coachmin", Name = "Coach Min", Username = "coachmin" }
             },
             new CommunityReplyDto
             {
                 ReplyId = 492,
                 Body = "Try a 20-minute timer with one focused topic. Momentum builds fast.",
                 CreatedLabel = "3h ago",
-                Author = new CommunityAuthorDto { Name = "Dina", Username = "dinamath" }
+                Author = new CommunityAuthorDto { LearnerId = "dinamath", Name = "Dina", Username = "dinamath" }
             }
         };
     }
@@ -1462,7 +1596,8 @@ public class LearnerService : ILearnerService
     private async Task<LearnerProfileDto> FetchProfileDtoAsync(string learnerId, LearnerRecord? identity)
     {
         var profile = BuildProfile(learnerId, identity);
-        const string sql = @"SELECT full_name, school, grade_year, motto, avatar_url, level, xp
+        const string sql = @"SELECT full_name, school, grade_year, motto, avatar_url, level, xp,
+                                    featured_badge_id, featured_badge_label, featured_badge_style
                              FROM learner_profile
                              WHERE uid = @Uid
                              LIMIT 1";
@@ -1488,6 +1623,23 @@ public class LearnerService : ILearnerService
                 profile.AvatarUrl = reader["avatar_url"]?.ToString() ?? profile.AvatarUrl;
                 profile.Level = SafeToInt(reader["level"], profile.Level);
                 profile.Xp = SafeToInt(reader["xp"], profile.Xp);
+
+                if (HasColumn(reader, "featured_badge_id") || HasColumn(reader, "featured_badge_label"))
+                {
+                    var featuredId = HasColumn(reader, "featured_badge_id") ? reader["featured_badge_id"]?.ToString() : string.Empty;
+                    var featuredLabel = HasColumn(reader, "featured_badge_label") ? reader["featured_badge_label"]?.ToString() : string.Empty;
+                    var featuredStyle = HasColumn(reader, "featured_badge_style") ? reader["featured_badge_style"]?.ToString() : string.Empty;
+
+                    if (!string.IsNullOrWhiteSpace(featuredId) || !string.IsNullOrWhiteSpace(featuredLabel))
+                    {
+                        profile.FeaturedBadge = new BadgeChipDto
+                        {
+                            Id = featuredId ?? string.Empty,
+                            Label = string.IsNullOrWhiteSpace(featuredLabel) ? "Unlocked badge" : featuredLabel!,
+                            Style = string.IsNullOrWhiteSpace(featuredStyle) ? "level" : featuredStyle!
+                        };
+                    }
+                }
             }
         }
         catch (Exception ex)
@@ -1524,6 +1676,18 @@ public class LearnerService : ILearnerService
         var trimmed = value.Trim();
         trimmed = trimmed.StartsWith("/") ? trimmed : "/" + trimmed.TrimStart('/');
         return AllowedAvatars.Contains(trimmed) ? trimmed : DefaultAvatar;
+    }
+
+    private static bool HasColumn(DbDataReader reader, string columnName)
+    {
+        for (var i = 0; i < reader.FieldCount; i++)
+        {
+            if (reader.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static string CoalesceProfileValue(string? candidate, string fallback)
@@ -3222,6 +3386,7 @@ public class LearnerService : ILearnerService
                                     t.reply_count,
                                     t.last_reply_at,
                                     t.created_at,
+                                    t.uid AS author_id,
                                     u.name AS author_name,
                                     u.username AS author_username
                              FROM community_threads t
@@ -3282,6 +3447,7 @@ public class LearnerService : ILearnerService
                                     t.reply_count,
                                     t.last_reply_at,
                                     t.created_at,
+                                    t.uid AS author_id,
                                     u.name AS author_name,
                                     u.username AS author_username
                              FROM community_threads t
@@ -3319,6 +3485,7 @@ public class LearnerService : ILearnerService
         const string sql = @"SELECT r.reply_id,
                                     r.body,
                                     r.created_at,
+                                    r.uid AS author_id,
                                     u.name AS author_name,
                                     u.username AS author_username
                              FROM community_replies r
@@ -3348,6 +3515,7 @@ public class LearnerService : ILearnerService
                     CreatedLabel = FormatRelativeTime(createdAt),
                     Author = new CommunityAuthorDto
                     {
+                        LearnerId = reader["author_id"]?.ToString() ?? string.Empty,
                         Name = reader["author_name"]?.ToString() ?? "Learner",
                         Username = reader["author_username"]?.ToString() ?? string.Empty
                     }
@@ -3413,6 +3581,7 @@ public class LearnerService : ILearnerService
         const string sql = @"SELECT r.reply_id,
                                     r.body,
                                     r.created_at,
+                                    r.uid AS author_id,
                                     u.name AS author_name,
                                     u.username AS author_username
                              FROM community_replies r
@@ -3455,6 +3624,7 @@ public class LearnerService : ILearnerService
                     CreatedLabel = FormatRelativeTime(createdAt),
                     Author = new CommunityAuthorDto
                     {
+                        LearnerId = reader["author_id"]?.ToString() ?? string.Empty,
                         Name = reader["author_name"]?.ToString() ?? "Learner",
                         Username = reader["author_username"]?.ToString() ?? string.Empty
                     }
@@ -3488,6 +3658,7 @@ public class LearnerService : ILearnerService
             CreatedLabel = FormatRelativeTime(createdAt),
             Author = new CommunityAuthorDto
             {
+                LearnerId = reader["author_id"]?.ToString() ?? string.Empty,
                 Name = reader["author_name"]?.ToString() ?? "Learner",
                 Username = reader["author_username"]?.ToString() ?? string.Empty
             }
@@ -3509,6 +3680,7 @@ public class LearnerService : ILearnerService
             CreatedLabel = "Just now",
             Author = new CommunityAuthorDto
             {
+                LearnerId = "sample",
                 Name = "You",
                 Username = "learner"
             }
@@ -3524,6 +3696,7 @@ public class LearnerService : ILearnerService
             CreatedLabel = "Just now",
             Author = new CommunityAuthorDto
             {
+                LearnerId = "sample",
                 Name = "You",
                 Username = "learner"
             }
@@ -3776,6 +3949,7 @@ public class LearnerProfileDto
     public int Xp { get; set; }
     public string School { get; set; } = string.Empty;
     public string GradeYear { get; set; } = string.Empty;
+    public BadgeChipDto? FeaturedBadge { get; set; }
 }
 
 public class LearnerMissionDto
@@ -3821,6 +3995,13 @@ public class LearnerModuleSnapshot
 {
     public IEnumerable<ModuleCardDto> ActiveModules { get; set; } = new List<ModuleCardDto>();
     public IEnumerable<ModuleCatalogueSectionDto> Catalogue { get; set; } = new List<ModuleCatalogueSectionDto>();
+}
+
+public class LearnerFeaturedBadgeDto
+{
+    public string BadgeId { get; set; } = string.Empty;
+    public string Label { get; set; } = string.Empty;
+    public string Style { get; set; } = "level";
 }
 
 public class ModuleSelectionResponse
@@ -4051,6 +4232,7 @@ public class CommunityThreadFiltersDto
 
 public class CommunityAuthorDto
 {
+    public string LearnerId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
 }
@@ -4068,6 +4250,26 @@ public class CommunityReplyDto
     public string Body { get; set; } = string.Empty;
     public string CreatedLabel { get; set; } = string.Empty;
     public CommunityAuthorDto Author { get; set; } = new();
+}
+
+public class CommunityProfileCardDto
+{
+    public string LearnerId { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string AvatarUrl { get; set; } = string.Empty;
+    public string Motto { get; set; } = string.Empty;
+    public int Level { get; set; }
+    public int Xp { get; set; }
+    public string Rank { get; set; } = "Learner";
+    public int StreakDays { get; set; }
+    public BadgeChipDto? FeaturedBadge { get; set; }
+}
+
+public class BadgeChipDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string Label { get; set; } = string.Empty;
+    public string Style { get; set; } = "level";
 }
 
 public class LearnerClassInfo

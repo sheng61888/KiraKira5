@@ -20,7 +20,13 @@
     introToggle: "#introVideosToggle",
     introLabel: "#introVideosLabel",
     introHint: "#introVideosHint",
-    introStatus: "[data-intro-status]"
+    introStatus: "[data-intro-status]",
+    badgeSelector: "[data-badge-selector]",
+    badgeTrigger: "[data-badge-trigger]",
+    badgePopup: "[data-badge-popup]",
+    badgeOptions: "[data-badge-options]",
+    badgeLabel: "[data-badge-label]",
+    saveProfileBtn: "#saveProfileBtn"
   };
 
   const state = {
@@ -33,8 +39,17 @@
     },
     editingMotto: false,
     editingInfo: false,
-    mission: null
+    mission: null,
+    badgePayload: null,
+    selectedBadgeId: null,
+    unlockedBadges: [],
+    badgeSelectorOpen: false,
+    badgeSelectorBound: false,
+    serverBadgePreference: null
   };
+
+  const BADGE_DISPLAY_STORAGE_KEY = "kiraPreferredBadgeDisplay";
+  const BADGE_STATS_STORAGE_KEY = "kiraUserStats";
 
   const resolveAvatarUrl = value => {
     if (typeof value !== "string") {
@@ -67,6 +82,358 @@
     const chip = document.querySelector(selectors.avatarStatus);
     if (chip && typeof text === "string") {
       chip.textContent = text;
+    }
+  };
+
+  const setBadgeDisplayLabel = text => {
+    const label = document.querySelector(selectors.badgeLabel);
+    if (label) {
+      label.textContent = text || "Next badge syncing...";
+    }
+  };
+
+  const setSaveButtonState = (label, options = {}) => {
+    const btn = document.querySelector(selectors.saveProfileBtn);
+    if (!btn) {
+      return;
+    }
+    if (label) {
+      btn.textContent = label;
+    }
+    if (Object.prototype.hasOwnProperty.call(options, "disabled")) {
+      btn.disabled = Boolean(options.disabled);
+    }
+  };
+
+  const readStoredBadgePreference = () => {
+    try {
+      const raw = localStorage.getItem(BADGE_DISPLAY_STORAGE_KEY);
+      if (!raw) {
+        return null;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        if (typeof parsed === "string") {
+          return { id: parsed };
+        }
+        if (parsed && typeof parsed === "object") {
+          return {
+            id: parsed.id || "",
+            label: parsed.label || "",
+            style: parsed.style || ""
+          };
+        }
+      } catch {
+        return { id: raw };
+      }
+    } catch (error) {
+      console.warn("Unable to read badge preference", error);
+    }
+    return null;
+  };
+
+  const normalizeBadgeChip = chip => {
+    if (!chip || typeof chip !== "object") {
+      return null;
+    }
+    const id = typeof chip.id === "string" && chip.id.length
+      ? chip.id
+      : typeof chip.badgeId === "string" && chip.badgeId.length
+        ? chip.badgeId
+        : "";
+    const label = typeof chip.label === "string" && chip.label.length
+      ? chip.label
+      : typeof chip.text === "string"
+        ? chip.text
+        : "";
+    const style = typeof chip.style === "string" && chip.style.length ? chip.style : "level";
+    if (!id && !label) {
+      return null;
+    }
+    return { id, label: label || "Unlocked badge", style };
+  };
+
+  const persistBadgePreference = badge => {
+    try {
+      if (!badge) {
+        localStorage.removeItem(BADGE_DISPLAY_STORAGE_KEY);
+        return;
+      }
+      const payload = JSON.stringify({
+        id: badge.id,
+        label: badge.label,
+        style: badge.style
+      });
+      localStorage.setItem(BADGE_DISPLAY_STORAGE_KEY, payload);
+    } catch (error) {
+      console.warn("Unable to store badge preference", error);
+    }
+  };
+
+  const saveFeaturedBadgeRemote = async badge => {
+    const session = window.kiraLearnerSession;
+    if (!session || !badge?.id) {
+      return;
+    }
+    try {
+      await session.fetch("profile/featured-badge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          badgeId: badge.id,
+          label: badge.label,
+          style: badge.style
+        })
+      });
+    } catch (error) {
+      console.warn("Unable to save badge selection", error);
+    }
+  };
+
+  const applyBadgeStyle = style => {
+    const root = document.querySelector(selectors.badgeSelector);
+    if (!root) {
+      return;
+    }
+    if (style) {
+      root.dataset.badgeStyle = style;
+    } else {
+      delete root.dataset.badgeStyle;
+    }
+  };
+
+  const updateBadgeOptionActiveState = () => {
+    const options = document.querySelector(selectors.badgeOptions);
+    if (!options) {
+      return;
+    }
+    options.querySelectorAll("[data-badge-id]").forEach(option => {
+      option.classList.toggle("is-active", option.dataset.badgeId === state.selectedBadgeId);
+    });
+  };
+
+  const applyBadgeSelection = (badge, options = {}) => {
+    const persist = Boolean(options.persist);
+    if (!badge) {
+      state.selectedBadgeId = null;
+      setBadgeDisplayLabel("Next badge syncing...");
+      applyBadgeStyle();
+      if (persist) {
+        persistBadgePreference(null);
+        saveFeaturedBadgeRemote(null);
+        state.serverBadgePreference = null;
+      }
+      updateBadgeOptionActiveState();
+      return;
+    }
+    state.selectedBadgeId = badge.id;
+    setBadgeDisplayLabel(badge.label);
+    applyBadgeStyle(badge.style);
+    if (persist) {
+      persistBadgePreference(badge);
+      state.serverBadgePreference = { ...badge };
+      saveFeaturedBadgeRemote(badge);
+    }
+    updateBadgeOptionActiveState();
+  };
+
+  const resolveBadgeCollections = payload => {
+    if (payload?.collections && Array.isArray(payload.collections)) {
+      return payload.collections;
+    }
+    if (Array.isArray(window.kiraBadgeCollections)) {
+      return window.kiraBadgeCollections;
+    }
+    return [];
+  };
+
+  const resolveBadgeStats = payload => {
+    if (payload?.stats) {
+      return payload.stats;
+    }
+    if (window.kiraBadgeStats) {
+      return window.kiraBadgeStats;
+    }
+    try {
+      const stored = localStorage.getItem(BADGE_STATS_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.warn("Unable to read stored badge stats", error);
+    }
+    return {};
+  };
+
+  const collectUnlockedBadges = (collections, stats) => {
+    if (!Array.isArray(collections) || !collections.length) {
+      return [];
+    }
+    return collections.reduce((acc, collection) => {
+      if (!Array.isArray(collection.rewards)) {
+        return acc;
+      }
+      const metricValue = stats?.[collection.metric] ?? 0;
+      collection.rewards.forEach(reward => {
+        if (typeof reward?.value !== "number") {
+          return;
+        }
+        if (metricValue >= reward.value) {
+          acc.push({
+            id: `${collection.id || collection.metric}-${reward.value}`,
+            label: reward.label || "Unlocked badge",
+            collection: collection.title || collection.description || "Unlocked badge",
+            style: collection.style || "level"
+          });
+        }
+      });
+      return acc;
+    }, []);
+  };
+
+  const setBadgePopupVisibility = open => {
+    const popup = document.querySelector(selectors.badgePopup);
+    const trigger = document.querySelector(selectors.badgeTrigger);
+    if (!popup || !trigger) {
+      return;
+    }
+    popup.hidden = !open;
+    popup.setAttribute("aria-hidden", open ? "false" : "true");
+    trigger.setAttribute("aria-expanded", open ? "true" : "false");
+    state.badgeSelectorOpen = open;
+  };
+
+  const closeBadgePopup = () => setBadgePopupVisibility(false);
+
+  const handleBadgeOutsideClick = event => {
+    if (!state.badgeSelectorOpen) {
+      return;
+    }
+    const root = document.querySelector(selectors.badgeSelector);
+    if (root && !root.contains(event.target)) {
+      closeBadgePopup();
+    }
+  };
+
+  const handleBadgeKeydown = event => {
+    if (event.key === "Escape" && state.badgeSelectorOpen) {
+      closeBadgePopup();
+      const trigger = document.querySelector(selectors.badgeTrigger);
+      if (trigger) {
+        trigger.focus();
+      }
+    }
+  };
+
+  const handleBadgeOptionClick = badgeId => {
+    const badge = state.unlockedBadges.find(item => item.id === badgeId);
+    if (!badge) {
+      return;
+    }
+    applyBadgeSelection(badge, { persist: true });
+    closeBadgePopup();
+  };
+
+  const renderBadgeSelector = badgePayload => {
+    if (badgePayload) {
+      state.badgePayload = badgePayload;
+    }
+    const options = document.querySelector(selectors.badgeOptions);
+    const label = document.querySelector(selectors.badgeLabel);
+    if (!options || !label) {
+      return;
+    }
+
+    const collections = resolveBadgeCollections(state.badgePayload);
+    if (!collections.length) {
+      options.innerHTML = '<p class="muted">Badges syncing...</p>';
+      applyBadgeSelection(null);
+      return;
+    }
+
+    const stats = resolveBadgeStats(state.badgePayload);
+    const unlocked = collectUnlockedBadges(collections, stats);
+    state.unlockedBadges = unlocked;
+
+    if (!unlocked.length) {
+      options.innerHTML = '<p class="muted">Unlock badges to feature them here.</p>';
+      applyBadgeSelection(null);
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    unlocked.forEach(badge => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "badge-selector__option";
+      button.dataset.badgeId = badge.id;
+      button.dataset.badgeStyle = badge.style;
+      button.innerHTML = `<strong>${badge.label}</strong><small>${badge.collection}</small>`;
+      button.addEventListener("click", () => handleBadgeOptionClick(badge.id));
+      fragment.appendChild(button);
+    });
+    options.innerHTML = "";
+    options.appendChild(fragment);
+
+    let preferredBadge = state.serverBadgePreference || readStoredBadgePreference();
+    preferredBadge = normalizeBadgeChip(preferredBadge) || null;
+    if (!state.selectedBadgeId && preferredBadge?.id) {
+      state.selectedBadgeId = preferredBadge.id;
+    }
+    let selected = state.selectedBadgeId
+      ? unlocked.find(item => item.id === state.selectedBadgeId)
+      : null;
+    if (!selected && preferredBadge) {
+      selected = preferredBadge;
+    }
+    if (!selected) {
+      selected = unlocked[0];
+    }
+    applyBadgeSelection(selected);
+  };
+
+  const bindBadgeSelector = () => {
+    if (state.badgeSelectorBound) {
+      return;
+    }
+    const trigger = document.querySelector(selectors.badgeTrigger);
+    const popup = document.querySelector(selectors.badgePopup);
+    if (!trigger || !popup) {
+      return;
+    }
+    trigger.addEventListener("click", () => {
+      setBadgePopupVisibility(!state.badgeSelectorOpen);
+    });
+    const closeBtn = popup.querySelector("[data-badge-close]");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", closeBadgePopup);
+    }
+    document.addEventListener("click", handleBadgeOutsideClick);
+    document.addEventListener("keydown", handleBadgeKeydown);
+    popup.setAttribute("aria-hidden", "true");
+    state.badgeSelectorBound = true;
+  };
+
+  const handleSaveChangesClick = async () => {
+    const btn = document.querySelector(selectors.saveProfileBtn);
+    if (!btn || btn.disabled) {
+      return;
+    }
+    setSaveButtonState("Saving...", { disabled: true });
+    const success = await fetchProfile({ silent: true });
+    if (success) {
+      setSaveButtonState("Saved!", { disabled: true });
+      setTimeout(() => setSaveButtonState("Save changes", { disabled: false }), 2000);
+    } else {
+      setSaveButtonState("Try again", { disabled: false });
+      setTimeout(() => setSaveButtonState("Save changes"), 2000);
+    }
+  };
+
+  const bindSaveChangesButton = () => {
+    const btn = document.querySelector(selectors.saveProfileBtn);
+    if (btn) {
+      btn.addEventListener("click", handleSaveChangesClick);
     }
   };
 
@@ -113,6 +480,12 @@
     state.profile.name = profile.name || state.profile.name;
     setProfileImage(profile.avatarUrl);
     selectAvatarOption(profile.avatarUrl);
+    const badgeChip = normalizeBadgeChip(profile.featuredBadge);
+    if (badgeChip) {
+      state.serverBadgePreference = badgeChip;
+      setBadgeDisplayLabel(badgeChip.label);
+      applyBadgeStyle(badgeChip.style);
+    }
   };
 
   function resetInfoEditingState() {
@@ -640,15 +1013,18 @@
     }
   };
 
-  const fetchProfile = async () => {
+  const fetchProfile = async (options = {}) => {
+    const { silent = false } = options;
     const session = window.kiraLearnerSession;
     if (!session) {
-      return;
+      return false;
     }
     const learnerId = session.ensureId();
     if (!learnerId) {
-      showProfileError("Please log in again to view your profile.");
-      return;
+      if (!silent) {
+        showProfileError("Please log in again to view your profile.");
+      }
+      return false;
     }
     try {
       const response = await session.fetch("profile");
@@ -656,6 +1032,10 @@
         throw new Error(`Profile request failed with status ${response.status}`);
       }
       const data = await response.json();
+      state.serverBadgePreference = normalizeBadgeChip(data.profile?.featuredBadge) || null;
+      if (state.serverBadgePreference?.id) {
+        state.selectedBadgeId = state.serverBadgePreference.id;
+      }
       updateProfileCard(data.profile);
       updateInfoForm(data.profile, data.contact, data.school);
       renderNotifications(data.notifications);
@@ -663,18 +1043,29 @@
       state.mission = data.mission || state.mission;
       renderStudyPreferences(state.mission);
       checkPasswordResetStatus();
+      return true;
     } catch (error) {
       console.error("Unable to load learner profile", error);
-      showProfileError("Unable to load profile right now. Please refresh.");
+      if (!silent) {
+        showProfileError("Unable to load profile right now. Please refresh.");
+      }
+      return false;
     }
   };
 
+  document.addEventListener("kira:badges-ready", event => {
+    renderBadgeSelector(event.detail);
+  });
+
   document.addEventListener("DOMContentLoaded", () => {
     bindAvatarPicker();
+    bindBadgeSelector();
+    bindSaveChangesButton();
     bindMottoEditor();
     bindInfoEditor();
     bindStudyPreferenceToggle();
     renderStudyPreferences(state.mission, { skipStatus: true });
+    renderBadgeSelector(state.badgePayload);
     fetchProfile();
   });
 

@@ -44,7 +44,7 @@
         </div>
         <div class="heading-actions">
           <button class="btn btn--ghost" type="button" id="editMottoBtn">Edit motto</button>
-          <button class="btn btn--primary" type="button">Update photo</button>
+          <button class="btn btn--primary" type="button" id="saveProfileBtn">Save changes</button>
         </div>
       </header>
 
@@ -58,7 +58,21 @@
             <span><strong>XP:</strong> 0</span>
             <span><strong>Rank:</strong> Loading...</span>
           </div>
-          <div class="chip chip--success" aria-live="polite">Next badge syncing...</div>
+          <div class="badge-selector" data-badge-selector>
+            <button class="badge-selector__trigger" type="button" data-badge-trigger aria-expanded="false" aria-controls="badgeDisplayPopup">
+              <span class="badge-selector__label" data-badge-label aria-live="polite">Next badge syncing...</span>
+            </button>
+            <div class="badge-selector__popup" id="badgeDisplayPopup" role="dialog" aria-modal="false" hidden data-badge-popup>
+              <div class="badge-selector__popup-head">
+                <p class="eyebrow">Display badge</p>
+                <button class="badge-selector__close" type="button" aria-label="Close badge picker" data-badge-close>&times;</button>
+              </div>
+              <p class="muted">Pick any unlocked badge to feature on your card.</p>
+              <div class="badge-selector__options" data-badge-options>
+                <p class="muted">Checking unlocked badges...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -83,6 +83,23 @@ public class LearnerController : ControllerBase
         return Ok(data);
     }
 
+    [HttpPost("{learnerId}/profile/featured-badge")]
+    public async Task<IActionResult> SaveFeaturedBadge(string learnerId, [FromBody] LearnerFeaturedBadgeRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(learnerId))
+        {
+            return BadRequest(new { error = "Learner ID is required." });
+        }
+
+        if (request == null || string.IsNullOrWhiteSpace(request.BadgeId))
+        {
+            return BadRequest(new { error = "badgeId is required." });
+        }
+
+        var badge = await _learnerService.SaveFeaturedBadgeAsync(learnerId, request);
+        return Ok(badge);
+    }
+
     [HttpPost("{learnerId}/modules/quizzes")]
     public async Task<IActionResult> LogModuleQuiz(string learnerId, [FromBody] ModuleQuizLogRequest request)
     {
@@ -229,6 +246,18 @@ public class LearnerController : ControllerBase
         var payload = await _learnerService.GetCommunityThreadDetailAsync(learnerId, threadId, query ?? new CommunityThreadDetailQuery());
         return Ok(payload);
     }
+
+    [HttpGet("{learnerId}/community/profiles/{profileLearnerId}")]
+    public async Task<IActionResult> GetCommunityProfileCard(string learnerId, string profileLearnerId)
+    {
+        var profile = await _learnerService.GetCommunityProfileCardAsync(profileLearnerId);
+        if (string.IsNullOrWhiteSpace(profile.LearnerId))
+        {
+            return NotFound(new { error = "Learner not found." });
+        }
+
+        return Ok(profile);
+    }
 }
 
 public class JoinClassRequest
@@ -248,6 +277,13 @@ public class ProfileDetailsUpdateRequest
     public string Motto { get; set; } = string.Empty;
     public string School { get; set; } = string.Empty;
     public string Year { get; set; } = string.Empty;
+}
+
+public class LearnerFeaturedBadgeRequest
+{
+    public string BadgeId { get; set; } = string.Empty;
+    public string Label { get; set; } = string.Empty;
+    public string Style { get; set; } = "level";
 }
 
 public class LearnerMissionUpdateRequest
