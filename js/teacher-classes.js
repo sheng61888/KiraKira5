@@ -5,8 +5,18 @@ $(document).ready(function() {
 
 async function loadTeacherClasses() {
     const tableBody = $('#classesTableBody').empty().append('<tr><td colspan="4">Loading...</td></tr>');
+    
+    // *** FIXED: Reads from 'currentLearnerId' which login.js saves ***
+    const teacherId = sessionStorage.getItem('currentLearnerId');
+    if (!teacherId) {
+        tableBody.html('<tr><td colspan="4">Could not find teacher ID. Please log in again.</td></tr>');
+        return;
+    }
+
     try {
-        const response = await fetch('/api/Teacher/classes');
+        // *** FIXED: Now sends the teacherId to the API ***
+        const response = await fetch(`/api/Teacher/classes?teacherId=${teacherId}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const classes = await response.json();
 
         if (!classes || classes.length === 0) {
@@ -15,12 +25,14 @@ async function loadTeacherClasses() {
         }
 
         tableBody.empty();
+        // The API returns a list of TeacherClassDto
         classes.forEach(cls => {
             const row = `
                 <tr>
                     <td>${cls.classId}</td>
                     <td>${cls.className}</td>
-                    <td>(N/A)</td> <td class="actions">
+                    <td>${cls.studentCount}</td>
+                    <td class="actions">
                         <button class="btn btn--ghost" onclick="loadStudents('${cls.classId}', '${cls.className}')">View Roster</button>
                     </td>
                 </tr>
@@ -39,7 +51,9 @@ async function loadStudents(classId, className) {
     const tableBody = $('#studentsTableBody').empty().append('<tr><td colspan="4">Loading students...</td></tr>');
     
     try {
-        const response = await fetch(`/api/TeacherData/classes/${classId}/students`);
+        // This URL was already correct from our previous fix
+        const response = await fetch(`/api/Teacher/classes/${classId}/students`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const students = await response.json();
 
         if (!students || students.length === 0) {

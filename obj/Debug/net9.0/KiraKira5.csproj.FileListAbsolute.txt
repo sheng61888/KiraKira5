@@ -211,9 +211,6 @@ C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\rjims
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\scopedcss\bundle\KiraKira5.styles.css
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\a17hsq02sz-iwxbvapmnm.gz
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\ig6vsqpwyd-zz8uipvtxq.gz
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\npxtpbyxf2-dlhbx1844h.gz
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\staticwebassets.development.json
@@ -224,3 +221,4 @@ C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\refin
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.pdb
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.genruntimeconfig.cache
 C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\ref\KiraKira5.dll
+C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Dapper.dll

@@ -5,8 +5,18 @@ $(document).ready(function() {
 
 async function loadStudentProgress() {
     const tableBody = $('#progressTableBody').empty().append('<tr><td colspan="4">Loading...</td></tr>');
+    
+    // *** FIXED: Reads from 'currentLearnerId' which login.js saves ***
+    const teacherId = sessionStorage.getItem('currentLearnerId');
+    if (!teacherId) {
+        tableBody.html('<tr><td colspan="4">Could not find teacher ID. Please log in again.</td></tr>');
+        return;
+    }
+
     try {
-        const response = await fetch('/api/TeacherData/student-progress');
+        // *** FIXED: Now sends the teacherId to the API ***
+        const response = await fetch(`/api/Teacher/student-progress?teacherId=${teacherId}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const progressData = await response.json();
 
         if (!progressData || progressData.length === 0) {
