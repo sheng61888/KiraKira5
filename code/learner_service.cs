@@ -48,6 +48,8 @@ public class LearnerService : ILearnerService
     private const int MaxActivityXp = 500;
     private const int BaseLevelXp = 1000;
     private const int XpPerUnitCompletion = 60;
+    private const int PostLevelRampIncrement = 250;
+    private static readonly int[] EarlyLevelRequirements = { 0, 200, 300, 400, 500 };
     private const string DefaultAvatar = "/images/profile-cat.jpg";
     private static readonly HashSet<string> AllowedAvatars = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -107,7 +109,8 @@ public class LearnerService : ILearnerService
 
     public async Task<LearnerProgressDto> GetProgressAsync(string learnerId)
     {
-        var topics = await FetchTopicsAsync(learnerId);
+        var moduleSnapshot = await BuildModuleSnapshotAsync(learnerId);
+        var topics = BuildTopicProgressList(moduleSnapshot);
         var checkpoints = await FetchCheckpointsAsync(learnerId);
         var overall = topics.Any() ? (int)Math.Round(topics.Average(topic => topic.Percent)) : 0;
         var motivation = BuildMotivation(overall);
@@ -138,15 +141,7 @@ public class LearnerService : ILearnerService
         }
 
         var announcements = await FetchClassAnnouncementsAsync(classInfo.Code);
-        var topics = (await FetchTopicsAsync(learnerId)).Take(3).ToList();
-        if (!topics.Any())
-        {
-            topics = moduleSnapshot.Catalogue
-                .SelectMany(section => section.Modules)
-                .Take(3)
-                .Select(module => new TopicProgressDto(module.Title, module.ProgressPercent ?? 0, string.Empty))
-                .ToList();
-        }
+        var topics = BuildTopicProgressList(moduleSnapshot, 3);
 
         var assignments = await FetchClassAssignmentsAsync(learnerId, classInfo.Code);
         var classModules = await FetchClassModulesAsync(classInfo.Code, moduleSnapshot.Catalogue);
@@ -1150,15 +1145,15 @@ public class LearnerService : ILearnerService
                         ModuleId = "form4-02",
                         Units = BuildNumberBasesUnits()
                     },
-                    new ModuleCardDto("03", "Logical Reasoning", new List<string> { "Statements", "Arguments" }, "lesson-form4-03.html", 35)
+                    new ModuleCardDto("03", "Logical Reasoning", new List<string> { "Statements", "Arguments" }, "course-map.html?module=form4-03", 0)
                     {
                         ModuleId = "form4-03"
                     },
-                    new ModuleCardDto("04", "Operations on Sets", new List<string> { "Intersection of Sets", "Union of Sets", "Combined Operations on Sets" }, "lesson-form4-04.html")
+                    new ModuleCardDto("04", "Operations on Sets", new List<string> { "Intersection of Sets", "Union of Sets", "Combined Operations on Sets" }, "course-map.html?module=form4-04")
                     {
                         ModuleId = "form4-04"
                     },
-                    new ModuleCardDto("05", "Network in Graph Theory", new List<string> { "Network" }, "lesson-form4-05.html")
+                    new ModuleCardDto("05", "Network in Graph Theory", new List<string> { "Network" }, "course-map.html?module=form4-05")
                     {
                         ModuleId = "form4-05"
                     }
@@ -1866,23 +1861,65 @@ public class LearnerService : ILearnerService
         return Math.Max(0, Math.Min(MaxActivityXp, value));
     }
 
+    private static int GetXpRequirementForLevel(int currentLevel)
+    {
+        if (currentLevel < 1)
+        {
+            return EarlyLevelRequirements[1];
+        }
+
+        if (currentLevel < EarlyLevelRequirements.Length)
+        {
+            return EarlyLevelRequirements[currentLevel];
+        }
+
+        var tier = currentLevel - (EarlyLevelRequirements.Length - 1);
+        var ramp = Math.Max(0, tier - 1);
+        return BaseLevelXp + (ramp * PostLevelRampIncrement);
+    }
+
     private static int CalculateLevelFromXp(int totalXp)
     {
         if (totalXp <= 0)
         {
             return 1;
         }
-        return Math.Max(1, (totalXp / BaseLevelXp) + 1);
+
+        var remainingXp = totalXp;
+        var level = 1;
+
+        while (true)
+        {
+            var requirement = GetXpRequirementForLevel(level);
+            if (requirement <= 0 || remainingXp < requirement)
+            {
+                return level;
+            }
+
+            remainingXp -= requirement;
+            level++;
+        }
     }
 
     private static int CalculateXpToNextLevel(int totalXp)
     {
         if (totalXp < 0)
         {
-            return BaseLevelXp;
+            return GetXpRequirementForLevel(1);
         }
-        var remainder = totalXp % BaseLevelXp;
-        return remainder == 0 ? BaseLevelXp : BaseLevelXp - remainder;
+
+        var remainingXp = totalXp;
+        var level = 1;
+        var requirement = GetXpRequirementForLevel(level);
+
+        while (requirement > 0 && remainingXp >= requirement)
+        {
+            remainingXp -= requirement;
+            level++;
+            requirement = GetXpRequirementForLevel(level);
+        }
+
+        return requirement <= 0 ? 0 : requirement - remainingXp;
     }
 
     private async Task UpdateLearnerXpToNextLevelAsync(string learnerId, int xpToNextLevel)
@@ -2463,7 +2500,7 @@ public class LearnerService : ILearnerService
             Longest = 0,
             XpToNextLevel = CalculateXpToNextLevel(profile.Xp),
             Status = "Start your streak",
-            LevelLabel = $"Level {profile.Level} - {profile.Xp} XP"
+            LevelLabel = $"Level {profile.Level}"
         };
 
         const string sql = @"SELECT current_streak, longest_streak, xp_to_next_level
@@ -2500,7 +2537,7 @@ public class LearnerService : ILearnerService
         }
 
         streak.Status = streak.Current > 0 ? $"{streak.Current}-day streak" : "Ready to start your streak";
-        streak.LevelLabel = $"Level {profile.Level} - {profile.Xp} XP";
+        streak.LevelLabel = $"Level {profile.Level}";
 
         return streak;
     }
@@ -2514,6 +2551,8 @@ public class LearnerService : ILearnerService
 
         foreach (var module in allModules)
         {
+            module.ProgressPercent = 0;
+
             var keys = new List<string?>
             {
                 module.ModuleId,
@@ -2528,7 +2567,7 @@ public class LearnerService : ILearnerService
             {
                 if (progress.TryGetValue(key!, out var state))
                 {
-                    module.ProgressPercent = state.ProgressPercent;
+                    module.ProgressPercent = Math.Max(0, Math.Min(100, state.ProgressPercent));
                     break;
                 }
             }
@@ -2536,7 +2575,7 @@ public class LearnerService : ILearnerService
             var topicPercent = CalculateModuleProgress(module, topicProgress);
             if (topicPercent.HasValue)
             {
-                module.ProgressPercent = topicPercent.Value;
+                module.ProgressPercent = Math.Max(0, Math.Min(100, topicPercent.Value));
             }
         }
 
@@ -2861,7 +2900,9 @@ public class LearnerService : ILearnerService
     private static int? CalculateModuleProgress(ModuleCardDto module, Dictionary<string, Dictionary<string, TopicProgressState>> topicProgress)
     {
         var units = module.Units ?? new List<ModuleUnitDto>();
-        var trackedUnits = units.Where(u => !string.IsNullOrWhiteSpace(u.UnitId)).ToList();
+        var trackedUnits = units
+            .Where(u => !string.IsNullOrWhiteSpace(u.UnitId) && !u.RescueOnly)
+            .ToList();
         if (!trackedUnits.Any())
         {
             return null;
@@ -3228,56 +3269,37 @@ public class LearnerService : ILearnerService
         return false;
     }
 
-    private async Task<List<TopicProgressDto>> FetchTopicsAsync(string learnerId)
+    private static List<TopicProgressDto> BuildTopicProgressList(LearnerModuleSnapshot snapshot, int? limit = null)
     {
-        var topics = new List<TopicProgressDto>();
-        const string sql = @"SELECT topic_code, percent, coach_note
-                             FROM learner_topics_progress
-                             WHERE uid = @Uid
-                             ORDER BY COALESCE(updated_at, CURRENT_TIMESTAMP) DESC";
-
-        try
+        if (snapshot == null)
         {
-            await using var connection = await OpenConnectionAsync();
-            if (connection == null)
-            {
-                return topics;
-            }
-
-            await using var command = new MySqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@Uid", learnerId);
-
-            await using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                var title = reader["topic_code"]?.ToString() ?? "Topic";
-                var percent = SafeToInt(reader["percent"], 0);
-                var note = reader["coach_note"]?.ToString() ?? string.Empty;
-                topics.Add(new TopicProgressDto(title, percent, note));
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[LearnerService] Failed to load learner_topics_progress for {learnerId}: {ex.Message}");
+            return new List<TopicProgressDto>();
         }
 
-        if (!topics.Any())
-        {
-            var snapshot = await BuildModuleSnapshotAsync(learnerId);
-            var fallbackModules = snapshot.ActiveModules.Any()
-                ? snapshot.ActiveModules
-                : snapshot.Catalogue.SelectMany(section => section.Modules).ToList();
+        var modules = snapshot.ActiveModules?
+            .Where(module => module != null)
+            .Cast<ModuleCardDto>()
+            .ToList() ?? new List<ModuleCardDto>();
 
-            topics = fallbackModules
-                .Take(5)
-                .Select(module => new TopicProgressDto(
-                    module.Title,
-                    module.ProgressPercent ?? 0,
-                    module.Lessons != null ? string.Join(", ", module.Lessons) : string.Empty))
+        if (!modules.Any())
+        {
+            modules = snapshot.Catalogue
+                .SelectMany(section => section.Modules ?? new List<ModuleCardDto>())
+                .Where(module => module != null)
                 .ToList();
         }
 
-        return topics;
+        if (limit.HasValue && limit.Value > 0)
+        {
+            modules = modules.Take(limit.Value).ToList();
+        }
+
+        return modules
+            .Select(module => new TopicProgressDto(
+                module.Title,
+                module.ProgressPercent ?? 0,
+                module.Lessons != null ? string.Join(", ", module.Lessons) : string.Empty))
+            .ToList();
     }
 
     private async Task<List<CheckpointDto>> FetchCheckpointsAsync(string learnerId)

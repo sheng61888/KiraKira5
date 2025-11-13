@@ -471,10 +471,11 @@
       state.editingMotto = false;
     }
     const summary = card.querySelectorAll(".xp-summary span");
-    if (summary.length >= 3) {
+    if (summary.length >= 1) {
       summary[0].innerHTML = `<strong>Level:</strong> ${profile.level ?? "-"}`;
-      summary[1].innerHTML = `<strong>XP:</strong> ${profile.xp ?? 0}`;
-      summary[2].innerHTML = `<strong>Rank:</strong> ${profile.rank || "Learner"}`;
+    }
+    if (summary.length >= 2) {
+      summary[1].innerHTML = `<strong>Rank:</strong> ${profile.rank || "Learner"}`;
     }
     state.profile.name = profile.name || state.profile.name;
     setProfileImage(profile.avatarUrl);

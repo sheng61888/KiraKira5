@@ -64,7 +64,7 @@
     setText(selectors.streak, streakLabel);
 
     const levelLabel = streak?.levelLabel || (profile?.level !== undefined
-      ? `Level ${profile.level} - ${profile.xp ?? 0} XP`
+      ? `Level ${profile.level}`
       : "Level updating");
     setText(selectors.levelLabel, levelLabel);
 

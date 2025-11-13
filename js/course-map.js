@@ -733,6 +733,38 @@
     );
   };
 
+  const syncModuleCompletion = completedUnitIds => {
+    if (
+      !state.moduleId ||
+      !Array.isArray(completedUnitIds) ||
+      !completedUnitIds.length ||
+      !window.kiraActivity?.logModuleProgress
+    ) {
+      return;
+    }
+    const uniqueUnitIds = Array.from(
+      new Set(
+        completedUnitIds
+          .map(normalizeId)
+          .filter(Boolean)
+      )
+    );
+    if (!uniqueUnitIds.length) {
+      return;
+    }
+    Promise.allSettled(
+      uniqueUnitIds.map(unitId =>
+        window.kiraActivity
+          .logModuleProgress({
+            moduleId: state.moduleId,
+            unitId,
+            status: "completed"
+          })
+          .catch(() => null)
+      )
+    ).catch(() => {});
+  };
+
   const markModuleComplete = () => {
     if (!state.units.length || !state.moduleId || isModuleComplete()) {
       return;
@@ -758,6 +790,7 @@
       completedAt: timestamp
     };
     saveUnitProgress(state.moduleId, payload);
+    syncModuleCompletion(allUnitIds);
     queueCompletionNotification();
     creditModuleMastery();
     renderUnitNav();
