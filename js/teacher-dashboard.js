@@ -1,7 +1,13 @@
-// This is your js/teacher-dashboard.js file
+// js/teacher-dashboard.js
 class TeacherDashboard {
     constructor() {
+        // *** FIXED: Read from 'currentLearnerId' which login.js saves ***
         this.teacherId = this.getCurrentTeacherId();
+        if (!this.teacherId) {
+            alert('No teacher ID found in session. Please log in again.');
+            window.location.href = '/html/login_signup.html';
+            return;
+        }
         this.init();
     }
 
@@ -13,15 +19,15 @@ class TeacherDashboard {
     }
 
     getCurrentTeacherId() {
-        // Implement based on your authentication system
-        // This could come from sessionStorage, JWT, etc.
-        return sessionStorage.getItem('currentUserId') || 'teacher123';
+        // *** FIXED: Reads from 'currentLearnerId' which login.js saves ***
+        return sessionStorage.getItem('currentLearnerId'); 
     }
 
     async loadClasses() {
         try {
-            // This URL calls your TeacherController
-            const response = await fetch('/api/Teacher/classes');
+            // *** FIXED: Now sends the teacherId to the API ***
+            const response = await fetch(`/api/Teacher/classes?teacherId=${this.teacherId}`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const classes = await response.json();
             
             const classSelect = document.getElementById('classSelect');
@@ -29,8 +35,8 @@ class TeacherDashboard {
             
             classes.forEach(cls => {
                 const option = document.createElement('option');
-                option.value = cls.classId;
-                option.textContent = cls.className;
+                option.value = cls.classId; // Should be C001, C002
+                option.textContent = cls.className; // Should be "Form 4 Algebra..."
                 classSelect.appendChild(option);
             });
         } catch (error) {
@@ -41,8 +47,9 @@ class TeacherDashboard {
 
     async loadCourses() {
         try {
-            // This URL calls your TeacherController
+            // This API call doesn't need a teacherId, it just gets all possible topics
             const response = await fetch('/api/Teacher/courses');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const courses = await response.json();
             
             const courseSelect = document.getElementById('courseSelect');
@@ -50,7 +57,7 @@ class TeacherDashboard {
             
             courses.forEach(course => {
                 const option = document.createElement('option');
-                option.value = course.courseName;
+                option.value = course.courseName; // e.g., "Quadratic Functions"
                 option.textContent = course.courseName;
                 courseSelect.appendChild(option);
             });
@@ -62,8 +69,9 @@ class TeacherDashboard {
 
     async loadAssignments() {
         try {
-            // This URL calls your TeacherController
-            const response = await fetch('/api/Teacher/assignments');
+            // *** FIXED: Now sends the teacherId to the API ***
+            const response = await fetch(`/api/Teacher/assignments?teacherId=${this.teacherId}`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const assignments = await response.json();
             
             this.renderAssignments(assignments);
@@ -155,7 +163,7 @@ class TeacherDashboard {
 
     async createAssignment() {
         const classId = document.getElementById('classSelect').value;
-        const courseName = document.getElementById('courseSelect').value;
+        const courseName = document.getElementById('courseSelect').value; // This is the 'topic'
         const title = document.getElementById('assignmentTitle').value;
         const deadline = document.getElementById('deadline').value;
 
@@ -168,11 +176,12 @@ class TeacherDashboard {
             const request = {
                 classId: classId,
                 title: title,
-                courseName: courseName,
-                deadline: new Date(deadline).toISOString()
+                topic: courseName, // Match C# model
+                dueAt: new Date(deadline).toISOString(),
+                statusTemplate: 'Open',
+                teacherId: this.teacherId // Send the teacher ID
             };
 
-            // This URL calls your TeacherController
             const response = await fetch('/api/Teacher/assignments', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -196,25 +205,21 @@ class TeacherDashboard {
 
     async updateAssignment() {
         const assignmentId = document.getElementById('editAssignmentId').value;
-        const title = document.getElementById('editTitle').value;
-        const deadline = document.getElementById('editDeadline').value;
         const status = document.getElementById('editStatus').value;
-
+        // You can add title and deadline updates here too
+        
         try {
-            // This URL calls your TeacherController
             const response = await fetch(`/api/Teacher/assignments/${assignmentId}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: status })
             });
-            // Note: Your C# code also needs to be updated to save the new title and deadline.
-            // This example only saves status, as per your TeacherController.cs file.
 
             const result = await response.json();
 
             if (response.ok) {
                 this.showMessage('Assignment updated successfully!', 'success');
-                this.closeEditModal();
+                closeEditModal(); // Use global function
                 await this.loadAssignments();
             } else {
                 this.showMessage(result.message || 'Failed to update assignment', 'error');
@@ -243,7 +248,10 @@ class TeacherDashboard {
 // Global functions for button clicks
 async function editAssignment(assignmentId) {
     try {
-        const response = await fetch('/api/Teacher/assignments');
+        const teacherId = sessionStorage.getItem('currentLearnerId');
+        const response = await fetch(`/api/Teacher/assignments?teacherId=${teacherId}`);
+        if (!response.ok) throw new Error('Failed to fetch assignments');
+        
         const assignments = await response.json();
         const assignment = assignments.find(a => a.assignmentId === assignmentId);
         
@@ -251,7 +259,7 @@ async function editAssignment(assignmentId) {
             document.getElementById('editAssignmentId').value = assignment.assignmentId;
             document.getElementById('editTitle').value = assignment.title;
             const deadlineDate = new Date(assignment.deadline);
-            const formattedDate = deadlineDate.toISOString().slice(0, 16);
+            const formattedDate = new Date(deadlineDate.getTime() - (deadlineDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
             document.getElementById('editDeadline').value = formattedDate;
             document.getElementById('editStatus').value = assignment.status;
             document.getElementById('editAssignmentModal').style.display = 'block';
@@ -289,7 +297,6 @@ async function updateAssignmentStatus(assignmentId, status) {
 async function deleteAssignment(assignmentId) {
     if (!confirm('Are you sure you want to delete this assignment?')) return;
     try {
-        // This URL calls your TeacherController
         const response = await fetch(`/api/Teacher/assignments/${assignmentId}`, {
             method: 'DELETE'
         });

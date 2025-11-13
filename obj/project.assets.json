@@ -52,6 +52,19 @@
           }
         }
       },
+      "Dapper/2.1.66": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Dapper.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Dapper.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Google.Protobuf/3.32.0": {
         "type": "package",
         "compile": {
@@ -3432,6 +3445,25 @@
         "lib/netstandard2.0/BouncyCastle.Cryptography.dll",
         "lib/netstandard2.0/BouncyCastle.Cryptography.xml",
         "packageIcon.png"
+      ]
+    },
+    "Dapper/2.1.66": {
+      "sha512": "/q77jUgDOS+bzkmk3Vy9SiWMaetTw+NOoPAV0xPBsGVAyljd5S6P+4RUW7R3ZUGGr9lDRyPKgAMj2UAOwvqZYw==",
+      "type": "package",
+      "path": "dapper/2.1.66",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Dapper.png",
+        "dapper.2.1.66.nupkg.sha512",
+        "dapper.nuspec",
+        "lib/net461/Dapper.dll",
+        "lib/net461/Dapper.xml",
+        "lib/net8.0/Dapper.dll",
+        "lib/net8.0/Dapper.xml",
+        "lib/netstandard2.0/Dapper.dll",
+        "lib/netstandard2.0/Dapper.xml",
+        "readme.md"
       ]
     },
     "Google.Protobuf/3.32.0": {
@@ -9329,6 +9361,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "Dapper >= 2.1.66",
       "Microsoft.AspNetCore.Mvc >= 2.3.0",
       "Microsoft.Data.SqlClient >= 6.1.2",
       "Microsoft.Extensions.Configuration >= 9.0.10",
@@ -9337,23 +9370,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ggshe\\.nuget\\packages\\": {},
+    "C:\\Users\\Zhexi\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
+      "projectUniqueName": "C:\\APU\\2025 APU SEM 2\\WAPP\\WAPP\\WAPP Assignment\\KiraKira5\\KiraKira5.csproj",
       "projectName": "KiraKira5",
-      "projectPath": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
-      "packagesPath": "C:\\Users\\ggshe\\.nuget\\packages\\",
-      "outputPath": "C:\\KiraKira5\\KiraKira5\\obj\\",
+      "projectPath": "C:\\APU\\2025 APU SEM 2\\WAPP\\WAPP\\WAPP Assignment\\KiraKira5\\KiraKira5.csproj",
+      "packagesPath": "C:\\Users\\Zhexi\\.nuget\\packages\\",
+      "outputPath": "C:\\APU\\2025 APU SEM 2\\WAPP\\WAPP\\WAPP Assignment\\KiraKira5\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\ggshe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Zhexi\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -9362,7 +9395,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -9387,6 +9419,10 @@
       "net9.0": {
         "targetAlias": "net9.0",
         "dependencies": {
+          "Dapper": {
+            "target": "Package",
+            "version": "[2.1.66, )"
+          },
           "Microsoft.AspNetCore.Mvc": {
             "target": "Package",
             "version": "[2.3.0, )"
@@ -9427,7 +9463,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -1,159 +1,217 @@
-// TeacherService.cs (Corrected)
+using Dapper;
 using MySql.Data.MySqlClient;
-using System.Data;
-using KiraKira5.Models; // Assuming your DTOs are here
+using KiraKira5.Controllers; // Needed for the CreateAssignmentRequest
 
-public class TeacherService
+namespace KiraKira5.Services
 {
-    private readonly string _connectionString;
+    // --- Data Models (DTOs) ---
+    // These classes define the shape of the data your API will send
 
-    public TeacherService(string connectionString)
+    public class TeacherClassDto
     {
-        _connectionString = connectionString;
+        public string ClassId { get; set; }
+        public string ClassName { get; set; }
+        public int StudentCount { get; set; }
     }
 
-    public async Task<List<TeacherClassDto>> GetTeacherClassesAsync(string teacherId)
+    public class TeacherCourseDto
     {
-        var classes = new List<TeacherClassDto>();
-        using var connection = new MySqlConnection(_connectionString);
-        await connection.OpenAsync();
+        public string CourseName { get; set; }
+    }
 
-        var query = @"SELECT class_id, class_name FROM teacher_classes 
-                     WHERE teacher_id = @teacherId 
-                     ORDER BY class_name";
+    public class TeacherAssignmentDto
+    {
+        public int AssignmentId { get; set; }
+        public string ClassId { get; set; }
+        public string Title { get; set; }
+        public string CourseName { get; set; }
+        public DateTime Deadline { get; set; }
+        public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
 
-        using var command = new MySqlCommand(query, connection);
-        command.Parameters.AddWithValue("@teacherId", teacherId);
+    public class StudentDto
+    {
+        public string Uid { get; set; }
+        public string Name { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+    }
 
-        using var reader = await command.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
+    public class StudentProgressDto
+    {
+        public string StudentName { get; set; }
+        public string Email { get; set; }
+        public string ClassName { get; set; }
+        public int CompletedCount { get; set; }
+    }
+
+    // --- The Service Class ---
+
+    public class TeacherService
+    {
+        private readonly string _connectionString;
+
+        public TeacherService(string connectionString)
         {
-            classes.Add(new TeacherClassDto
-            {
-                ClassId = reader.GetString("class_id"),
-                ClassName = reader.GetString("class_name")
-            });
+            _connectionString = connectionString;
         }
-        return classes;
-    }
 
-    public async Task<List<CourseDto>> GetAvailableCoursesAsync()
-    {
-        var courses = new List<CourseDto>();
-        using var connection = new MySqlConnection(_connectionString);
-        await connection.OpenAsync();
-
-        // --- FIX 1: Query for 'title' not 'course_name' ---
-        var query = "SELECT course_id, title, description FROM courses ORDER BY title";
-
-        using var command = new MySqlCommand(query, connection);
-        
-        using var reader = await command.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
+        private MySqlConnection GetConnection()
         {
-            courses.Add(new CourseDto
-            {
-                CourseId = reader.GetInt32("course_id"),
-                // --- FIX 2: Read from 'title' column ---
-                CourseName = reader.GetString("title"), 
-                Description = reader.GetString("description")
-            });
+            return new MySqlConnection(_connectionString);
         }
-        return courses;
-    }
 
-    public async Task<bool> CreateAssignmentAsync(TeacherAssignmentDto assignment)
-    {
-        using var connection = new MySqlConnection(_connectionString);
-        await connection.OpenAsync();
-
-        // This query uses your 'teacher_assignments' table
-        var query = @"INSERT INTO teacher_assignments 
-                     (teacher_id, class_id, title, course_name, deadline, status) 
-                     VALUES (@teacherId, @classId, @title, @courseName, @deadline, @status)";
-
-        using var command = new MySqlCommand(query, connection);
-        command.Parameters.AddWithValue("@teacherId", assignment.TeacherId);
-        command.Parameters.AddWithValue("@classId", assignment.ClassId);
-        command.Parameters.AddWithValue("@title", assignment.Title);
-        command.Parameters.AddWithValue("@courseName", assignment.CourseName);
-        command.Parameters.AddWithValue("@deadline", assignment.Deadline);
-        command.Parameters.AddWithValue("@status", "Open");
-
-        var result = await command.ExecuteNonQueryAsync();
-        return result > 0;
-    }
-
-    public async Task<List<TeacherAssignmentDto>> GetTeacherAssignmentsAsync(string teacherId)
-    {
-        var assignments = new List<TeacherAssignmentDto>();
-        using var connection = new MySqlConnection(_connectionString);
-        await connection.OpenAsync();
-
-        var query = @"SELECT * FROM teacher_assignments 
-                     WHERE teacher_id = @teacherId 
-                     ORDER BY deadline ASC, created_at DESC";
-
-        using var command = new MySqlCommand(query, connection);
-        command.Parameters.AddWithValue("@teacherId", teacherId);
-
-        using var reader = await command.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
+        // Used by Dashboard and My Classes
+        public async Task<IEnumerable<TeacherClassDto>> GetTeacherClassesAsync(string teacherId)
         {
-            assignments.Add(new TeacherAssignmentDto
+            using (var conn = GetConnection())
             {
-                AssignmentId = reader.GetInt32("assignment_id"),
-                TeacherId = reader.GetString("teacher_id"),
-                ClassId = reader.GetString("class_id"),
-                Title = reader.GetString("title"),
-                CourseName = reader.GetString("course_name"),
-                Deadline = reader.GetDateTime("deadline"),
-                Status = reader.GetString("status"),
-                CreatedAt = reader.GetDateTime("created_at")
-            });
+                // *** FIXED: Now uses the teacherId in the query ***
+                var sql = @"
+                    SELECT 
+                        class_code AS ClassId, 
+                        title AS ClassName,
+                        (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.course_id) AS StudentCount
+                    FROM classes c
+                    WHERE c.teacher_id = @TeacherId";
+                return await conn.QueryAsync<TeacherClassDto>(sql, new { TeacherId = teacherId });
+            }
         }
-        return assignments;
+
+        // Used by Dashboard dropdown
+        public async Task<IEnumerable<TeacherCourseDto>> GetCoursesAsync()
+        {
+            using (var conn = GetConnection())
+            {
+                // Gets all unique assignment topics to use as "Courses"
+                var sql = "SELECT DISTINCT topic AS CourseName FROM class_assignments";
+                return await conn.QueryAsync<TeacherCourseDto>(sql);
+            }
+        }
+
+        // Used by Dashboard
+        public async Task<IEnumerable<TeacherAssignmentDto>> GetAssignmentsAsync(string teacherId)
+        {
+            using (var conn = GetConnection())
+            {
+                // *** FIXED: Now uses the teacherId in the query ***
+                var sql = @"
+                    SELECT 
+                        ca.assignment_id AS AssignmentId, 
+                        ca.class_code AS ClassId, 
+                        ca.title AS Title, 
+                        ca.topic AS CourseName, 
+                        ca.due_at AS Deadline, 
+                        ca.status_template AS Status, 
+                        ca.created_at AS CreatedAt
+                    FROM class_assignments ca
+                    JOIN classes c ON ca.class_code = c.class_code
+                    WHERE c.teacher_id = @TeacherId
+                    ORDER BY ca.due_at DESC";
+                return await conn.QueryAsync<TeacherAssignmentDto>(sql, new { TeacherId = teacherId });
+            }
+        }
+
+        // Used by Dashboard (Create)
+        public async Task<TeacherAssignmentDto> CreateAssignmentAsync(CreateAssignmentRequest req)
+        {
+            using (var conn = GetConnection())
+            {
+                var sql = @"
+                    INSERT INTO class_assignments (class_code, title, topic, due_at, status_template)
+                    VALUES (@ClassId, @Title, @Topic, @DueAt, @StatusTemplate);
+                    SELECT LAST_INSERT_ID();";
+                
+                int newId = await conn.ExecuteScalarAsync<int>(sql, new 
+                {
+                    req.ClassId,
+                    req.Title,
+                    req.Topic,
+                    req.DueAt,
+                    req.StatusTemplate
+                });
+
+                // Return the newly created assignment
+                return new TeacherAssignmentDto
+                {
+                    AssignmentId = newId,
+                    ClassId = req.ClassId,
+                    Title = req.Title,
+                    CourseName = req.Topic,
+                    Deadline = req.DueAt,
+                    Status = req.StatusTemplate,
+                    CreatedAt = DateTime.UtcNow
+                };
+            }
+        }
+
+        // Used by My Classes
+        public async Task<IEnumerable<StudentDto>> GetStudentsInClassAsync(string classId)
+        {
+            // *** NOTE ***
+            // This query assumes you have an 'enrollments' table linking users to courses
+            // and a 'classes' table linked to 'courses'.
+            // Based on your 'create_course_tables.sql'
+            using (var conn = GetConnection())
+            {
+                var sql = @"
+                    SELECT u.uid, u.name, u.username, u.email 
+                    FROM usertable u
+                    JOIN enrollments e ON u.uid = e.learner_id
+                    JOIN courses co ON e.course_id = co.course_id
+                    JOIN classes cl ON co.course_id = cl.course_id
+                    WHERE cl.class_code = @ClassId AND u.usertype = 'learner'";
+                return await conn.QueryAsync<StudentDto>(sql, new { ClassId = classId });
+            }
+        }
+
+        // Used by Student Progress
+        public async Task<IEnumerable<StudentProgressDto>> GetStudentProgressAsync(string teacherId)
+        {
+            // *** NOTE ***
+            // This query is complex and relies on your schema.
+            // It joins classes, courses, enrollments, users, and progress.
+            using (var conn = GetConnection())
+            {
+                var sql = @"
+                    SELECT 
+                        u.name AS StudentName, 
+                        u.email AS Email, 
+                        c.title AS ClassName, 
+                        COUNT(cp.chapter_id) AS CompletedCount
+                    FROM chapter_progress cp
+                    JOIN enrollments e ON cp.enrollment_id = e.enrollment_id
+                    JOIN usertable u ON e.learner_id = u.uid
+                    JOIN courses co ON e.course_id = co.course_id
+                    JOIN classes c ON co.course_id = c.course_id
+                    WHERE c.teacher_id = @TeacherId AND cp.is_completed = 1
+                    GROUP BY u.uid, c.class_code, u.name, u.email, c.title";
+                
+                return await conn.QueryAsync<StudentProgressDto>(sql, new { TeacherId = teacherId });
+            }
+        }
+
+        // Used by Dashboard (Update)
+        public async Task<bool> UpdateAssignmentStatusAsync(int assignmentId, string status)
+        {
+             using (var conn = GetConnection())
+            {
+                var sql = "UPDATE class_assignments SET status_template = @Status WHERE assignment_id = @AssignmentId";
+                var rowsAffected = await conn.ExecuteAsync(sql, new { Status = status, AssignmentId = assignmentId });
+                return rowsAffected > 0;
+            }
+        }
+
+        // Used by Dashboard (Delete)
+         public async Task<bool> DeleteAssignmentAsync(int assignmentId)
+        {
+             using (var conn = GetConnection())
+            {
+                var sql = "DELETE FROM class_assignments WHERE assignment_id = @AssignmentId";
+                var rowsAffected = await conn.ExecuteAsync(sql, new { AssignmentId = assignmentId });
+                return rowsAffected > 0;
+            }
+        }
     }
-
-    public async Task<bool> UpdateAssignmentStatusAsync(int assignmentId, string status)
-    {
-        using var connection = new MySqlConnection(_connectionString);
-        await connection.OpenAsync();
-        var query = "UPDATE teacher_assignments SET status = @status WHERE assignment_id = @assignmentId";
-        using var command = new MySqlCommand(query, connection);
-        command.Parameters.AddWithValue("@status", status);
-        command.Parameters.AddWithValue("@assignmentId", assignmentId);
-        var result = await command.ExecuteNonQueryAsync();
-        return result > 0;
-    }
-
-    public async Task<bool> DeleteAssignmentAsync(int assignmentId)
-    {
-        using var connection = new MySqlConnection(_connectionString);
-        await connection.OpenAsync();
-        var query = "DELETE FROM teacher_assignments WHERE assignment_id = @assignmentId";
-        using var command = new MySqlCommand(query, connection);
-        command.Parameters.AddWithValue("@assignmentId", assignmentId);
-        var result = await command.ExecuteNonQueryAsync();
-        return result > 0;
-    }
-}
-
-// --- FIX 3: Add '?' to make strings nullable, fixing CS8618 warnings ---
-public class TeacherClassDto
-{
-    public string? ClassId { get; set; }
-    public string? ClassName { get; set; }
-}
-
-public class TeacherAssignmentDto
-{
-    public int AssignmentId { get; set; }
-    public string? TeacherId { get; set; }
-    public string? ClassId { get; set; }
-    public string? Title { get; set; }
-    public string? CourseName { get; set; }
-    public DateTime Deadline { get; set; }
-    public string? Status { get; set; }
-    public DateTime CreatedAt { get; set; }
 }
