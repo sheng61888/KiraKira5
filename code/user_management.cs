@@ -271,25 +271,68 @@ public class UserManagement
     public static bool DeleteUser(string id)
     {
         string connectionString = _configuration.GetConnectionString("KiraKiraDB");
+        Console.WriteLine($"DeleteUser called for ID: {id}");
         
         try
         {
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                string query = "DELETE FROM usertable WHERE uid = @Id";
-                
-                using (MySqlCommand command = new MySqlCommand(query, connection))
+                connection.Open();
+                using (MySqlTransaction transaction = connection.BeginTransaction())
                 {
-                    command.Parameters.AddWithValue("@Id", id);
-                    
-                    connection.Open();
-                    return command.ExecuteNonQuery() > 0;
+                    try
+                    {
+                        // Delete related records - ignore errors for non-existent tables
+                        string[] deleteQueries = new string[]
+                        {
+                            "DELETE FROM class_enrollments WHERE student_id = @Id",
+                            "DELETE FROM student_module_progress WHERE student_id = @Id",
+                            "DELETE FROM teacher_classes WHERE teacher_id = @Id",
+                            "DELETE FROM user_sessions WHERE uid = @Id",
+                            "DELETE FROM password_reset_requests WHERE uid = @Id"
+                        };
+                        
+                        foreach (string query in deleteQueries)
+                        {
+                            try
+                            {
+                                using (MySqlCommand command = new MySqlCommand(query, connection, transaction))
+                                {
+                                    command.Parameters.AddWithValue("@Id", id);
+                                    command.ExecuteNonQuery();
+                                }
+                            }
+                            catch (MySqlException ex)
+                            {
+                                Console.WriteLine($"Skipping query (table may not exist): {query} - {ex.Message}");
+                            }
+                        }
+                        
+                        // Delete user - this must succeed
+                        using (MySqlCommand command = new MySqlCommand("DELETE FROM usertable WHERE uid = @Id", connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@Id", id);
+                            int affected = command.ExecuteNonQuery();
+                            Console.WriteLine($"User deletion affected {affected} rows");
+                        }
+                        
+                        transaction.Commit();
+                        Console.WriteLine("Transaction committed successfully");
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Transaction error: {ex.Message}");
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error deleting user: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
             return false;
         }
     }

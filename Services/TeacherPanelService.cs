@@ -73,7 +73,13 @@ namespace KiraKira5.Services
             
             if (!classId.HasValue) return false;
             
-            var sql = @"INSERT IGNORE INTO class_enrollments (class_id, student_id) 
+            var exists = await conn.ExecuteScalarAsync<int>(
+                "SELECT COUNT(*) FROM class_enrollments WHERE class_id = @ClassId AND student_id = @StudentId",
+                new { ClassId = classId.Value, request.StudentId });
+            
+            if (exists > 0) return true;
+            
+            var sql = @"INSERT INTO class_enrollments (class_id, student_id) 
                        VALUES (@ClassId, @StudentId)";
             
             await conn.ExecuteAsync(sql, new { ClassId = classId.Value, request.StudentId });
@@ -181,6 +187,73 @@ namespace KiraKira5.Services
             const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
             var random = new Random();
             return new string(Enumerable.Range(0, 6).Select(_ => chars[random.Next(chars.Length)]).ToArray());
+        }
+
+        public async Task<bool> CheckJoinCodeExistsAsync(string joinCode)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            var classId = await conn.ExecuteScalarAsync<int?>(
+                "SELECT class_id FROM teacher_classes WHERE join_code = @JoinCode AND is_active = 1",
+                new { JoinCode = joinCode });
+            return classId.HasValue;
+        }
+
+        public async Task<IEnumerable<TeacherClass>> GetStudentClassesAsync(string studentId)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            var sql = @"SELECT tc.class_id AS ClassId, tc.teacher_id AS TeacherId,
+                              tc.class_name AS ClassName, tc.join_code AS JoinCode,
+                              tc.created_at AS CreatedAt, tc.is_active AS IsActive
+                       FROM teacher_classes tc
+                       JOIN class_enrollments ce ON tc.class_id = ce.class_id
+                       WHERE ce.student_id = @StudentId AND tc.is_active = 1
+                       ORDER BY ce.enrolled_at DESC";
+            
+            return await conn.QueryAsync<TeacherClass>(sql, new { StudentId = studentId });
+        }
+
+        /// <summary>
+        /// Searches for students by ID or name
+        /// </summary>
+        public async Task<IEnumerable<ClassStudent>> SearchStudentsAsync(string query)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            var sql = @"SELECT uid AS StudentId, name AS Name, email AS Email, NULL AS EnrolledAt
+                       FROM usertable
+                       WHERE usertype = 'learner' AND (uid LIKE @Query OR name LIKE @Query)
+                       LIMIT 20";
+            
+            return await conn.QueryAsync<ClassStudent>(sql, new { Query = $"%{query}%" });
+        }
+
+        /// <summary>
+        /// Adds a student to a class
+        /// </summary>
+        public async Task<bool> AddStudentToClassAsync(int classId, string studentId)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            
+            var exists = await conn.ExecuteScalarAsync<int>(
+                "SELECT COUNT(*) FROM class_enrollments WHERE class_id = @ClassId AND student_id = @StudentId",
+                new { ClassId = classId, StudentId = studentId });
+            
+            if (exists > 0) return true;
+            
+            await conn.ExecuteAsync(
+                "INSERT INTO class_enrollments (class_id, student_id) VALUES (@ClassId, @StudentId)",
+                new { ClassId = classId, StudentId = studentId });
+            
+            var assignmentsSql = "SELECT assignment_id FROM class_module_assignments WHERE class_id = @ClassId";
+            var assignments = await conn.QueryAsync<int>(assignmentsSql, new { ClassId = classId });
+            
+            foreach (var assignmentId in assignments)
+            {
+                await conn.ExecuteAsync(
+                    "INSERT IGNORE INTO student_module_progress (assignment_id, student_id) VALUES (@AssignmentId, @StudentId)",
+                    new { AssignmentId = assignmentId, StudentId = studentId });
+            }
+            
+            return true;
         }
     }
 }

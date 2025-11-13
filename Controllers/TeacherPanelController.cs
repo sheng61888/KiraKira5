@@ -138,5 +138,80 @@ namespace KiraKira5.Controllers
                 return StatusCode(500, new { message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Debug: Check if join code exists
+        /// </summary>
+        [HttpGet("check-code/{joinCode}")]
+        public async Task<IActionResult> CheckJoinCode(string joinCode)
+        {
+            try
+            {
+                var exists = await _service.CheckJoinCodeExistsAsync(joinCode);
+                return Ok(new { joinCode, exists });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Gets classes a student is enrolled in
+        /// </summary>
+        [HttpGet("student/{studentId}/classes")]
+        public async Task<IActionResult> GetStudentClasses(string studentId)
+        {
+            try
+            {
+                var classes = await _service.GetStudentClassesAsync(studentId);
+                return Ok(classes);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Searches for students by ID or name
+        /// </summary>
+        [HttpGet("search-students")]
+        public async Task<IActionResult> SearchStudents([FromQuery] string query)
+        {
+            try
+            {
+                var students = await _service.SearchStudentsAsync(query);
+                return Ok(students);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Adds a student to a class
+        /// </summary>
+        [HttpPost("classes/{classId}/add-student")]
+        public async Task<IActionResult> AddStudentToClass(int classId, [FromBody] AddStudentRequest request)
+        {
+            try
+            {
+                var success = await _service.AddStudentToClassAsync(classId, request.StudentId);
+                if (success)
+                    return Ok(new { message = "Student added successfully" });
+                return BadRequest(new { message = "Failed to add student" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+    }
+
+    public class AddStudentRequest
+    {
+        public string StudentId { get; set; } = string.Empty;
     }
 }

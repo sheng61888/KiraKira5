@@ -96,28 +96,54 @@
     }
   };
 
-  const renderEnrolledCourses = (enrollments) => {
+  const renderEnrolledClasses = async (classes, learnerId) => {
     const container = getElement(selectors.enrolledCoursesList);
     if (!container) return;
 
-    if (!enrollments || enrollments.length === 0) {
-      container.innerHTML = "<p class='muted'>No enrolled courses yet. Use the form above to join a course.</p>";
+    if (!classes || classes.length === 0) {
+      container.innerHTML = "<p class='muted'>No classes yet. Use the form above to join a class.</p>";
       return;
     }
 
-    let html = '';
-    enrollments.forEach(enrollment => {
-      html += `<article class="card" style="margin-bottom: 1rem;">
-        <div class="section-head">
-          <div>
-            <h3>${enrollment.course.title}</h3>
-            <p class="muted">${enrollment.course.description}</p>
-            <p><strong>Code:</strong> ${enrollment.course.enrollmentCode} | <strong>Status:</strong> ${enrollment.isCompleted ? 'Completed' : 'In Progress'}</p>
-          </div>
-          <button class="btn btn--primary" onclick="viewCourse(${enrollment.courseId})">View Course</button>
-        </div>
-      </article>`;
+    let assignments = [];
+    try {
+      const response = await fetch(`/api/learner/${learnerId}/assignments`);
+      if (response.ok) {
+        assignments = await response.json();
+      }
+    } catch (error) {
+      console.error("Unable to load assignments", error);
+    }
+
+    let html = '<div style="display: grid; gap: 1rem;">';
+    classes.forEach(cls => {
+      const classAssignments = assignments.filter(a => a.className === cls.className);
+      html += `<div style="padding: 1.5rem; background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); border-left: 4px solid var(--accent);">
+        <h3 style="color: var(--text); margin: 0 0 0.5rem 0;">${cls.className}</h3>
+        <p style="color: var(--muted); margin: 0.25rem 0;">Teacher: ${cls.teacherId}</p>
+        <p style="color: var(--muted); margin: 0.25rem 0;"><strong>Join Code:</strong> ${cls.joinCode}</p>`;
+      
+      if (classAssignments.length > 0) {
+        html += '<div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">';
+        html += '<h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem;">Assigned Modules</h4>';
+        classAssignments.forEach(a => {
+          const d = new Date(a.dueDate);
+          const dueDate = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+          const status = a.isCompleted ? '✓ Completed' : '○ Pending';
+          const moduleLink = `course-map.html?module=${a.moduleId}`;
+          html += `<a href="${moduleLink}" style="display: block; margin: 0.5rem 0; padding: 0.5rem; background: var(--surface); border-radius: 4px; text-decoration: none; color: inherit; border: 1px solid transparent; transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent'">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 500;">${a.moduleName}</span>
+              <span style="color: var(--muted); font-size: 0.85rem;">${status}</span>
+            </div>
+            <div style="color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem;">Due: ${dueDate}</div>
+          </a>`;
+        });
+        html += '</div>';
+      }
+      html += '</div>';
     });
+    html += '</div>';
     container.innerHTML = html;
   };
 
@@ -223,16 +249,15 @@
       return;
     }
     try {
-      const numericLearnerId = learnerId.replace(/\D/g, '');
-      const response = await fetch(`http://localhost:5000/api/course/enrollments/${numericLearnerId}`);
+      const response = await fetch(`/api/TeacherPanel/student/${learnerId}/classes`);
       if (!response.ok) {
         throw new Error(`Classes request failed with status ${response.status}`);
       }
-      const enrollments = await response.json();
+      const classes = await response.json();
       
-      if (enrollments && enrollments.length > 0) {
+      if (classes && classes.length > 0) {
         setVisibility(true);
-        renderEnrolledCourses(enrollments);
+        await renderEnrolledClasses(classes, learnerId);
       } else {
         setVisibility(false);
       }
@@ -260,16 +285,14 @@
       alert("Please enter a class code.");
       return;
     }
-    const numericLearnerId = learnerId.replace(/\D/g, '');
-    console.log("Attempting to join class with:", { learnerId, numericLearnerId, code });
+    console.log("Attempting to join class with:", { learnerId, code });
     try {
-      const response = await fetch('http://localhost:5000/api/course/enroll', {
+      const response = await fetch('/api/TeacherPanel/join', {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ learnerId: parseInt(numericLearnerId), enrollmentCode: code })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId: learnerId, joinCode: code })
       });
+      
       console.log("Response status:", response.status);
       const data = await response.json();
       console.log("Response data:", data);
@@ -277,7 +300,7 @@
         alert(data.message || "Unable to join class. Please check the code.");
         return;
       }
-      alert("Successfully enrolled in class!");
+      alert("Successfully joined class!");
       await fetchClasses();
       if (input) {
         input.value = "";

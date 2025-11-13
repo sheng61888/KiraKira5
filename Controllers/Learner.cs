@@ -258,6 +258,16 @@ public class LearnerController : ControllerBase
 
         return Ok(profile);
     }
+
+    /// <summary>
+    /// Gets assigned modules with due dates for a learner
+    /// </summary>
+    [HttpGet("{learnerId}/assignments")]
+    public async Task<IActionResult> GetAssignedModules(string learnerId)
+    {
+        var assignments = await _learnerService.GetAssignedModulesAsync(learnerId);
+        return Ok(assignments);
+    }
 }
 
 public class JoinClassRequest

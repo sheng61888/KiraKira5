@@ -98,7 +98,9 @@ public class UserController : ControllerBase
     [HttpDelete("delete/{id}")]
     public IActionResult DeleteUser(string id)
     {
+        Console.WriteLine($"DeleteUser endpoint called with ID: {id}");
         var result = UserManagement.DeleteUser(id);
+        Console.WriteLine($"DeleteUser result: {result}");
         return Ok(new { success = result });
     }
     

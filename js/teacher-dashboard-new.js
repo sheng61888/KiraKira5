@@ -55,10 +55,23 @@ class TeacherDashboard {
         `).join('');
     }
 
-    updateStats(classes) {
+    async updateStats(classes) {
         const totalStudents = classes.reduce((sum, cls) => sum + cls.studentCount, 0);
         document.getElementById('totalClasses').textContent = classes.length;
         document.getElementById('totalStudents').textContent = totalStudents;
+        
+        // Get total active assignments
+        let totalAssignments = 0;
+        for (const cls of classes) {
+            try {
+                const response = await fetch(`/api/TeacherPanel/classes/${cls.classId}/assignments`);
+                const assignments = await response.json();
+                totalAssignments += assignments.length;
+            } catch (error) {
+                console.error('Error loading assignments for stats:', error);
+            }
+        }
+        document.getElementById('activeAssignments').textContent = totalAssignments;
     }
 
     async createClass(className) {

@@ -24,20 +24,19 @@ function displayUsers(userList) {
     const tbody = document.getElementById('usersTableBody');
     tbody.innerHTML = '';
     userList.forEach(user => {
-        const row = `
-            <tr>
-                <td>${user.id}</td>
-                <td>${user.username}</td>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
-                <td>
-                    <button onclick="editUser('${user.id}')">Edit</button>
-                    <button onclick="deleteUser('${user.id}')">Delete</button>
-                </td>
-            </tr>
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.id}</td>
+            <td>${user.username}</td>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${user.role}</td>
+            <td>
+                <button class="btn-edit" data-user-id="${user.id}">Edit</button>
+                <button class="btn-delete" data-user-id="${user.id}">Delete</button>
+            </td>
         `;
-        tbody.innerHTML += row;
+        tbody.appendChild(row);
     });
 }
 
@@ -79,8 +78,10 @@ function showAddModal() {
     document.getElementById('modalTitle').textContent = 'Add User';
     document.getElementById('userForm').reset();
     document.getElementById('userId').value = '';
-    document.getElementById('userPassword').style.display = 'block';
-    document.getElementById('userPassword').previousElementSibling.style.display = 'block';
+    const passwordField = document.getElementById('userPassword');
+    passwordField.style.display = 'block';
+    passwordField.setAttribute('required', 'required');
+    passwordField.previousElementSibling.style.display = 'block';
     document.getElementById('userModal').style.display = 'flex';
 }
 
@@ -92,19 +93,24 @@ function editUser(id) {
     document.getElementById('userName').value = user.name;
     document.getElementById('userEmail').value = user.email;
     document.getElementById('userRole').value = user.role;
-    document.getElementById('userPassword').style.display = 'none';
-    document.getElementById('userPassword').previousElementSibling.style.display = 'none';
+    const passwordField = document.getElementById('userPassword');
+    passwordField.style.display = 'none';
+    passwordField.removeAttribute('required');
+    passwordField.previousElementSibling.style.display = 'none';
     document.getElementById('userModal').style.display = 'flex';
 }
 
 function deleteUser(id) {
+    console.log('deleteUser called with ID:', id);
     if (confirm('Are you sure you want to delete this user?')) {
+        console.log('Sending DELETE request to:', `/api/user/delete/${id}`);
         $.ajax({
             type: "DELETE",
             url: `/api/user/delete/${id}`,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function(response) {
+                console.log('Delete response:', response);
                 if (response.success) {
                     loadUsers();
                     alert('User deleted successfully');
@@ -112,8 +118,10 @@ function deleteUser(id) {
                     alert('Failed to delete user');
                 }
             },
-            error: function() {
-                alert('Error deleting user');
+            error: function(xhr, status, error) {
+                console.error('Delete error:', status, error);
+                console.error('Response:', xhr.responseText);
+                alert('Error deleting user: ' + error);
             }
         });
     }
@@ -227,6 +235,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize user management if on that page
     if (document.getElementById('usersTable')) {
         loadUsers();
+        
+        // Event delegation for edit and delete buttons
+        document.getElementById('usersTableBody').addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-edit')) {
+                editUser(e.target.getAttribute('data-user-id'));
+            } else if (e.target.classList.contains('btn-delete')) {
+                deleteUser(e.target.getAttribute('data-user-id'));
+            }
+        });
         
         // Enable search on Enter key
         document.getElementById('searchUserId').addEventListener('keypress', function(e) {

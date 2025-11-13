@@ -33,6 +33,7 @@ public interface ILearnerService
     Task<ModuleSelectionResponse> RemoveModuleSelectionAsync(string learnerId, string moduleId);
     Task<ModuleProgressResponse> LogModuleProgressAsync(string learnerId, ModuleProgressLogRequest request);
     Task<LiveProgressSnapshotDto> GetLiveProgressSnapshotAsync();
+    Task<IEnumerable<KiraKira5.Models.LearnerAssignedModule>> GetAssignedModulesAsync(string learnerId);
 }
 
 /// <summary>
@@ -4055,6 +4056,56 @@ public class LearnerService : ILearnerService
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Gets assigned modules with due dates for a learner
+    /// </summary>
+    public async Task<IEnumerable<KiraKira5.Models.LearnerAssignedModule>> GetAssignedModulesAsync(string learnerId)
+    {
+        var assignments = new List<KiraKira5.Models.LearnerAssignedModule>();
+        const string sql = @"SELECT cma.assignment_id, cma.module_id, cma.due_date, cma.assigned_at,
+                                    tc.class_name, smp.is_completed, smp.completed_at
+                             FROM class_module_assignments cma
+                             JOIN class_enrollments ce ON cma.class_id = ce.class_id
+                             JOIN teacher_classes tc ON cma.class_id = tc.class_id
+                             LEFT JOIN student_module_progress smp ON cma.assignment_id = smp.assignment_id AND smp.student_id = @LearnerId
+                             WHERE ce.student_id = @LearnerId
+                             ORDER BY cma.due_date ASC";
+
+        try
+        {
+            await using var connection = await OpenConnectionAsync();
+            if (connection == null)
+            {
+                return assignments;
+            }
+
+            await using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@LearnerId", learnerId);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                assignments.Add(new KiraKira5.Models.LearnerAssignedModule
+                {
+                    AssignmentId = SafeToInt(reader["assignment_id"], 0),
+                    ModuleId = reader["module_id"]?.ToString() ?? string.Empty,
+                    ModuleName = reader["module_id"]?.ToString() ?? string.Empty,
+                    ClassName = reader["class_name"]?.ToString() ?? string.Empty,
+                    DueDate = reader["due_date"] is DateTime dueDate ? dueDate : DateTime.MinValue,
+                    AssignedAt = reader["assigned_at"] is DateTime assignedAt ? assignedAt : DateTime.MinValue,
+                    IsCompleted = reader["is_completed"] != DBNull.Value && Convert.ToBoolean(reader["is_completed"]),
+                    CompletedAt = reader["completed_at"] is DateTime completedAt ? completedAt : null
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LearnerService] Failed to load assigned modules for {learnerId}: {ex.Message}");
+        }
+
+        return assignments;
     }
 
     private class LearnerRecord

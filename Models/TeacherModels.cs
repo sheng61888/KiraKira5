@@ -81,4 +81,19 @@ namespace KiraKira5.Models
         public string StudentId { get; set; } = string.Empty;
         public string JoinCode { get; set; } = string.Empty;
     }
+
+    /// <summary>
+    /// Represents a module assigned to a learner
+    /// </summary>
+    public class LearnerAssignedModule
+    {
+        public int AssignmentId { get; set; }
+        public string ModuleId { get; set; }
+        public string ModuleName { get; set; }
+        public string ClassName { get; set; }
+        public DateTime DueDate { get; set; }
+        public DateTime AssignedAt { get; set; }
+        public bool IsCompleted { get; set; }
+        public DateTime? CompletedAt { get; set; }
+    }
 }
