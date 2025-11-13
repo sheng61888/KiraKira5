@@ -5,11 +5,6 @@ const signInCard = document.querySelector('.sign-in-card');
 const signupForm = document.getElementById('signupForm');
 const forgotLink = document.querySelector('.forgot-link');
 
-if (window.location.search.includes('signup=true')) {
-    signInCard.classList.remove('active');
-    signUpCard.classList.add('active');
-}
-
 switchToSignUp.addEventListener('click', (e) => {
 	e.preventDefault();
 	signInCard.classList.remove('active');

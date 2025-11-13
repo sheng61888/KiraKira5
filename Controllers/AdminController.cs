@@ -165,40 +165,4 @@ public class AdminController : ControllerBase
             return StatusCode(500, new { error = ex.Message });
         }
     }
-    
-    /// <summary>
-    /// Tracks a website visit
-    /// </summary>
-    [HttpPost("analytics/visit")]
-    public async Task<IActionResult> TrackVisit()
-    {
-        try
-        {
-            await AdminService.TrackVisitAsync(_configuration);
-            return Ok(new { success = true });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error tracking visit: {ex.Message}");
-            return StatusCode(500, new { error = ex.Message });
-        }
-    }
-    
-    /// <summary>
-    /// Gets website visit statistics
-    /// </summary>
-    [HttpGet("analytics/visits")]
-    public async Task<IActionResult> GetVisitStats([FromQuery] string year = null, [FromQuery] string month = null)
-    {
-        try
-        {
-            var stats = await AdminService.GetVisitStatsAsync(_configuration, year, month);
-            return Ok(stats);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting visit stats: {ex.Message}");
-            return StatusCode(500, new { error = ex.Message });
-        }
-    }
 }

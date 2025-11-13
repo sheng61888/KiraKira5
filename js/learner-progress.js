@@ -5,8 +5,7 @@
     overallChip: ".overall-progress .chip",
     topicsContainer: "#topicProgressList",
     checkpointsList: "#checkpointList",
-    motivationCard: "#motivation",
-    downloadBtn: "#downloadReportBtn"
+    motivationCard: "#motivation"
   };
 
   const updateOverall = (percent, delta) => {
@@ -76,25 +75,12 @@
     if (!card) {
       return;
     }
+    const body = card.querySelector(".motivation__body") || card;
     if (!motivation) {
-      card.innerHTML = "<h2>Keep going!</h2><p>Your next study session will update this card.</p>";
+      body.innerHTML = "<h2>Keep going!</h2><p>Your next study session will update this card.</p>";
       return;
     }
-    card.innerHTML = `<h2>${motivation.title}</h2><p>${motivation.body}</p>`;
-  };
-
-  const wireDownloadButton = reportUrl => {
-    const button = document.querySelector(selectors.downloadBtn);
-    if (!button) {
-      return;
-    }
-    if (reportUrl) {
-      button.onclick = () => window.open(reportUrl, "_blank");
-      button.disabled = false;
-    } else {
-      button.onclick = null;
-      button.disabled = true;
-    }
+    body.innerHTML = `<h2>${motivation.title}</h2><p>${motivation.body}</p>`;
   };
 
   const showProgressError = message => {
@@ -124,7 +110,6 @@
       renderTopics(data.topics);
       renderCheckpoints(data.checkpoints);
       renderMotivation(data.motivation);
-      wireDownloadButton(data.reportUrl);
     } catch (error) {
       console.error("Unable to load learner progress", error);
       showProgressError("Unable to load progress right now. Please refresh.");

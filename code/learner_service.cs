@@ -862,22 +862,22 @@ public class LearnerService : ILearnerService
                 Style = "module",
                 Rewards = new List<BadgeRewardDto>
                 {
-                    new BadgeRewardDto(1, "DESPAIRRRR", "../images/module-mastery/DESPAIRRRRR.png")
+                    new BadgeRewardDto(1, "DESPAIRRRR", "../images/module mastery/bronze.png")
                     {
                         Hint = "Complete one module with 95% progress.",
                         Requirement = "1 completed module"
                     },
-                    new BadgeRewardDto(3, "Nyum", "../images/module-mastery/Nyum.png")
+                    new BadgeRewardDto(3, "Nyum", "../images/module mastery/silver.png")
                     {
                         Hint = "Keep momentum by finishing three modules.",
                         Requirement = "3 completed modules"
                     },
-                    new BadgeRewardDto(6, "Butter", "../images/module-mastery/Butter.png")
+                    new BadgeRewardDto(6, "Butter", "../images/module mastery/gold.png")
                     {
                         Hint = "Six full modules unlock gold fur.",
                         Requirement = "6 completed modules"
                     },
-                    new BadgeRewardDto(8, "EEEEEEE", "../images/module-mastery/EEEEEEE.png")
+                    new BadgeRewardDto(8, "EEEEEEE", "../images/module mastery/rare.png")
                     {
                         Hint = "Master almost every topic to meet the rare cat.",
                         Requirement = "8 completed modules"
@@ -893,27 +893,27 @@ public class LearnerService : ILearnerService
                 Style = "paper",
                 Rewards = new List<BadgeRewardDto>
                 {
-                    new BadgeRewardDto(1, "Wooden Stick", "../images/paper-wizard/Wooden stick.png")
+                    new BadgeRewardDto(1, "Wooden Stick", "../images/paper wizard/Wooden stick.png")
                     {
                         Requirement = "1 logged past-paper",
                         Hint = "Log your first paper."
                     },
-                    new BadgeRewardDto(3, "Wooden Staff", "../images/paper-wizard/Wooden staff.png")
+                    new BadgeRewardDto(3, "Wooden Staff", "../images/paper wizard/Wooden staff.png")
                     {
                         Requirement = "3 logged papers",
                         Hint = "Keep practicing to upgrade your gear."
                     },
-                    new BadgeRewardDto(5, "Silver Staff", "../images/paper-wizard/Silver staff.png")
+                    new BadgeRewardDto(5, "Silver Staff", "../images/paper wizard/Silver staff.png")
                     {
                         Requirement = "5 logged papers",
                         Hint = "Silver arrives after five serious sessions."
                     },
-                    new BadgeRewardDto(8, "Enchanted Staff", "../images/paper-wizard/Enchanted staff.png")
+                    new BadgeRewardDto(8, "Enchanted Staff", "../images/paper wizard/Enchanted staff.png")
                     {
                         Requirement = "8 logged papers",
                         Hint = "Stay consistent to charge the staff."
                     },
-                    new BadgeRewardDto(12, "Golden Staff", "../images/paper-wizard/Golden staff.png")
+                    new BadgeRewardDto(12, "Golden Staff", "../images/paper wizard/Golden staff.png")
                     {
                         Requirement = "12 logged papers",
                         Hint = "A dozen papers forge the golden staff."
