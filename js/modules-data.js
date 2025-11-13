@@ -310,6 +310,19 @@ window.kiraModules = [
             ]
           },
           {
+            id: "variation-intro-video",
+            title: "Video - Direct, inverse, joint",
+            type: "video",
+            duration: "5 min",
+            videos: [
+              {
+                title: "Variation intro",
+                description: "Explains direct, inverse, and joint variation side-by-side.",
+                src: "/videos/variation intro.mp4"
+              }
+            ]
+          },
+          {
             id: "lesson-direct-inverse",
             title: "Lesson 1 · Direct & inverse relationships",
             type: "lesson",
