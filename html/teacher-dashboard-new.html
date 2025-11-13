@@ -93,8 +93,20 @@
     <div id="viewStudentsModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeViewStudentsModal()">&times;</span>
-            <h2 id="studentsModalTitle">Students</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h2 id="studentsModalTitle">Students</h2>
+                <button class="btn btn--primary" onclick="openAddStudentModal()">+ Add Student</button>
+            </div>
             <div id="studentsContainer"></div>
+        </div>
+    </div>
+
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddStudentModal()">&times;</span>
+            <h2>Add Student to Class</h2>
+            <input type="text" id="studentSearchInput" placeholder="Search by ID or name" style="width:100%; padding:0.75rem; margin:1rem 0; border:1px solid var(--border); border-radius:var(--radius-sm);">
+            <div id="searchResults" style="max-height:300px; overflow-y:auto;"></div>
         </div>
     </div>
 

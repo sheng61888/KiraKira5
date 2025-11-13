@@ -96,6 +96,8 @@ class TeacherDashboard {
     }
 
     async viewStudents(classId, className) {
+        this.currentClassId = classId;
+        this.currentClassName = className;
         try {
             const response = await fetch(`/api/TeacherPanel/classes/${classId}/students`);
             const students = await response.json();
@@ -133,6 +135,37 @@ class TeacherDashboard {
         }
     }
 
+    async searchStudents(query) {
+        if (query.length < 2) return [];
+        try {
+            const response = await fetch(`/api/TeacherPanel/search-students?query=${encodeURIComponent(query)}`);
+            return await response.json();
+        } catch (error) {
+            console.error('Error searching students:', error);
+            return [];
+        }
+    }
+
+    async addStudent(studentId) {
+        try {
+            const response = await fetch(`/api/TeacherPanel/classes/${this.currentClassId}/add-student`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId })
+            });
+            if (response.ok) {
+                this.showMessage('Student added successfully!', 'success');
+                closeAddStudentModal();
+                await this.viewStudents(this.currentClassId, this.currentClassName);
+            } else {
+                this.showMessage('Failed to add student', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding student:', error);
+            this.showMessage('Error adding student', 'error');
+        }
+    }
+
     async viewAssignments(classId, className) {
         try {
             const response = await fetch(`/api/TeacherPanel/classes/${classId}/assignments`);
@@ -144,13 +177,15 @@ class TeacherDashboard {
             if (assignments.length === 0) {
                 container.innerHTML = '<p class="muted">No assignments yet</p>';
             } else {
-                container.innerHTML = assignments.map(a => `
+                container.innerHTML = assignments.map(a => {
+                    const percentage = a.totalStudents > 0 ? Math.round((a.completedCount / a.totalStudents) * 100) : 0;
+                    return `
                     <div style="padding: 1rem; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 1rem;">
                         <h4>${a.moduleName}</h4>
                         <p class="muted">Due: ${new Date(a.dueDate).toLocaleString()}</p>
-                        <p>Progress: ${a.completedCount}/${a.totalStudents} completed</p>
+                        <p>Progress: ${a.completedCount}/${a.totalStudents} completed (${percentage}%)</p>
                     </div>
-                `).join('');
+                `}).join('');
             }
             
             document.getElementById('viewAssignmentsModal').style.display = 'block';
@@ -235,6 +270,41 @@ document.getElementById('assignModuleForm').addEventListener('submit', (e) => {
     const moduleId = document.getElementById('moduleSelect').value;
     const dueDate = new Date(document.getElementById('dueDate').value).toISOString();
     dashboard.assignModule(classId, moduleId, dueDate);
+});
+
+function openAddStudentModal() {
+    document.getElementById('addStudentModal').style.display = 'block';
+    document.getElementById('studentSearchInput').value = '';
+    document.getElementById('searchResults').innerHTML = '';
+}
+
+function closeAddStudentModal() {
+    document.getElementById('addStudentModal').style.display = 'none';
+}
+
+let searchTimeout;
+document.getElementById('studentSearchInput')?.addEventListener('input', async (e) => {
+    clearTimeout(searchTimeout);
+    const query = e.target.value.trim();
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if (query.length < 2) {
+        resultsDiv.innerHTML = '';
+        return;
+    }
+
+    searchTimeout = setTimeout(async () => {
+        const students = await dashboard.searchStudents(query);
+        resultsDiv.innerHTML = students.map(s => `
+            <div style="padding:0.75rem; border:1px solid var(--border); margin:0.5rem 0; border-radius:var(--radius-sm); cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:background 0.2s;" onmouseover="this.style.background='var(--surface-alt)'" onmouseout="this.style.background='transparent'" onclick="dashboard.addStudent('${s.studentId}')">
+                <div>
+                    <strong>${s.name}</strong><br>
+                    <small style="color:var(--muted);">${s.studentId} - ${s.email}</small>
+                </div>
+                <button class="btn btn--sm btn--primary">Add</button>
+            </div>
+        `).join('');
+    }, 300);
 });
 
 window.onclick = (event) => {
