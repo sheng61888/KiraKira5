@@ -10,8 +10,142 @@
     "Form 5": [0, 0, 0, 0, 0]
   };
 
+  const storageKey = moduleId => `kiraUnitProgress:${moduleId}`;
+
+  const normalizeId = value => (value || "").toString().trim().toLowerCase();
+
+  const loadUnitProgress = moduleId => {
+    if (!moduleId || typeof window === "undefined") {
+      return null;
+    }
+    try {
+      const raw = localStorage.getItem(storageKey(moduleId));
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const wantsRescueVideos = () => {
+    if (window.kiraOnboardingData && typeof window.kiraOnboardingData.wantsVideos === "boolean") {
+      return window.kiraOnboardingData.wantsVideos;
+    }
+    try {
+      const stored = localStorage.getItem("kiraOnboarding");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return !!parsed?.wantsVideos;
+      }
+    } catch {
+      /* ignore parse errors */
+    }
+    return false;
+  };
+
+  const deriveModuleId = (section, module) => {
+    if (!module) {
+      return "";
+    }
+    const direct =
+      module.moduleId ||
+      module.ModuleId ||
+      module.slug ||
+      module.Slug;
+    if (direct) {
+      return direct.toString().trim();
+    }
+    const link = module.link || module.Link;
+    if (link) {
+      const match = link.match(/module=([^&]+)/i);
+      if (match && match[1]) {
+        try {
+          return decodeURIComponent(match[1]).trim();
+        } catch {
+          return match[1].trim();
+        }
+      }
+      const cleaned = link
+        .replace(/^https?:\/\/[^/]+/i, "")
+        .split(/[?#]/)[0]
+        .replace(/^\//, "")
+        .replace(/\.html?$/i, "")
+        .trim();
+      if (cleaned) {
+        return cleaned;
+      }
+    }
+    if (module.number && section?.grade) {
+      const digits = section.grade.match(/\d+/)?.[0];
+      if (digits) {
+        return `form${digits}-${module.number}`.trim();
+      }
+    }
+    return module.number ? module.number.toString().trim() : "";
+  };
+
+  const deriveActiveModuleId = module => deriveModuleId({ grade: module?.grade }, module);
+
+  const findCatalogueEntry = moduleId => {
+    const target = normalizeId(moduleId);
+    if (!target) {
+      return null;
+    }
+    const catalogue = modulesData();
+    for (const section of catalogue) {
+      const list = section.modules || section.Modules || [];
+      for (const module of list) {
+        const candidateId = deriveModuleId(section, module);
+        if (normalizeId(candidateId) === target) {
+          return { section, module, moduleId: candidateId };
+        }
+      }
+    }
+    return null;
+  };
+
+  const collectVisibleUnits = module => {
+    const includeRescue = wantsRescueVideos();
+    const units = module?.units || module?.Units || [];
+    if (!units.length) {
+      return [];
+    }
+    return includeRescue ? units : units.filter(unit => !(unit.rescueOnly || unit.RescueOnly));
+  };
+
+  const computeUnitProgressPercent = module => {
+    const moduleId = deriveActiveModuleId(module);
+    if (!moduleId) {
+      return null;
+    }
+    const stored = loadUnitProgress(moduleId);
+    const completed = Array.isArray(stored?.completed) ? stored.completed : [];
+    const completedSet = new Set(completed.map(normalizeId));
+    const catalogueEntry = findCatalogueEntry(moduleId);
+    const units = catalogueEntry ? collectVisibleUnits(catalogueEntry.module) : [];
+    let totalUnits = units.length;
+    if (!totalUnits) {
+      const storedTotal = Number(stored?.unitCount ?? stored?.totalUnits);
+      if (Number.isFinite(storedTotal) && storedTotal > 0) {
+        totalUnits = storedTotal;
+      }
+    }
+    if (!totalUnits) {
+      return null;
+    }
+    const fallbackCompleted = Number(stored?.completedCount);
+    const completedCount = Math.min(
+      totalUnits,
+      completedSet.size || (Number.isFinite(fallbackCompleted) ? fallbackCompleted : completed.length)
+    );
+    const percent = Math.round((completedCount / totalUnits) * 100);
+    return Number.isFinite(percent) ? percent : 0;
+  };
 
   const getProgressValue = (module, grade, index) => {
+    const derivedProgress = computeUnitProgressPercent(module);
+    if (typeof derivedProgress === "number" && !Number.isNaN(derivedProgress)) {
+      return Math.max(0, Math.min(100, derivedProgress));
+    }
     const provided = Number(module?.progressPercent);
     if (Number.isFinite(provided)) {
       return Math.max(0, Math.min(100, provided));
