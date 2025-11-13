@@ -21,7 +21,7 @@ public class UserController : ControllerBase
     /// Authenticates user login
     /// </summary>
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         try
         {
@@ -29,6 +29,7 @@ public class UserController : ControllerBase
             
             if (user != null)
             {
+                await AdminService.UpdateUserSessionAsync(_configuration, user.Id);
                 return Ok(new { success = true, user = user });
             }
             

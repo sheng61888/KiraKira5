@@ -342,3 +342,88 @@
     background: #000000;
     color: var(--text);
 }
+
+
+.page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+.notification-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-panel h3 {
+    color: var(--accent);
+    margin-bottom: 1rem;
+}
+
+.notification-item {
+    background: var(--surface-alt);
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+}
+
+.notification-item p {
+    margin: 0.25rem 0;
+    color: var(--text);
+}
+
+.notification-item small {
+    color: var(--muted);
+}
+
+.notification-actions {
+    margin-top: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.notification-actions button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.notification-actions .btn-approve {
+    background: var(--success);
+    color: #0c0f1c;
+}
+
+.notification-actions .btn-reject {
+    background: var(--danger);
+    color: #0c0f1c;
+}

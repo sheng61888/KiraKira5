@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS user_sessions (
+    session_id INT AUTO_INCREMENT PRIMARY KEY,
+    uid VARCHAR(50) NOT NULL,
+    last_activity DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (uid) REFERENCES usertable(uid),
+    UNIQUE KEY unique_uid (uid)
+);

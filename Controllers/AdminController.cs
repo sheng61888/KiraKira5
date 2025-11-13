@@ -33,6 +33,42 @@ public class AdminController : ControllerBase
     }
 
     /// <summary>
+    /// Gets the community engagement rate
+    /// </summary>
+    [HttpGet("engagement-rate")]
+    public async Task<IActionResult> GetEngagementRate()
+    {
+        try
+        {
+            var rate = await AdminService.GetEngagementRateAsync(_configuration);
+            return Ok(new { engagementRate = rate });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting engagement rate: {ex.Message}");
+            return StatusCode(500, new { engagementRate = 0, error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Gets the count of currently online users
+    /// </summary>
+    [HttpGet("online-users")]
+    public async Task<IActionResult> GetOnlineUsers()
+    {
+        try
+        {
+            var count = await AdminService.GetOnlineUsersAsync(_configuration);
+            return Ok(new { onlineUsers = count });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting online users: {ex.Message}");
+            return StatusCode(500, new { onlineUsers = 0, error = ex.Message });
+        }
+    }
+
+    /// <summary>
     /// Gets all community threads
     /// </summary>
     [HttpGet("community/threads")]
@@ -199,6 +235,42 @@ public class AdminController : ControllerBase
         {
             Console.WriteLine($"Error getting visit stats: {ex.Message}");
             return StatusCode(500, new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Gets pending password reset requests
+    /// </summary>
+    [HttpGet("password-reset-requests")]
+    public async Task<IActionResult> GetPasswordResetRequests()
+    {
+        try
+        {
+            var requests = await AdminService.GetPasswordResetRequestsAsync(_configuration);
+            return Ok(requests);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting password reset requests: {ex.Message}");
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Approves or rejects a password reset request
+    /// </summary>
+    [HttpPost("password-reset-request/handle")]
+    public async Task<IActionResult> HandlePasswordResetRequest([FromQuery] int requestId, [FromQuery] string action)
+    {
+        try
+        {
+            var success = await AdminService.HandlePasswordResetRequestAsync(_configuration, requestId, action);
+            return Ok(new { success = success });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error handling password reset request: {ex.Message}");
+            return StatusCode(500, new { success = false, error = ex.Message });
         }
     }
 }

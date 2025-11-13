@@ -31,7 +31,16 @@
                     <h1 id="welcomeMessage">Welcome, Admin</h1>
                     <p>Manage your KiraKira learning platform</p>
                 </div>
+                <div class="notification-bell" onclick="toggleNotifications()">
+                    <span class="bell-icon">🔔</span>
+                    <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+                </div>
             </header>
+            
+            <div id="notificationPanel" class="notification-panel" style="display: none;">
+                <h3>Password Reset Requests</h3>
+                <div id="notificationList"></div>
+            </div>
 
             <section class="grid stats-grid">
                 <article class="card stat-block">
@@ -40,19 +49,14 @@
                     <p class="muted">Active learners and teachers</p>
                 </article>
                 <article class="card stat-block">
-                    <h3>Active Lessons</h3>
-                    <strong>89</strong>
-                    <p class="muted">Currently available modules</p>
+                    <h3>Engagement Rate</h3>
+                    <strong id="engagementRate">Loading...</strong>
+                    <p class="muted">Community activity</p>
                 </article>
                 <article class="card stat-block">
-                    <h3>Completed Exercises</h3>
-                    <strong>3,456</strong>
-                    <p class="muted">This month</p>
-                </article>
-                <article class="card stat-block">
-                    <h3>System Uptime</h3>
-                    <strong>98.5%</strong>
-                    <p class="muted">Last 30 days</p>
+                    <h3>Online Users</h3>
+                    <strong id="onlineUsers">Loading...</strong>
+                    <p class="muted">Currently logged in</p>
                 </article>
             </section>
 
