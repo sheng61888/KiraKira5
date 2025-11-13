@@ -101,9 +101,6 @@ C:\KiraKira5\KiraKira5\obj\Debug\net9.0\scopedcss\bundle\KiraKira5.styles.css
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\a17hsq02sz-iwxbvapmnm.gz
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\ig6vsqpwyd-zz8uipvtxq.gz
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\npxtpbyxf2-dlhbx1844h.gz
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\kdf18owrj7-g4y6y0ylvq.gz
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\mczsbsortj-r251bv9ayq.gz
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\er5e9eswiy-yokd9avcoo.gz
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.development.json
