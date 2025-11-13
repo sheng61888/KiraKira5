@@ -4,20 +4,26 @@ document.addEventListener('DOMContentLoaded', function() {
     loadCommunityStats();
     loadRegisteredUsers();
     populateFilters();
+    loadVisitStats();
 });
 
 function populateFilters() {
     const yearSelect = document.getElementById('yearFilter');
     const monthSelect = document.getElementById('monthFilter');
+    const visitYearSelect = document.getElementById('visitYearFilter');
+    const visitMonthSelect = document.getElementById('visitMonthFilter');
     const currentYear = new Date().getFullYear();
     
     for (let year = 2025; year <= currentYear + 5; year++) {
         yearSelect.innerHTML += `<option value="${year}">${year}</option>`;
+        visitYearSelect.innerHTML += `<option value="${year}">${year}</option>`;
     }
     
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     months.forEach((month, index) => {
-        monthSelect.innerHTML += `<option value="${String(index + 1).padStart(2, '0')}">${month}</option>`;
+        const value = String(index + 1).padStart(2, '0');
+        monthSelect.innerHTML += `<option value="${value}">${month}</option>`;
+        visitMonthSelect.innerHTML += `<option value="${value}">${month}</option>`;
     });
 }
 
@@ -26,6 +32,12 @@ function applyFilter() {
     const year = document.getElementById('yearFilter').value;
     const month = document.getElementById('monthFilter').value;
     loadRegisteredUsers(role, year, month);
+}
+
+function applyVisitFilter() {
+    const year = document.getElementById('visitYearFilter').value;
+    const month = document.getElementById('visitMonthFilter').value;
+    loadVisitStats(year, month);
 }
 
 // Load user analytics by role
@@ -128,4 +140,98 @@ function loadCommunityStats() {
     });
 }
 
+let visitsChartInstance = null;
+
+// Load website visit statistics
+function loadVisitStats(year = '', month = '') {
+    let url = '/api/admin/analytics/visits?';
+    if (year) url += `year=${year}&`;
+    if (month) url += `month=${month}`;
+    
+    $.ajax({
+        type: "GET",
+        url: url,
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(response) {
+            const labels = response.map(item => item.date);
+            const data = response.map(item => item.count);
+            
+            if (visitsChartInstance) {
+                visitsChartInstance.destroy();
+            }
+            
+            const ctx = document.getElementById('visitsChart').getContext('2d');
+            visitsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Visits',
+                        data: data,
+                        backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        error: function() {
+            console.error('Failed to load visit stats');
+        }
+    });
+}
+
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    pdf.setFontSize(18);
+    pdf.text('KiraKira Analytics Report', 105, 15, { align: 'center' });
+    pdf.setFontSize(10);
+    pdf.text(`Generated: ${new Date().toLocaleString()}`, 105, 22, { align: 'center' });
+    
+    let yPos = 35;
+    
+    pdf.setFontSize(14);
+    pdf.text('User Distribution by Role', 15, yPos);
+    yPos += 8;
+    pdf.setFontSize(10);
+    pdf.text(`Learners: ${document.getElementById('learnerCount').textContent}`, 20, yPos);
+    yPos += 6;
+    pdf.text(`Teachers: ${document.getElementById('teacherCount').textContent}`, 20, yPos);
+    yPos += 6;
+    pdf.text(`Admins: ${document.getElementById('adminCount').textContent}`, 20, yPos);
+    yPos += 12;
+    
+    pdf.setFontSize(14);
+    pdf.text('Community Engagement', 15, yPos);
+    yPos += 8;
+    pdf.setFontSize(10);
+    pdf.text(`Total Threads: ${document.getElementById('totalThreads').textContent}`, 20, yPos);
+    yPos += 6;
+    pdf.text(`Total Replies: ${document.getElementById('totalReplies').textContent}`, 20, yPos);
+    yPos += 12;
+    
+    const canvas = document.getElementById('visitsChart');
+    const imgData = canvas.toDataURL('image/png');
+    pdf.setFontSize(14);
+    pdf.text('Website Visits', 15, yPos);
+    yPos += 8;
+    pdf.addImage(imgData, 'PNG', 15, yPos, 180, 80);
+    
+    pdf.save('KiraKira-Analytics-Report.pdf');
+}
 

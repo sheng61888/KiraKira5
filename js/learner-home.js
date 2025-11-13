@@ -32,7 +32,6 @@
     coursePickerTrigger: "[data-action='open-course-picker']",
     modulePickerModal: "#modulePickerModal",
     modulePickerList: "#modulePickerList",
-    resumeButton: "#resumeModuleBtn",
     notificationList: "#notificationList",
     notificationEmpty: "[data-role='notification-empty']",
     notificationClear: "[data-action='clear-notifications']",
@@ -64,28 +63,6 @@
     isOpen: false,
     keydownBound: false,
     selectedIds: new Set()
-  };
-
-  const unitProgressKey = moduleId => `kiraUnitProgress:${moduleId}`;
-
-  const loadUnitProgress = moduleId => {
-    if (!moduleId) {
-      return null;
-    }
-    try {
-      const raw = localStorage.getItem(unitProgressKey(moduleId));
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  };
-
-  const buildCourseMapLink = (moduleId, unitId) => {
-    if (!moduleId) {
-      return "/html/course-map.html";
-    }
-    const unitSegment = unitId ? `&unit=${encodeURIComponent(unitId)}` : "";
-    return `/html/course-map.html?module=${encodeURIComponent(moduleId)}${unitSegment}`;
   };
 
   const notificationCenter = (() => {
@@ -433,59 +410,6 @@
     console.warn("Modules are still syncing. Please use the Continue button on a course to open it.");
   };
 
-  const updateResumeButton = modules => {
-    const button = getEl(selectors.resumeButton);
-    if (!button) {
-      return;
-    }
-    const list = Array.isArray(modules) ? modules.filter(Boolean) : (window.kiraActiveModules || []).filter(Boolean);
-    if (!list.length) {
-      button.disabled = false;
-      button.textContent = "Add a module";
-      button.onclick = () => {
-        const trigger = document.querySelector("[data-action='open-course-picker']");
-        if (trigger) {
-          trigger.click();
-        } else {
-          notifyCourseMapUnavailable();
-        }
-      };
-      return;
-    }
-
-    const storedTarget =
-      list
-        .map(module => {
-          const moduleId = module.moduleId || module.ModuleId || "";
-          const progress = loadUnitProgress(moduleId);
-          return { module, progress, link: progress?.lastUrl };
-        })
-        .find(entry => !!entry.link) || null;
-
-    const fallbackTarget =
-      list
-        .map(module => ({
-          module,
-          link: module.link || module.Link || buildCourseMapLink(module.moduleId || module.ModuleId || "")
-        }))
-        .find(entry => !!entry.link) || null;
-
-    const target = storedTarget || fallbackTarget;
-
-    if (!target) {
-      button.disabled = true;
-      button.onclick = null;
-      button.textContent = "Resume module";
-      return;
-    }
-
-    button.disabled = false;
-    button.textContent = "Resume module";
-    button.onclick = () => {
-      window.location.href = target.link;
-    };
-  };
-
   const dispatchModulesUpdated = () => {
     document.dispatchEvent(
       new CustomEvent("kira:modules-ready", {
@@ -495,7 +419,6 @@
         }
       })
     );
-    updateResumeButton(window.kiraActiveModules || []);
   };
 
   const addModuleSelection = async moduleId => {
@@ -875,7 +798,6 @@
   const startDashboard = () => {
     notificationCenter.init();
     wireModulePicker();
-    updateResumeButton(window.kiraActiveModules || []);
     fetchDashboard();
   };
 

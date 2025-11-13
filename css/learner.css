@@ -1248,23 +1248,6 @@ ul {
   border-bottom: none;
 }
 
-.motivation {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.motivation__body {
-  flex: 1;
-}
-
-.motivation__image {
-  width: 140px;
-  height: auto;
-  border-radius: var(--radius-md);
-  object-fit: cover;
-}
-
 .badge-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -2418,15 +2401,6 @@ ul {
   border-color: rgba(168, 142, 240, 0.9);
   background: rgba(124, 93, 250, 0.15);
   box-shadow: 0 12px 24px rgba(124, 93, 250, 0.25);
-}
-
-.unit-nav-item.is-completed {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.unit-nav-item.is-completed .unit-nav-order {
-  color: rgba(255, 255, 255, 0.5);
 }
 
 .unit-nav-order {
