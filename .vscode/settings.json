@@ -8,7 +8,7 @@
             "host": "0.tcp.ap.ngrok.io",
             "port": 17500,
             "ssl": false,
-            "username": "root",
+            "username": "user_teoh",
             "password": "",
             "savePassword": "secretStorage",
             "database": "kirakiradb",
