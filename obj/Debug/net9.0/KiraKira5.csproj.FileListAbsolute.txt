@@ -1,42 +1,18 @@
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.AssemblyReference.cache
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.GeneratedMSBuildEditorConfig.editorconfig
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.AssemblyInfoInputs.cache
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.AssemblyInfo.cs
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.CoreCompileInputs.cache
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.sourcelink.json
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\appsettings.json
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\KiraKira5.staticwebassets.runtime.json
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\KiraKira5.staticwebassets.endpoints.json
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\KiraKira5.exe
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\KiraKira5.deps.json
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\KiraKira5.runtimeconfig.json
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\KiraKira5.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\KiraKira5.pdb
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Azure.Core.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Azure.Identity.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\BouncyCastle.Cryptography.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Google.Protobuf.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\K4os.Compression.LZ4.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\K4os.Compression.LZ4.Streams.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\K4os.Hash.xxHash.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\MySql.Data.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Configuration.ConfigurationManager.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Diagnostics.EventLog.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Security.Cryptography.ProtectedData.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Security.Permissions.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Windows.Extensions.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\ZstdSharp.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\comerr64.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\gssapi64.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\k5sprt64.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\krb5_64.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\krbcc64.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.Up2Date
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.dll
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\refint\KiraKira5.dll
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.pdb
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.genruntimeconfig.cache
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\ref\KiraKira5.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\appsettings.json
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\KiraKira5.staticwebassets.endpoints.json
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Azure.Core.dll
-C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Azure.Identity.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Microsoft.AspNetCore.JsonPatch.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Microsoft.AspNetCore.Razor.Language.dll
@@ -65,13 +41,20 @@ C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Microsoft.SqlServer.Server.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\MySql.Data.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Newtonsoft.Json.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\Newtonsoft.Json.Bson.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.ClientModel.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Configuration.ConfigurationManager.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Data.SqlClient.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Diagnostics.EventLog.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Memory.Data.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Security.Cryptography.Pkcs.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Security.Cryptography.ProtectedData.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Security.Permissions.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\System.Windows.Extensions.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\ZstdSharp.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\cs\Microsoft.Data.SqlClient.resources.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\de\Microsoft.Data.SqlClient.resources.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\es\Microsoft.Data.SqlClient.resources.dll
@@ -90,6 +73,11 @@ C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net9.0\Microsoft.Data.S
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\comerr64.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\gssapi64.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\k5sprt64.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\krb5_64.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\krbcc64.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-arm64\native\sni.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\sni.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win-x86\native\sni.dll
@@ -97,249 +85,32 @@ C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\unix\lib\net8.0\System.Data.Sql
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Data.SqlClient.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Diagnostics.EventLog.dll
 C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Security.Cryptography.Pkcs.dll
+C:\KiraKira5\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.AssemblyReference.cache
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.GeneratedMSBuildEditorConfig.editorconfig
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.AssemblyInfoInputs.cache
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.AssemblyInfo.cs
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.CoreCompileInputs.cache
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.MvcApplicationPartsAssemblyInfo.cache
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.sourcelink.json
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\rjimswa.dswa.cache.json
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\scopedcss\bundle\KiraKira5.styles.css
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json.cache
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.development.json
-C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.build.endpoints.json
-c:\KiraKira5\KiraKira5\bin\Debug\net9.0\KiraKira5.staticwebassets.runtime.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\appsettings.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\KiraKira5.staticwebassets.runtime.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\KiraKira5.staticwebassets.endpoints.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\KiraKira5.exe
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\KiraKira5.deps.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\KiraKira5.runtimeconfig.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\KiraKira5.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\KiraKira5.pdb
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Azure.Core.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Azure.Identity.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\BouncyCastle.Cryptography.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Google.Protobuf.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\K4os.Compression.LZ4.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\K4os.Compression.LZ4.Streams.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\K4os.Hash.xxHash.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.AspNetCore.JsonPatch.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.AspNetCore.Razor.Language.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Bcl.AsyncInterfaces.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Bcl.Cryptography.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.CodeAnalysis.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.CodeAnalysis.CSharp.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.CodeAnalysis.Razor.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Data.SqlClient.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.DotNet.PlatformAbstractions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Caching.Abstractions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Caching.Memory.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Configuration.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Configuration.Abstractions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.DependencyModel.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Logging.Abstractions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Options.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Primitives.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Identity.Client.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.Identity.Client.Extensions.Msal.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Abstractions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Microsoft.SqlServer.Server.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\MySql.Data.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Newtonsoft.Json.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\Newtonsoft.Json.Bson.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.ClientModel.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.Configuration.ConfigurationManager.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.Data.SqlClient.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.Diagnostics.EventLog.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.Memory.Data.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.Security.Cryptography.Pkcs.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.Security.Cryptography.ProtectedData.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.Security.Permissions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\System.Windows.Extensions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\ZstdSharp.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\cs\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\de\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\es\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\fr\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\it\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\ja\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\ko\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\pl\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\ru\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\tr\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\unix\lib\net9.0\Microsoft.Data.SqlClient.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net9.0\Microsoft.Data.SqlClient.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\comerr64.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\gssapi64.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\k5sprt64.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\krb5_64.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\krbcc64.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-arm64\native\sni.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\sni.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win-x86\native\sni.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\unix\lib\net8.0\System.Data.SqlClient.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Data.SqlClient.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Diagnostics.EventLog.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Security.Cryptography.Pkcs.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.AssemblyReference.cache
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\rpswa.dswa.cache.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.AssemblyInfoInputs.cache
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.AssemblyInfo.cs
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.CoreCompileInputs.cache
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.sourcelink.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\rjimswa.dswa.cache.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\scopedcss\bundle\KiraKira5.styles.css
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json.cache
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\staticwebassets.development.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\staticwebassets.build.endpoints.json
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.Up2Date
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\refint\KiraKira5.dll
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.pdb
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\KiraKira5.genruntimeconfig.cache
-C:\Users\Arielle Lee\Documents\GitHub\KiraKira5\obj\Debug\net9.0\ref\KiraKira5.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\appsettings.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\KiraKira5.staticwebassets.runtime.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\KiraKira5.staticwebassets.endpoints.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\KiraKira5.exe
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\KiraKira5.deps.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\KiraKira5.runtimeconfig.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\KiraKira5.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\KiraKira5.pdb
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Azure.Core.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Azure.Identity.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\BouncyCastle.Cryptography.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Google.Protobuf.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\K4os.Compression.LZ4.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\K4os.Compression.LZ4.Streams.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\K4os.Hash.xxHash.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.AspNetCore.JsonPatch.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.AspNetCore.Razor.Language.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Bcl.AsyncInterfaces.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Bcl.Cryptography.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.CodeAnalysis.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.CodeAnalysis.CSharp.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.CodeAnalysis.Razor.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Data.SqlClient.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.DotNet.PlatformAbstractions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Caching.Abstractions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Caching.Memory.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Configuration.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Configuration.Abstractions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.DependencyModel.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Logging.Abstractions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Options.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Extensions.Primitives.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Identity.Client.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.Identity.Client.Extensions.Msal.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Abstractions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Microsoft.SqlServer.Server.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\MySql.Data.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Newtonsoft.Json.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\Newtonsoft.Json.Bson.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.ClientModel.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.Configuration.ConfigurationManager.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.Data.SqlClient.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.Diagnostics.EventLog.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.Memory.Data.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.Security.Cryptography.Pkcs.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.Security.Cryptography.ProtectedData.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.Security.Permissions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\System.Windows.Extensions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\ZstdSharp.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\cs\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\de\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\es\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\fr\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\it\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\ja\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\ko\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\pl\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\ru\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\tr\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\unix\lib\net9.0\Microsoft.Data.SqlClient.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net9.0\Microsoft.Data.SqlClient.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\comerr64.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\gssapi64.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\k5sprt64.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\krb5_64.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\krbcc64.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-arm64\native\sni.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-x64\native\sni.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win-x86\native\sni.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\unix\lib\net8.0\System.Data.SqlClient.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Data.SqlClient.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Diagnostics.EventLog.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Security.Cryptography.Pkcs.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.AssemblyReference.cache
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\rpswa.dswa.cache.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.GeneratedMSBuildEditorConfig.editorconfig
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.AssemblyInfoInputs.cache
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.AssemblyInfo.cs
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.CoreCompileInputs.cache
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.MvcApplicationPartsAssemblyInfo.cache
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.sourcelink.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\rjimswa.dswa.cache.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\scopedcss\bundle\KiraKira5.styles.css
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json.cache
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\staticwebassets.development.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\staticwebassets.build.endpoints.json
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.Up2Date
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\refint\KiraKira5.dll
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.pdb
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\KiraKira5.genruntimeconfig.cache
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\ref\KiraKira5.dll
-<<<<<<< HEAD
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\a17hsq02sz-iwxbvapmnm.gz
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\ig6vsqpwyd-zz8uipvtxq.gz
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\npxtpbyxf2-dlhbx1844h.gz
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\kdf18owrj7-g4y6y0ylvq.gz
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\mczsbsortj-r251bv9ayq.gz
-C:\APU\2025 APU SEM 2\WAPP\WAPP\WAPP Assignment\KiraKira5\obj\Debug\net9.0\compressed\er5e9eswiy-yokd9avcoo.gz
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\a17hsq02sz-iwxbvapmnm.gz
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\ig6vsqpwyd-zz8uipvtxq.gz
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\npxtpbyxf2-dlhbx1844h.gz
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\kdf18owrj7-g4y6y0ylvq.gz
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\mczsbsortj-r251bv9ayq.gz
 C:\KiraKira5\KiraKira5\obj\Debug\net9.0\compressed\er5e9eswiy-yokd9avcoo.gz
-=======
->>>>>>> parent of 0154d7b (Merge branch 'main' of https://github.com/sheng61888/KiraKira5)
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.build.json.cache
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.development.json
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\staticwebassets.build.endpoints.json
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.csproj.Up2Date
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.dll
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\refint\KiraKira5.dll
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.pdb
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\KiraKira5.genruntimeconfig.cache
+C:\KiraKira5\KiraKira5\obj\Debug\net9.0\ref\KiraKira5.dll
