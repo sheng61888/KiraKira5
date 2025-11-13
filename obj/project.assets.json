@@ -9370,23 +9370,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Zhexi\\.nuget\\packages\\": {},
+    "C:\\Users\\ggshe\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\APU\\2025 APU SEM 2\\WAPP\\WAPP\\WAPP Assignment\\KiraKira5\\KiraKira5.csproj",
+      "projectUniqueName": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
       "projectName": "KiraKira5",
-      "projectPath": "C:\\APU\\2025 APU SEM 2\\WAPP\\WAPP\\WAPP Assignment\\KiraKira5\\KiraKira5.csproj",
-      "packagesPath": "C:\\Users\\Zhexi\\.nuget\\packages\\",
-      "outputPath": "C:\\APU\\2025 APU SEM 2\\WAPP\\WAPP\\WAPP Assignment\\KiraKira5\\obj\\",
+      "projectPath": "C:\\KiraKira5\\KiraKira5\\KiraKira5.csproj",
+      "packagesPath": "C:\\Users\\ggshe\\.nuget\\packages\\",
+      "outputPath": "C:\\KiraKira5\\KiraKira5\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Zhexi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ggshe\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -9395,6 +9395,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -9463,7 +9464,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
