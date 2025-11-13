@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Class - KiraKira</title>
+    <link rel="stylesheet" href="/css/learner.css">
+    <style>
+        .join-container { max-width: 500px; margin: 4rem auto; padding: 2rem; }
+        .join-card { background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 4px; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; font-family: monospace; }
+        .form-group input:focus { outline: none; border-color: #4f46e5; }
+    </style>
+</head>
+<body>
+    <div class="join-container">
+        <div class="join-card">
+            <h1>Join a Class</h1>
+            <p class="muted">Enter the join code provided by your teacher</p>
+            
+            <form id="joinClassForm">
+                <div class="form-group">
+                    <label for="joinCode">Join Code</label>
+                    <input type="text" id="joinCode" placeholder="ABC123" maxlength="6" required>
+                </div>
+                <button type="submit" class="btn btn--primary" style="width: 100%;">Join Class</button>
+            </form>
+            
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <a href="/html/learner-home.html" class="btn btn--ghost">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/learner-join-class.js"></script>
+</body>
+</html>

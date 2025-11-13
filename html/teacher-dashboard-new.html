@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - KiraKira</title>
+    <link rel="stylesheet" href="/css/learner.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .class-card { background: white; border-radius: 8px; padding: 1.5rem; border-left: 4px solid #4f46e5; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .class-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; }
+        .join-code { background: #f3f4f6; padding: 0.5rem 1rem; border-radius: 4px; font-family: monospace; font-size: 1.25rem; font-weight: bold; letter-spacing: 2px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 2rem; border-radius: 8px; max-width: 500px; }
+        .close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/logo transparent.png" alt="KiraKira Logo">
+            </div>
+            <nav class="nav">
+                <a href="/html/teacher-dashboard-new.html" aria-current="page">My Classes</a>
+                <a href="/html/teacher-student-progress-new.html">Student Progress</a>
+                <a href="/html/login_signup.html" onclick="sessionStorage.clear();">Sign Out</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="page-heading">
+                <div>
+                    <p class="eyebrow">Teacher Panel</p>
+                    <h1>My Classes</h1>
+                    <p>Create classes and assign modules to students</p>
+                </div>
+                <button class="btn btn--primary" onclick="openCreateClassModal()">+ Create Class</button>
+            </header>
+
+            <section class="grid stats-grid">
+                <article class="card stat-block"><h3>Total Classes</h3><strong id="totalClasses">0</strong></article>
+                <article class="card stat-block"><h3>Total Students</h3><strong id="totalStudents">0</strong></article>
+                <article class="card stat-block"><h3>Active Assignments</h3><strong id="activeAssignments">0</strong></article>
+            </section>
+
+            <section class="card">
+                <h2>Your Classes</h2>
+                <div id="classesContainer" class="class-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="createClassModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCreateClassModal()">&times;</span>
+            <h2>Create New Class</h2>
+            <form id="createClassForm">
+                <div class="form-group">
+                    <label for="className">Class Name</label>
+                    <input type="text" id="className" placeholder="e.g., Form 4 Mathematics" required>
+                </div>
+                <button type="submit" class="btn btn--primary">Create Class</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="assignModuleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAssignModuleModal()">&times;</span>
+            <h2>Assign Module</h2>
+            <form id="assignModuleForm">
+                <input type="hidden" id="assignClassId">
+                <div class="form-group">
+                    <label for="moduleSelect">Select Module</label>
+                    <select id="moduleSelect" required>
+                        <option value="">Choose a module...</option>
+                        <option value="quadratic-intro">Quadratic Functions - Introduction</option>
+                        <option value="quadratic-equations">Quadratic Equations</option>
+                        <option value="quadratic-functions">Quadratic Functions - Advanced</option>
+                        <option value="numberbases-intro">Number Bases - Introduction</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dueDate">Due Date</label>
+                    <input type="datetime-local" id="dueDate" required>
+                </div>
+                <button type="submit" class="btn btn--primary">Assign Module</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="viewStudentsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeViewStudentsModal()">&times;</span>
+            <h2 id="studentsModalTitle">Students</h2>
+            <div id="studentsContainer"></div>
+        </div>
+    </div>
+
+    <div id="viewAssignmentsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeViewAssignmentsModal()">&times;</span>
+            <h2 id="assignmentsModalTitle">Assignments</h2>
+            <div id="assignmentsContainer"></div>
+        </div>
+    </div>
+
+    <script src="/js/teacher-dashboard-new.js"></script>
+</body>
+</html>

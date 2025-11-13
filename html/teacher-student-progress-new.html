@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Progress - KiraKira</title>
+    <link rel="stylesheet" href="/css/learner.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .progress-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .progress-table th { text-align: left; padding: 0.75rem; background: #f3f4f6; border-bottom: 2px solid #e5e7eb; }
+        .progress-table td { padding: 0.75rem; border-bottom: 1px solid #e5e7eb; }
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .status-completed { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-overdue { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/logo transparent.png" alt="KiraKira Logo">
+            </div>
+            <nav class="nav">
+                <a href="/html/teacher-dashboard-new.html">My Classes</a>
+                <a href="/html/teacher-student-progress-new.html" aria-current="page">Student Progress</a>
+                <a href="/html/login_signup.html" onclick="sessionStorage.clear();">Sign Out</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="page-heading">
+                <div>
+                    <p class="eyebrow">Teacher Panel</p>
+                    <h1>Student Progress</h1>
+                    <p>Track student completion of assigned modules</p>
+                </div>
+            </header>
+
+            <section class="card">
+                <h2>Progress Overview</h2>
+                <table class="progress-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Module</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="progressTableBody">
+                        <tr><td colspan="5">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script src="/js/teacher-student-progress-new.js"></script>
+</body>
+</html>
