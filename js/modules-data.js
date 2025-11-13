@@ -9,7 +9,7 @@ window.kiraModules = [
         number: "01",
         title: "Quadratic Functions and Equations in One Variable",
         lessons: ["Quadratic Functions", "Quadratic Equations"],
-        link: "lesson-form4-01.html",
+        link: "course-map.html?module=form4-01",
         units: [
           {
             id: "overview",
@@ -152,7 +152,7 @@ window.kiraModules = [
         number: "02",
         title: "Number Bases",
         lessons: ["Number Bases"],
-        link: "lesson-form4-02.html",
+        link: "course-map.html?module=form4-02",
         units: [
           {
             id: "nb-overview",
@@ -223,21 +223,21 @@ window.kiraModules = [
         number: "03",
         title: "Logical Reasoning",
         lessons: ["Statements", "Arguments"],
-        link: "lesson-form4-03.html"
+        link: "course-map.html?module=form4-03"
       },
       {
         moduleId: "form4-04",
         number: "04",
         title: "Operations on Sets",
         lessons: ["Intersection of Sets", "Union of Sets", "Combined Operations on Sets"],
-        link: "lesson-form4-04.html"
+        link: "course-map.html?module=form4-04"
       },
       {
         moduleId: "form4-05",
         number: "05",
         title: "Network in Graph Theory",
         lessons: ["Network"],
-        link: "lesson-form4-05.html"
+        link: "course-map.html?module=form4-05"
       },
       {
         moduleId: "form4-06",
@@ -247,21 +247,21 @@ window.kiraModules = [
           "Linear Inequalities in Two Variables",
           "Systems of Linear Inequalities in Two Variables"
         ],
-        link: "lesson-form4-06.html"
+        link: "course-map.html?module=form4-06"
       },
       {
         moduleId: "form4-07",
         number: "07",
         title: "Graphs of Motion",
         lessons: ["Distance-Time Graph", "Speed-Time Graph"],
-        link: "lesson-form4-07.html"
+        link: "course-map.html?module=form4-07"
       },
       {
         moduleId: "form4-08",
         number: "08",
         title: "Measures of Dispersion for Ungrouped Data",
         lessons: ["Dispersion", "Measures of Dispersion"],
-        link: "lesson-form4-08.html"
+        link: "course-map.html?module=form4-08"
       },
       {
         moduleId: "form4-09",
@@ -273,14 +273,14 @@ window.kiraModules = [
           "Mutually Exclusive and Non-Mutually Exclusive Events",
           "Applications of Probability of Combined Events"
         ],
-        link: "lesson-form4-09.html"
+        link: "course-map.html?module=form4-09"
       },
       {
         moduleId: "form4-10",
         number: "10",
         title: "Consumer Mathematics: Financial Management",
         lessons: ["Financial Planning and Management"],
-        link: "lesson-form4-10.html"
+        link: "course-map.html?module=form4-10"
       }
     ]
   },
@@ -499,14 +499,14 @@ window.kiraModules = [
         number: "03",
         title: "Consumer Mathematics: Insurance",
         lessons: ["Risk Basics", "Coverage & Policy Features"],
-        link: "lesson-form5-03.html"
+        link: "course-map.html?module=form5-03"
       },
       {
         moduleId: "form5-04",
         number: "04",
         title: "Consumer Mathematics: Taxation",
         lessons: ["SST Fundamentals", "Personal Tax Calculations"],
-        link: "lesson-form5-04.html"
+        link: "course-map.html?module=form5-04"
       },
       {
         moduleId: "form5-05",
@@ -518,7 +518,7 @@ window.kiraModules = [
           "Combination of Transformation",
           "Tessellation"
         ],
-        link: "lesson-form5-05.html"
+        link: "course-map.html?module=form5-05"
       },
       {
         moduleId: "form5-06",
@@ -528,21 +528,21 @@ window.kiraModules = [
           "Values of sine, cosine and tangent for angles from 0 to 360 degrees",
           "Graphs of trigonometric functions for sine, cosine and tangent"
         ],
-        link: "lesson-form5-06.html"
+        link: "course-map.html?module=form5-06"
       },
       {
         moduleId: "form5-07",
         number: "07",
         title: "Measures of Dispersion for Grouped Data",
         lessons: ["Grouped Data Mean & Variance", "Interquartile Range & Spread"],
-        link: "lesson-form5-07.html"
+        link: "course-map.html?module=form5-07"
       },
       {
         moduleId: "form5-08",
         number: "08",
         title: "Mathematical Modelling",
         lessons: ["Modelling Cycle", "Applications in Context"],
-        link: "lesson-form5-08.html"
+        link: "course-map.html?module=form5-08"
       }
     ]
   }

@@ -44,8 +44,7 @@
         </div>
 
         <div class="heading-actions">
-          <button class="btn btn--ghost" type="button">View weekly plan</button>
-          <button class="btn btn--primary" type="button">Resume warm-up</button>
+          <button class="btn btn--primary" type="button" id="resumeModuleBtn">Resume module</button>
           <button class="btn btn--ghost" type="button" onclick="if (window.kiraLearnerSession) { window.kiraLearnerSession.logout('login_signup.html'); } else { window.location.href='login_signup.html'; }">Logout</button>
         </div>
       </header>
@@ -86,18 +85,23 @@
         <ul class="notification-list" id="notificationList" aria-live="polite"></ul>
       </section>
 
-      <section class="card achievements">
+      <section class="card checklist-card" aria-labelledby="checklistTitle">
         <div class="section-head">
           <div>
-            <p class="eyebrow">Milestones</p>
-            <h2>Recent achievements</h2>
+            <p class="eyebrow">My checklist</p>
+            <h2 id="checklistTitle">Custom goals</h2>
           </div>
-          <span class="chip chip--success" aria-live="polite">Fetching XP...</span>
+          <button class="btn btn--ghost" type="button" data-action="clear-checklist">Clear completed</button>
         </div>
-        <div class="badge-collections" data-role="badge-collections">
-          <p class="muted">Loading your badge collections.</p>
-        </div>
+        <form class="checklist-form" id="checklistForm" autocomplete="off">
+          <label class="sr-only" for="checklistInput">Add a goal</label>
+          <input id="checklistInput" name="goal" type="text" placeholder="Example: Finish variation quiz" maxlength="120" required />
+          <button class="btn btn--primary" type="submit">Add</button>
+        </form>
+        <p class="muted checklist-empty" data-role="checklist-empty">Add goals you want to tackle next.</p>
+        <ul class="checklist-list" id="checklistList" aria-live="polite"></ul>
       </section>
+
     </main>
   </div>
 
@@ -105,9 +109,7 @@
   <script src="../js/learner-session.js"></script>
   <script src="../js/learner-shell.js"></script>
   <script src="../js/modules-data.js"></script>
-  <script src="../js/badge-library.js"></script>
   <script src="../js/learner-modules.js"></script>
-  <script src="../js/learner-badges.js"></script>
   <script src="../js/learner-home.js"></script>
 
   <div class="module-picker-modal" id="modulePickerModal" aria-hidden="true">

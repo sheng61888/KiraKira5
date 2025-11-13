@@ -35,7 +35,13 @@
     notificationList: "#notificationList",
     notificationEmpty: "[data-role='notification-empty']",
     notificationClear: "[data-action='clear-notifications']",
-    notificationToasts: "#notificationToasts"
+    notificationToasts: "#notificationToasts",
+    resumeButton: "#resumeModuleBtn",
+    checklistForm: "#checklistForm",
+    checklistInput: "#checklistInput",
+    checklistList: "#checklistList",
+    checklistEmpty: "[data-role='checklist-empty']",
+    checklistClear: "[data-action='clear-checklist']"
   };
 
   window.kiraActiveModules = Array.isArray(window.kiraActiveModules) ? window.kiraActiveModules : [];
@@ -63,6 +69,180 @@
     isOpen: false,
     keydownBound: false,
     selectedIds: new Set()
+  };
+
+  const checklistState = {
+    items: [],
+    storageKey: () => {
+      const learnerId = sessionStorage.getItem("currentLearnerId") || "anon";
+      return `kiraDashboardChecklist:${learnerId}`;
+    }
+  };
+
+  const unitProgressKey = moduleId => `kiraUnitProgress:${moduleId}`;
+
+  const loadUnitProgress = moduleId => {
+    if (!moduleId) {
+      return null;
+    }
+    try {
+      const raw = localStorage.getItem(unitProgressKey(moduleId));
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const buildCourseMapLink = (moduleId, unitId) => {
+    if (!moduleId) {
+      return "/html/course-map.html";
+    }
+    const unitSegment = unitId ? `&unit=${encodeURIComponent(unitId)}` : "";
+    return `/html/course-map.html?module=${encodeURIComponent(moduleId)}${unitSegment}`;
+  };
+
+  const checklistStorageKey = () => checklistState.storageKey();
+
+  const loadChecklist = () => {
+    try {
+      const raw = localStorage.getItem(checklistStorageKey());
+      const parsed = raw ? JSON.parse(raw) : [];
+      checklistState.items = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      checklistState.items = [];
+    }
+  };
+
+  const saveChecklist = () => {
+    try {
+      localStorage.setItem(checklistStorageKey(), JSON.stringify(checklistState.items));
+    } catch {
+      /* ignore storage errors */
+    }
+  };
+
+  const renderChecklist = () => {
+    const list = getEl(selectors.checklistList);
+    const empty = getEl(selectors.checklistEmpty);
+    if (!list) {
+      return;
+    }
+    list.innerHTML = "";
+    if (!checklistState.items.length) {
+      if (empty) {
+        empty.hidden = false;
+      }
+      return;
+    }
+    if (empty) {
+      empty.hidden = true;
+    }
+    const fragment = document.createDocumentFragment();
+    checklistState.items.forEach(item => {
+      const li = document.createElement("li");
+      li.className = "checklist-item";
+      li.dataset.id = item.id;
+      if (item.completed) {
+        li.classList.add("completed");
+      }
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = !!item.completed;
+      checkbox.dataset.action = "toggle-checklist";
+      checkbox.dataset.id = item.id;
+
+      const label = document.createElement("label");
+      label.textContent = item.text;
+
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.dataset.action = "delete-checklist";
+      removeBtn.dataset.id = item.id;
+      removeBtn.setAttribute("aria-label", "Delete goal");
+      removeBtn.textContent = "×";
+
+      li.appendChild(checkbox);
+      li.appendChild(label);
+      li.appendChild(removeBtn);
+      fragment.appendChild(li);
+    });
+    list.appendChild(fragment);
+  };
+
+  const addChecklistItem = text => {
+    const trimmed = text.trim();
+    if (!trimmed) {
+      return;
+    }
+    const id = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `goal-${Date.now()}`;
+    checklistState.items.push({ id, text: trimmed, completed: false });
+    saveChecklist();
+    renderChecklist();
+  };
+
+  const toggleChecklistItem = id => {
+    checklistState.items = checklistState.items.map(item =>
+      item.id === id ? { ...item, completed: !item.completed } : item
+    );
+    saveChecklist();
+    renderChecklist();
+  };
+
+  const deleteChecklistItem = id => {
+    checklistState.items = checklistState.items.filter(item => item.id !== id);
+    saveChecklist();
+    renderChecklist();
+  };
+
+  const clearCompletedChecklist = () => {
+    checklistState.items = checklistState.items.filter(item => !item.completed);
+    saveChecklist();
+    renderChecklist();
+  };
+
+  const initChecklist = () => {
+    const form = getEl(selectors.checklistForm);
+    const input = getEl(selectors.checklistInput);
+    const list = getEl(selectors.checklistList);
+    const clearBtn = getEl(selectors.checklistClear);
+    if (!form || !input || !list) {
+      return;
+    }
+    loadChecklist();
+    renderChecklist();
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      const value = input.value.trim();
+      if (!value) {
+        return;
+      }
+      addChecklistItem(value);
+      input.value = "";
+      input.focus();
+    });
+
+    list.addEventListener("change", event => {
+      const target = event.target;
+      if (target?.dataset?.action === "toggle-checklist" && target.dataset.id) {
+        toggleChecklistItem(target.dataset.id);
+      }
+    });
+
+    list.addEventListener("click", event => {
+      const target = event.target;
+      if (target?.dataset?.action === "delete-checklist" && target.dataset.id) {
+        deleteChecklistItem(target.dataset.id);
+      }
+    });
+
+    if (clearBtn && !clearBtn.dataset.wired) {
+      clearBtn.dataset.wired = "true";
+      clearBtn.addEventListener("click", () => {
+        clearCompletedChecklist();
+      });
+    }
   };
 
   const notificationCenter = (() => {
@@ -410,6 +590,73 @@
     console.warn("Modules are still syncing. Please use the Continue button on a course to open it.");
   };
 
+  const resolveResumeLink = module => {
+    if (!module) {
+      return "";
+    }
+    const moduleId = module.moduleId || module.ModuleId || "";
+    const stored = loadUnitProgress(moduleId);
+    if (stored?.courseMap) {
+      return stored.courseMap;
+    }
+    return buildCourseMapLink(moduleId);
+  };
+
+
+  const updateResumeButton = modules => {
+    const button = getEl(selectors.resumeButton);
+    if (!button) {
+      return;
+    }
+    const list = Array.isArray(modules) ? modules.filter(Boolean) : (window.kiraActiveModules || []).filter(Boolean);
+    if (!list.length) {
+      button.disabled = false;
+      button.textContent = "Add a module";
+      button.onclick = () => {
+        const trigger = document.querySelector("[data-action='open-course-picker']");
+        if (trigger) {
+          trigger.click();
+        } else {
+          notifyCourseMapUnavailable();
+        }
+      };
+      return;
+    }
+
+    const storedTarget = list
+      .map(module => {
+        const moduleId = module.moduleId || module.ModuleId || "";
+        const progress = loadUnitProgress(moduleId);
+        const link = progress?.courseMap || null;
+        const updatedAt = progress?.updatedAt ? Date.parse(progress.updatedAt) || 0 : 0;
+        return { moduleId, link, updatedAt, progress };
+      })
+      .filter(entry => !!entry.link)
+      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+
+    const fallbackTarget = list
+      .map(module => ({
+        moduleId: module.moduleId || module.ModuleId || "",
+        link: resolveResumeLink(module)
+      }))
+      .find(entry => !!entry.link);
+
+    const target = storedTarget || fallbackTarget;
+
+    if (!target) {
+      button.disabled = true;
+      button.textContent = "Resume module";
+      button.onclick = null;
+      return;
+    }
+
+    button.disabled = false;
+    button.textContent = "Resume module";
+    button.onclick = () => {
+      window.location.href = target.link;
+    };
+  };
+
   const dispatchModulesUpdated = () => {
     document.dispatchEvent(
       new CustomEvent("kira:modules-ready", {
@@ -419,6 +666,7 @@
         }
       })
     );
+    updateResumeButton(window.kiraActiveModules || []);
   };
 
   const addModuleSelection = async moduleId => {
@@ -725,6 +973,7 @@
     }, {});
     window.kiraActiveModules = activeModules;
     modulePickerState.catalogue = catalogue;
+    updateResumeButton(activeModules);
     renderModulePicker();
     document.dispatchEvent(
       new CustomEvent("kira:modules-ready", { detail: { catalogue, activeModules } })
@@ -798,6 +1047,8 @@
   const startDashboard = () => {
     notificationCenter.init();
     wireModulePicker();
+    updateResumeButton(window.kiraActiveModules || []);
+    initChecklist();
     fetchDashboard();
   };
 
