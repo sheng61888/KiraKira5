@@ -21,6 +21,17 @@
       return el;
     };
 
+    const getLessonHref = module => {
+      if (!module || typeof module.moduleId !== "string") {
+        return null;
+      }
+      const trimmed = module.moduleId.trim();
+      if (!trimmed) {
+        return null;
+      }
+      return `lesson-${trimmed}.html`;
+    };
+
     catalogueContainer.innerHTML = "";
     modules.forEach(section => {
       const card = createElement("article", "class-catalogue-card");
@@ -40,11 +51,12 @@
       const modulesWrapper = createElement("div", "class-modules");
 
       section.modules.forEach(module => {
-        const wrapperTag = module.link ? "a" : "div";
-        const classes = module.link ? "class-module module-link" : "class-module";
+        const resolvedHref = getLessonHref(module) || module.link;
+        const wrapperTag = resolvedHref ? "a" : "div";
+        const classes = resolvedHref ? "class-module module-link" : "class-module";
         const moduleEl = createElement(wrapperTag, classes);
-        if (module.link) {
-          moduleEl.href = module.link;
+        if (resolvedHref) {
+          moduleEl.href = resolvedHref;
         }
         const moduleHeading = createElement("p", "module-heading", `${module.number} ${module.title}`);
         const lessonList = createElement("ul", "module-lessons");
