@@ -6,11 +6,20 @@ class TeacherDashboard {
             window.location.href = '/html/login_signup.html';
             return;
         }
+        this.teacherName = sessionStorage.getItem('userName') || 'Teacher';
         this.init();
     }
 
     async init() {
+        this.displayWelcome();
         await this.loadClasses();
+    }
+
+    displayWelcome() {
+        const welcomeEl = document.getElementById('welcomeMessage');
+        if (welcomeEl) {
+            welcomeEl.textContent = `Welcome back, Teacher ${this.teacherName}`;
+        }
     }
 
     async loadClasses() {
