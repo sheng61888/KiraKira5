@@ -6,7 +6,7 @@
             "driver": "mysql",
             "connectionType": "host",
             "host": "0.tcp.ap.ngrok.io",
-            "port": 17089,
+            "port": 10197,
             "ssl": false,
             "username": "root",
             "password": "",
