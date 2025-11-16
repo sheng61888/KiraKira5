@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Final Quiz - Quadratic Functions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/learner.css">
+</head>
+
+<body>
+  <div class="app quiz-app">
+    <aside class="sidebar">
+      <div class="logo"><img src="/images/logo transparent.png" alt="KiraKira logo"></div>
+      <nav class="nav">
+        <a href="../learner-home.html">Dashboard</a>
+        <a href="../learner-progress.html">Progress</a>
+        <a href="../learner-pastyears.html">Past Papers</a>
+        <a href="../learner-classes.html">Classes</a>
+        <a href="../learner-community.html">Community</a>
+        <a href="../learner-profile.html">Profile</a>
+      </nav>
+    </aside>
+
+    <main class="main quiz-main">
+      <header class="page-heading">
+        <p class="eyebrow">Checkpoint · Quadratic functions</p>
+        <h1>Module finale · Quadratic Functions & Equations in One Variable</h1>
+        <p>A short quiz that checks your graph sense, discriminant intuition, and root language.</p>
+      </header>
+
+      <section class="card quiz-block" id="quiz">
+        <!-- Dynamic question injected by JS -->
+      </section>
+    </main>
+  </div>
+
+  <script src="../../js/learner-session.js"></script>
+  <script src="../../js/learner-activity.js"></script>
+  <script>
+    const quizData = [
+      {
+        question: "If a > 0 in y = ax² + bx + c, the parabola opens",
+        options: ["Upward", "Downward", "Sideways"],
+        correct: 0,
+        explanation: "A positive a makes the arms of the curve smile upwards."
+      },
+      {
+        question: "For y = -2x² + 3x - 1, what does the turning point represent?",
+        options: ["Minimum point", "Maximum point", "Y-intercept"],
+        correct: 1,
+        explanation: "Negative a means the parabola is concave down, so the vertex is a maximum."
+      },
+      {
+        question: "The axis of symmetry of a parabola y = ax² + bx + c is x =",
+        options: ["-b / (2a)", "c / a", "b² - 4ac"],
+        correct: 0,
+        explanation: "The axis passes through the vertex at x = -b/(2a)."
+      },
+      {
+        question: "A discriminant b² - 4ac that is positive means the equation has",
+        options: ["Two distinct real roots", "One repeated root", "No real roots"],
+        correct: 0,
+        explanation: "Positive discriminant gives two distinct intersection points with the x-axis."
+      },
+      {
+        question: "The sum of the roots r₁ + r₂ equals",
+        options: ["-b / a", "c / a", "-c / b"],
+        correct: 0,
+        explanation: "Sum of roots uses the identity r₁ + r₂ = -b/a."
+      },
+      {
+        question: "If |a| increases in y = ax² + bx + c, the parabola becomes",
+        options: ["Narrower", "Wider", "Shifted horizontally"],
+        correct: 0,
+        explanation: "A larger absolute value makes the graph steeper (narrower)."
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+    const startTime = Date.now();
+    const quizContainer = document.getElementById("quiz");
+
+    function renderQuestion() {
+      const q = quizData[current];
+      quizContainer.innerHTML = `
+        <div class="quiz-progress">Question ${current + 1} of ${quizData.length}</div>
+        <h2>${q.question}</h2>
+        <div class="quiz-options">
+          ${q.options.map((opt, i) => `<button class="quiz-option" data-index="${i}">${opt}</button>`).join("")}
+        </div>
+        <p class="quiz-feedback"></p>
+      `;
+      document.querySelectorAll(".quiz-option").forEach(btn => btn.addEventListener("click", handleAnswer));
+    }
+
+    function handleAnswer(event) {
+      const index = parseInt(event.target.dataset.index, 10);
+      const q = quizData[current];
+      const feedback = document.querySelector(".quiz-feedback");
+      const buttons = document.querySelectorAll(".quiz-option");
+
+      buttons.forEach(button => button.disabled = true);
+      event.target.classList.add(index === q.correct ? "correct" : "wrong");
+
+      if (index === q.correct) {
+        score += 1;
+      }
+
+      feedback.textContent = index === q.correct ? "Correct. " + q.explanation : "Incorrect. " + q.explanation;
+
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "btn btn--primary quiz-next";
+      nextBtn.textContent = current < quizData.length - 1 ? "Next" : "Finish";
+      nextBtn.addEventListener("click", nextQuestion);
+      feedback.after(nextBtn);
+    }
+
+    function nextQuestion() {
+      current += 1;
+      if (current < quizData.length) {
+        renderQuestion();
+      } else {
+        renderResults();
+      }
+    }
+
+    function renderResults() {
+      const total = quizData.length;
+      const percent = Math.round((score / total) * 100);
+      let title, subtitle;
+
+      if (percent === 100) {
+        title = "Module mastered!";
+        subtitle = "You nailed every idea in this module. Move confidently to the next topic.";
+      } else if (percent >= 70) {
+        title = "Solid finish!";
+        subtitle = "You understand most of it. Review a couple of ideas if anything still feels fuzzy.";
+      } else {
+        title = "Try again!";
+        subtitle = "Use the lesson notes to tidy any gaps, then re-run this checkpoint.";
+      }
+
+      quizContainer.innerHTML = `
+        <h2>${title}</h2>
+        <p>You got <strong>${score}</strong> out of <strong>${total}</strong> correct (${percent}%).</p>
+        <p>${subtitle}</p>
+        <div class="wrap-actions">
+          <a href="quiz-quadratic-final.html" class="btn btn--ghost">Retake checkpoint</a>
+          <a href="../course-map.html?module=form4-01" class="btn btn--primary">Return to module map</a>
+        </div>
+      `;
+
+      const durationSeconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+
+      if (window.kiraActivity?.logModuleQuiz) {
+        window.kiraActivity.logModuleQuiz({
+          moduleId: "form4-01",
+          unitId: "checkpoint-final",
+          scorePercent: percent,
+          durationSeconds
+        }).catch(() => {});
+      }
+
+      if (window.kiraActivity?.logModuleProgress) {
+        window.kiraActivity.logModuleProgress({
+          moduleId: "form4-01",
+          unitId: "checkpoint-final",
+          status: "completed",
+          scorePercent: percent,
+          durationSeconds
+        }).catch(() => {});
+      }
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>

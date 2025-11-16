@@ -124,27 +124,15 @@ window.kiraModules = [
           },
 
 
-          {
-            id: "practice-equations",
-            title: "Practice questions - Solve and explain",
-            type: "practice",
-            duration: "8 min",
-            summary: "Mixed problems that require different solving paths and discriminant analysis.",
-            body: "Solve equations, justify your chosen method, and interpret what the roots or lack of roots mean in context.",
-            cta: { label: "Work through solving set", link: "../docs/module01-quiz-solve.html", kind: "quiz" }
-          },
-          {
-            id: "checkpoint-final",
-            title: "Last checkpoint",
-            type: "checkpoint",
-            duration: "10 min",
-            summary: "Wrap up the module with a single sheet that mixes graphs, equations, and real-life modelling.",
-            body: "Confirm you can state graph features, decide on a solving strategy, and interpret discriminant results before moving on.",
-            resources: [
-              { label: "Checkpoint sheet", type: "sheet", detail: "6 curated questions + answers", url: "../docs/module01-mastery.pdf" }
-            ],
-            cta: { label: "Download checkpoint", link: "../docs/module01-mastery.pdf", kind: "download" }
-          }
+            {
+              id: "checkpoint-final",
+              title: "Last checkpoint",
+              type: "checkpoint",
+              duration: "10 min",
+              summary: "Wrap up the module with a single sheet that mixes graphs, equations, and real-life modelling.",
+              body: "Confirm you can state graph features, decide on a solving strategy, and interpret discriminant results before moving on.",
+              cta: { label: "Launch chapter quiz", link: "/html/lessons/quiz-quadratic-final.html", kind: "quiz" }
+            }
         ]
       },
       {
