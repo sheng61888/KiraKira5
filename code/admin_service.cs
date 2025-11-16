@@ -34,6 +34,36 @@ public class AdminService
     }
 
     /// <summary>
+    /// Gets the count of new learner and teacher registrations in the past 7 days
+    /// </summary>
+    public static async Task<int> GetNewRegistrations7DaysAsync(IConfiguration configuration)
+    {
+        string connectionString = configuration.GetConnectionString("KiraKiraDB");
+        
+        try
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                string query = @"SELECT COUNT(*) FROM usertable 
+                                WHERE usertype IN ('learner', 'teacher') 
+                                AND registration_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+                
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    var result = await command.ExecuteScalarAsync();
+                    return Convert.ToInt32(result);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting new registrations: {ex.Message}");
+            return 0;
+        }
+    }
+
+    /// <summary>
     /// Gets the community engagement rate
     /// </summary>
     public static async Task<decimal> GetEngagementRateAsync(IConfiguration configuration)

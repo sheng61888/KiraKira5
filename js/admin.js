@@ -134,9 +134,9 @@ function closeModal() {
 // Admin Dashboard JavaScript
 async function loadDashboardStats() {
     try {
-        const response = await fetch('/api/admin/total-users');
+        const response = await fetch('/api/admin/new-registrations-7days');
         const data = await response.json();
-        document.getElementById('totalUsers').textContent = data.totalUsers.toLocaleString();
+        document.getElementById('totalUsers').textContent = data.newRegistrations.toLocaleString();
     } catch (error) {
         document.getElementById('totalUsers').textContent = 'Error';
     }

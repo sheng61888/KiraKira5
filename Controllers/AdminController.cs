@@ -33,6 +33,24 @@ public class AdminController : ControllerBase
     }
 
     /// <summary>
+    /// Gets the count of new learner and teacher registrations in the past 7 days
+    /// </summary>
+    [HttpGet("new-registrations-7days")]
+    public async Task<IActionResult> GetNewRegistrations7Days()
+    {
+        try
+        {
+            var count = await AdminService.GetNewRegistrations7DaysAsync(_configuration);
+            return Ok(new { newRegistrations = count });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting new registrations: {ex.Message}");
+            return StatusCode(500, new { newRegistrations = 0, error = ex.Message });
+        }
+    }
+
+    /// <summary>
     /// Gets the community engagement rate
     /// </summary>
     [HttpGet("engagement-rate")]
