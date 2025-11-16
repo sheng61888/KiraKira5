@@ -5,7 +5,7 @@ using System.Data;
 namespace KiraKira5.Controllers
 {
     /// <summary>
-    /// Handles password reset requests and approvals
+    /// Handles password reset requests with OTP verification
     /// </summary>
     [ApiController]
     [Route("api/passwordreset")]
@@ -19,7 +19,15 @@ namespace KiraKira5.Controllers
         }
 
         /// <summary>
-        /// Submit a password reset request
+        /// Generate a 6-digit OTP
+        /// </summary>
+        private string GenerateOTP()
+        {
+            return new Random().Next(100000, 999999).ToString();
+        }
+
+        /// <summary>
+        /// Submit a password reset request and generate OTP
         /// </summary>
         [HttpPost("request")]
         public async Task<IActionResult> RequestPasswordReset([FromBody] PasswordResetRequest request)
@@ -39,15 +47,31 @@ namespace KiraKira5.Controllers
                     return Ok(new { success = false, message = "Email not found" });
                 }
 
+                var otp = GenerateOTP();
+                var otpExpiry = DateTime.Now.AddMinutes(15);
+
                 var insertCmd = new MySqlCommand(
-                    "INSERT INTO password_reset_requests (email, request_date, status) VALUES (@Email, @RequestDate, @Status)", 
+                    "INSERT INTO password_reset_requests (email, request_date, status, otp, otp_expiry) VALUES (@Email, @RequestDate, @Status, @OTP, @OTPExpiry)", 
                     connection);
                 insertCmd.Parameters.AddWithValue("@Email", request.Email);
                 insertCmd.Parameters.AddWithValue("@RequestDate", DateTime.Now);
-                insertCmd.Parameters.AddWithValue("@Status", "Pending");
+                insertCmd.Parameters.AddWithValue("@Status", "Active");
+                insertCmd.Parameters.AddWithValue("@OTP", otp);
+                insertCmd.Parameters.AddWithValue("@OTPExpiry", otpExpiry);
 
                 await insertCmd.ExecuteNonQueryAsync();
-                return Ok(new { success = true });
+
+                var notificationCmd = new MySqlCommand(
+                    "INSERT INTO notifications (user_email, title, body, kind, created_at) VALUES (@Email, @Title, @Body, @Kind, @CreatedAt)",
+                    connection);
+                notificationCmd.Parameters.AddWithValue("@Email", request.Email);
+                notificationCmd.Parameters.AddWithValue("@Title", "Password Reset OTP");
+                notificationCmd.Parameters.AddWithValue("@Body", $"Your OTP is: {otp}. Valid for 15 minutes.");
+                notificationCmd.Parameters.AddWithValue("@Kind", "info");
+                notificationCmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
+                await notificationCmd.ExecuteNonQueryAsync();
+
+                return Ok(new { success = true, message = "OTP sent to your notifications." });
             }
             catch (Exception ex)
             {
@@ -56,7 +80,7 @@ namespace KiraKira5.Controllers
         }
 
         /// <summary>
-        /// Get all password reset requests
+        /// Get all password reset requests with OTP
         /// </summary>
         [HttpGet("requests")]
         public async Task<IActionResult> GetPasswordResetRequests()
@@ -67,7 +91,7 @@ namespace KiraKira5.Controllers
                 await connection.OpenAsync();
 
                 var cmd = new MySqlCommand(
-                    "SELECT request_id, email, request_date, status FROM password_reset_requests ORDER BY request_date DESC", 
+                    "SELECT request_id, email, request_date, status, otp, otp_expiry FROM password_reset_requests ORDER BY request_date DESC", 
                     connection);
                 
                 var requests = new List<object>();
@@ -79,7 +103,9 @@ namespace KiraKira5.Controllers
                         RequestId = reader.GetInt32("request_id"),
                         Email = reader.GetString("email"),
                         RequestDate = reader.GetDateTime("request_date"),
-                        Status = reader.GetString("status")
+                        Status = reader.GetString("status"),
+                        OTP = reader.IsDBNull(reader.GetOrdinal("otp")) ? null : reader.GetString("otp"),
+                        OTPExpiry = reader.IsDBNull(reader.GetOrdinal("otp_expiry")) ? (DateTime?)null : reader.GetDateTime("otp_expiry")
                     });
                 }
 
@@ -92,10 +118,10 @@ namespace KiraKira5.Controllers
         }
 
         /// <summary>
-        /// Approve password reset request
+        /// Verify OTP and reset password
         /// </summary>
-        [HttpPost("approve")]
-        public async Task<IActionResult> ApprovePasswordReset([FromBody] ApproveResetRequest request)
+        [HttpPost("verify")]
+        public async Task<IActionResult> VerifyOTP([FromBody] VerifyOTPRequest request)
         {
             try
             {
@@ -103,84 +129,43 @@ namespace KiraKira5.Controllers
                 await connection.OpenAsync();
 
                 var cmd = new MySqlCommand(
-                    "UPDATE password_reset_requests SET status = @Status WHERE request_id = @RequestId", connection);
-                cmd.Parameters.AddWithValue("@Status", "Approved");
-                cmd.Parameters.AddWithValue("@RequestId", request.RequestId);
-                await cmd.ExecuteNonQueryAsync();
-
-                return Ok(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
-
-        /// <summary>
-        /// Check if user has approved reset request
-        /// </summary>
-        [HttpGet("status/{email}")]
-        public async Task<IActionResult> CheckResetStatus(string email)
-        {
-            try
-            {
-                using var connection = new MySqlConnection(connectionString);
-                await connection.OpenAsync();
-
-                var cmd = new MySqlCommand(
-                    "SELECT request_id, status FROM password_reset_requests WHERE email = @Email ORDER BY request_date DESC LIMIT 1", 
+                    "SELECT request_id, email, otp, otp_expiry, status FROM password_reset_requests WHERE email = @Email ORDER BY request_date DESC LIMIT 1", 
                     connection);
-                cmd.Parameters.AddWithValue("@Email", email);
+                cmd.Parameters.AddWithValue("@Email", request.Email);
 
-                using var reader = await cmd.ExecuteReaderAsync();
-                if (await reader.ReadAsync())
-                {
-                    return Ok(new 
-                    { 
-                        success = true, 
-                        requestId = reader.GetInt32("request_id"),
-                        status = reader.GetString("status")
-                    });
-                }
-
-                return Ok(new { success = false, message = "No request found" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
-
-        /// <summary>
-        /// Submit new password after approval
-        /// </summary>
-        [HttpPost("submit")]
-        public async Task<IActionResult> SubmitNewPassword([FromBody] SubmitPasswordRequest request)
-        {
-            try
-            {
-                using var connection = new MySqlConnection(connectionString);
-                await connection.OpenAsync();
-
-                var checkCmd = new MySqlCommand(
-                    "SELECT email, status FROM password_reset_requests WHERE request_id = @RequestId", connection);
-                checkCmd.Parameters.AddWithValue("@RequestId", request.RequestId);
-
+                int requestId;
                 string email;
+                string storedOTP;
+                DateTime otpExpiry;
                 string status;
-                using (var reader = await checkCmd.ExecuteReaderAsync())
+
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     if (!await reader.ReadAsync())
                     {
-                        return Ok(new { success = false, message = "Request not found" });
+                        return Ok(new { success = false, message = "No reset request found" });
                     }
+
+                    requestId = reader.GetInt32("request_id");
                     email = reader.GetString("email");
+                    storedOTP = reader.IsDBNull(reader.GetOrdinal("otp")) ? null : reader.GetString("otp");
+                    otpExpiry = reader.IsDBNull(reader.GetOrdinal("otp_expiry")) ? DateTime.MinValue : reader.GetDateTime("otp_expiry");
                     status = reader.GetString("status");
                 }
 
-                if (status != "Approved")
+                if (status != "Active")
                 {
-                    return Ok(new { success = false, message = "Request not approved" });
+                    return Ok(new { success = false, message = "Reset request is no longer active" });
+                }
+
+                if (storedOTP != request.OTP)
+                {
+                    return Ok(new { success = false, message = "Invalid OTP" });
+                }
+
+                if (DateTime.Now > otpExpiry)
+                {
+                    return Ok(new { success = false, message = "OTP has expired" });
                 }
 
                 var updatePasswordCmd = new MySqlCommand(
@@ -192,10 +177,10 @@ namespace KiraKira5.Controllers
                 var updateStatusCmd = new MySqlCommand(
                     "UPDATE password_reset_requests SET status = @Status WHERE request_id = @RequestId", connection);
                 updateStatusCmd.Parameters.AddWithValue("@Status", "Completed");
-                updateStatusCmd.Parameters.AddWithValue("@RequestId", request.RequestId);
+                updateStatusCmd.Parameters.AddWithValue("@RequestId", requestId);
                 await updateStatusCmd.ExecuteNonQueryAsync();
 
-                return Ok(new { success = true });
+                return Ok(new { success = true, message = "Password reset successful" });
             }
             catch (Exception ex)
             {
@@ -203,30 +188,7 @@ namespace KiraKira5.Controllers
             }
         }
 
-        /// <summary>
-        /// Reject password reset request
-        /// </summary>
-        [HttpPost("reject")]
-        public async Task<IActionResult> RejectPasswordReset([FromBody] RejectResetRequest request)
-        {
-            try
-            {
-                using var connection = new MySqlConnection(connectionString);
-                await connection.OpenAsync();
 
-                var cmd = new MySqlCommand(
-                    "UPDATE password_reset_requests SET status = @Status WHERE request_id = @RequestId", connection);
-                cmd.Parameters.AddWithValue("@Status", "Rejected");
-                cmd.Parameters.AddWithValue("@RequestId", request.RequestId);
-                await cmd.ExecuteNonQueryAsync();
-
-                return Ok(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
 
         /// <summary>
         /// Delete password reset request
@@ -258,19 +220,10 @@ namespace KiraKira5.Controllers
         public string Email { get; set; }
     }
 
-    public class ApproveResetRequest
+    public class VerifyOTPRequest
     {
-        public int RequestId { get; set; }
-    }
-
-    public class SubmitPasswordRequest
-    {
-        public int RequestId { get; set; }
+        public string Email { get; set; }
+        public string OTP { get; set; }
         public string NewPassword { get; set; }
-    }
-
-    public class RejectResetRequest
-    {
-        public int RequestId { get; set; }
     }
 }

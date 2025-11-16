@@ -375,6 +375,38 @@ public class UserManagement
             return new UserStats();
         }
     }
+
+    /// <summary>
+    /// Updates user password
+    /// </summary>
+    public static bool UpdatePassword(string email, string newPassword)
+    {
+        string connectionString = _configuration.GetConnectionString("KiraKiraDB");
+        
+        try
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                string query = "UPDATE usertable SET password = @Password WHERE email = @Email";
+                
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Email", email);
+                    command.Parameters.AddWithValue("@Password", newPassword);
+                    
+                    connection.Open();
+                    int rowsAffected = command.ExecuteNonQuery();
+                    Console.WriteLine($"UpdatePassword: {rowsAffected} rows affected for email {email}");
+                    return rowsAffected > 0;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating password: {ex.Message}");
+            return false;
+        }
+    }
 }
 
 /// <summary>

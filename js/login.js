@@ -84,9 +84,11 @@ signinForm.addEventListener('submit', async (e) => {
 			const userRole = result.user.role || result.user.Role;
 			const userName = result.user.name || result.user.Name;
 			const userId = result.user.id || result.user.Id;
+			const userEmail = result.user.email || result.user.Email;
 			console.log('Login successful, user role:', userRole);
 			sessionStorage.setItem('userName', userName);
 			sessionStorage.setItem('currentLearnerId', userId);
+			sessionStorage.setItem('userEmail', userEmail);
 			if (userRole === 'admin') {
 				window.location.href = 'admin-dashboard.html';
 			} else if (userRole === 'learner') {
@@ -118,7 +120,26 @@ forgotLink.addEventListener('click', async (e) => {
 		
 		const result = await response.json();
 		if (result.success) {
-			alert('Password reset request submitted. Admin will review your request.');
+			alert('OTP has been sent to your notifications. Please login to check your notifications, or contact admin for the OTP.');
+			
+			const otp = prompt('Enter the OTP from your notifications:');
+			if (!otp) return;
+			
+			const newPassword = prompt('Enter your new password:');
+			if (!newPassword) return;
+			
+			const verifyResponse = await fetch('/api/passwordreset/verify', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email, otp, newPassword })
+			});
+			
+			const verifyResult = await verifyResponse.json();
+			if (verifyResult.success) {
+				alert('Password reset successful! You can now login with your new password.');
+			} else {
+				alert(verifyResult.message || 'Failed to reset password');
+			}
 		} else {
 			alert(result.message || 'Failed to submit request');
 		}

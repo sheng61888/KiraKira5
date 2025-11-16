@@ -889,102 +889,46 @@
     }
   };
 
-  const checkPasswordResetStatus = async () => {
-    const email = state.profile.email;
-    if (!email) return;
+  const bindPasswordChange = () => {
+    const form = document.querySelector("#changePasswordForm");
+    if (!form) return;
 
-    try {
-      const response = await fetch(`/api/passwordreset/status/${encodeURIComponent(email)}`);
-      const result = await response.json();
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const currentPassword = document.querySelector("#currentPassword").value;
+      const newPassword = document.querySelector("#newPassword").value;
+      const confirmPassword = document.querySelector("#confirmPassword").value;
 
-      const section = document.querySelector("#passwordResetSection");
-      if (!section) return;
-
-      if (result.success && result.status === "Approved") {
-        section.innerHTML = `
-          <p class="muted">Your password reset has been approved. Set your new password:</p>
-          <div class="form-group">
-            <label for="newPassword">New Password</label>
-            <input id="newPassword" type="password" placeholder="Enter new password">
-          </div>
-          <div class="form-group">
-            <label for="confirmPassword">Confirm Password</label>
-            <input id="confirmPassword" type="password" placeholder="Confirm new password">
-          </div>
-          <button class="btn btn--primary" type="button" id="submitPasswordBtn">Submit New Password</button>
-        `;
-        document.querySelector("#submitPasswordBtn").addEventListener("click", () => submitNewPassword(result.requestId));
-      } else if (result.success && result.status === "Pending") {
-        section.innerHTML = `<p class="muted">Password reset request pending admin approval</p>`;
-      } else {
-        section.innerHTML = `
-          <p class="muted">Request a password reset from admin</p>
-          <button class="btn btn--primary" type="button" id="requestResetBtn">Request Password Reset</button>
-        `;
-        document.querySelector("#requestResetBtn").addEventListener("click", requestPasswordReset);
+      if (newPassword !== confirmPassword) {
+        alert("New passwords do not match");
+        return;
       }
-    } catch (error) {
-      console.error("Error checking reset status", error);
-    }
-  };
 
-  const requestPasswordReset = async () => {
-    const email = state.profile.email;
-    if (!email) {
-      alert("Email not found. Please refresh the page.");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/passwordreset/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        alert("Password reset request submitted. Please wait for admin approval.");
-        checkPasswordResetStatus();
-      } else {
-        alert("Failed to submit request: " + result.message);
+      const email = state.profile.email;
+      if (!email) {
+        alert("Email not found. Please refresh the page.");
+        return;
       }
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
-  };
 
-  const submitNewPassword = async requestId => {
-    const newPassword = document.querySelector("#newPassword").value;
-    const confirmPassword = document.querySelector("#confirmPassword").value;
+      try {
+        const response = await fetch("/api/user/changepassword", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, currentPassword, newPassword })
+        });
 
-    if (!newPassword || !confirmPassword) {
-      alert("Please fill in both password fields");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/passwordreset/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId, newPassword })
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        alert("Password updated successfully!");
-        checkPasswordResetStatus();
-      } else {
-        alert("Failed to update password: " + result.message);
+        const result = await response.json();
+        if (result.success) {
+          alert("Password changed successfully!");
+          form.reset();
+        } else {
+          alert(result.message || "Failed to change password");
+        }
+      } catch (error) {
+        alert("Error: " + error.message);
       }
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
+    });
   };
 
   const fetchProfile = async (options = {}) => {
@@ -1015,7 +959,6 @@
       broadcastBadges(data.badges);
       state.mission = data.mission || state.mission;
       renderStudyPreferences(state.mission);
-      checkPasswordResetStatus();
       return true;
     } catch (error) {
       console.error("Unable to load learner profile", error);
@@ -1037,12 +980,12 @@
     bindMottoEditor();
     bindInfoEditor();
     bindStudyPreferenceToggle();
+    bindPasswordChange();
     renderStudyPreferences(state.mission, { skipStatus: true });
     renderBadgeSelector(state.badgePayload);
     fetchProfile();
   });
 
-  setInterval(checkPasswordResetStatus, 30000);
   document.addEventListener("kira:learner-missing", () => {
     showProfileError("Please sign in to manage your profile.");
   });

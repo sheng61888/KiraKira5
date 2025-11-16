@@ -4,13 +4,12 @@ async function loadPasswordResetRequests() {
     try {
         const response = await fetch('/api/passwordreset/requests');
         const result = await response.json();
-        console.log('API Response:', result);
         
         if (result.success && result.requests) {
             allRequests = result.requests;
             displayRequests(allRequests);
         } else {
-            document.getElementById('requestsContainer').innerHTML = '<p class="muted">No pending password reset requests.</p>';
+            document.getElementById('requestsContainer').innerHTML = '<p class="muted">No password reset requests.</p>';
         }
     } catch (error) {
         console.error('Error loading requests:', error);
@@ -27,22 +26,28 @@ function displayRequests(requests) {
             const requestDate = req.RequestDate || req.request_date || req.requestDate;
             const status = req.Status || req.status || 'Unknown';
             const requestId = req.RequestId || req.request_id || req.requestId;
+            const otp = req.OTP || req.otp;
+            const otpExpiry = req.OTPExpiry || req.otp_expiry;
+            
+            const isExpired = otpExpiry && new Date(otpExpiry) < new Date();
+            const otpStatus = isExpired ? 'Expired' : status;
             
             return `
             <div class="card" style="margin-bottom: 1rem; padding: 1.5rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
+                    <div style="flex: 1;">
                         <h3>${email}</h3>
                         <p class="muted">Requested: ${new Date(requestDate).toLocaleString()}</p>
-                        <p class="muted">Status: ${status}</p>
+                        <p class="muted">Status: ${otpStatus}</p>
+                        ${otp && status === 'Active' ? `
+                            <div style="margin-top: 0.5rem; padding: 0.75rem; background: #f0f0f0; border-radius: 4px; display: inline-block;">
+                                <strong>OTP: ${otp}</strong>
+                                <p class="muted" style="margin: 0.25rem 0 0 0; font-size: 0.85rem;">Expires: ${new Date(otpExpiry).toLocaleString()}</p>
+                            </div>
+                        ` : ''}
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
-                        ${status === 'Pending' ? `
-                            <button class="btn btn--primary" onclick="approveReset(${requestId}, '${email}')">Approve</button>
-                            <button class="btn btn--ghost" onclick="rejectReset(${requestId})">Reject</button>
-                        ` : `
-                            <button class="btn btn--ghost" onclick="deleteRequest(${requestId})">Delete</button>
-                        `}
+                        <button class="btn btn--ghost" onclick="deleteRequest(${requestId})">Delete</button>
                     </div>
                 </div>
             </div>
@@ -65,50 +70,6 @@ function searchRequests() {
 function clearSearch() {
     document.getElementById('searchEmail').value = '';
     displayRequests(allRequests);
-}
-
-async function approveReset(requestId, email) {
-    if (!confirm(`Approve password reset for ${email}?`)) return;
-    
-    try {
-        const response = await fetch('/api/passwordreset/approve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ requestId })
-        });
-        
-        const result = await response.json();
-        if (result.success) {
-            alert('Password reset approved! User can now set their new password.');
-            loadPasswordResetRequests();
-        } else {
-            alert('Failed to approve reset: ' + result.message);
-        }
-    } catch (error) {
-        alert('Error: ' + error.message);
-    }
-}
-
-async function rejectReset(requestId) {
-    if (!confirm('Are you sure you want to reject this request?')) return;
-    
-    try {
-        const response = await fetch('/api/passwordreset/reject', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ requestId })
-        });
-        
-        const result = await response.json();
-        if (result.success) {
-            alert('Request rejected.');
-            loadPasswordResetRequests();
-        } else {
-            alert('Failed to reject: ' + result.message);
-        }
-    } catch (error) {
-        alert('Error: ' + error.message);
-    }
 }
 
 async function deleteRequest(requestId) {

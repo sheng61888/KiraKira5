@@ -277,6 +277,36 @@
       }
     };
 
+    const loadServerNotifications = async () => {
+      const session = window.kiraLearnerSession;
+      if (!session) return;
+      
+      const email = sessionStorage.getItem('userEmail');
+      if (!email) return;
+
+      try {
+        const response = await fetch(`/api/notifications/${encodeURIComponent(email)}`);
+        const result = await response.json();
+        
+        if (result.success && result.notifications) {
+          result.notifications.forEach(notif => {
+            const exists = history.some(h => h.id === `server-${notif.Id}`);
+            if (!exists) {
+              addNotification({
+                id: `server-${notif.Id}`,
+                title: notif.Title,
+                body: notif.Body,
+                kind: notif.Kind,
+                timestamp: notif.Timestamp
+              }, { silent: true });
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load server notifications:', error);
+      }
+    };
+
     const ensureInit = () => {
       if (initialized) {
         return;
@@ -373,9 +403,13 @@
     };
 
     return {
-      init: () => ensureInit(),
+      init: () => {
+        ensureInit();
+        loadServerNotifications();
+      },
       evaluateDashboard: (profile, streak, badges) => {
         ensureInit();
+        loadServerNotifications();
         handleLevel(profile?.level);
         handleStreak(streak);
         handleBadges(badges);

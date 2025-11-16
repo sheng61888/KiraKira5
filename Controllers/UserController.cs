@@ -113,6 +113,33 @@ public class UserController : ControllerBase
         var stats = UserManagement.GetUserStats();
         return Ok(stats);
     }
+
+    /// <summary>
+    /// Change user password
+    /// </summary>
+    [HttpPost("changepassword")]
+    public IActionResult ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        try
+        {
+            Console.WriteLine($"ChangePassword called for email: {request.Email}");
+            var user = UserManagement.Login(request.Email, request.CurrentPassword);
+            if (user == null)
+            {
+                Console.WriteLine("Current password is incorrect");
+                return Ok(new { success = false, message = "Current password is incorrect" });
+            }
+
+            var result = UserManagement.UpdatePassword(request.Email, request.NewPassword);
+            Console.WriteLine($"Password update result: {result}");
+            return Ok(new { success = result, message = result ? "Password changed successfully" : "Failed to change password" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ChangePassword error: {ex.Message}");
+            return Ok(new { success = false, message = ex.Message });
+        }
+    }
 }
 
 public class LoginRequest
@@ -137,4 +164,11 @@ public class UpdateUserRequest
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
+}
+
+public class ChangePasswordRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string CurrentPassword { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
 }

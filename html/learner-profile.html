@@ -148,13 +148,39 @@
 
       <section class="card">
         <div class="section-head">
-          <h2>Password Reset</h2>
+          <h2>Change Password</h2>
         </div>
-        <div id="passwordResetSection">
-          <p class="muted">Request a password reset from admin</p>
-          <button class="btn btn--primary" type="button" id="requestResetBtn">Request Password Reset</button>
-        </div>
+        <form id="changePasswordForm">
+          <div class="form-group" style="position: relative;">
+            <label for="currentPassword">Current Password</label>
+            <input id="currentPassword" type="password" placeholder="Enter current password" required>
+            <button type="button" onclick="togglePassword('currentPassword', this)" style="position: absolute; right: 10px; top: 35px; border: none; background: none; cursor: pointer; font-size: 14px;">Show</button>
+          </div>
+          <div class="form-group" style="position: relative;">
+            <label for="newPassword">New Password</label>
+            <input id="newPassword" type="password" placeholder="Enter new password" required>
+            <button type="button" onclick="togglePassword('newPassword', this)" style="position: absolute; right: 10px; top: 35px; border: none; background: none; cursor: pointer; font-size: 14px;">Show</button>
+          </div>
+          <div class="form-group" style="position: relative;">
+            <label for="confirmPassword">Confirm New Password</label>
+            <input id="confirmPassword" type="password" placeholder="Confirm new password" required>
+            <button type="button" onclick="togglePassword('confirmPassword', this)" style="position: absolute; right: 10px; top: 35px; border: none; background: none; cursor: pointer; font-size: 14px;">Show</button>
+          </div>
+          <button class="btn btn--primary" type="submit">Change Password</button>
+        </form>
       </section>
+      <script>
+        function togglePassword(fieldId, btn) {
+          const field = document.getElementById(fieldId);
+          if (field.type === 'password') {
+            field.type = 'text';
+            btn.textContent = 'Hide';
+          } else {
+            field.type = 'password';
+            btn.textContent = 'Show';
+          }
+        }
+      </script>
 
       <section class="grid grid--two">
         <article class="card achievements">
