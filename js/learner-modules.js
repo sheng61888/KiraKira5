@@ -199,13 +199,13 @@
   };
 
   const getProgressValue = (module, grade, index) => {
-    const derivedProgress = computeUnitProgressPercent(module);
-    if (typeof derivedProgress === "number" && !Number.isNaN(derivedProgress)) {
-      return Math.max(0, Math.min(100, derivedProgress));
-    }
     const provided = Number(module?.progressPercent);
     if (Number.isFinite(provided)) {
       return Math.max(0, Math.min(100, provided));
+    }
+    const derivedProgress = computeUnitProgressPercent(module);
+    if (typeof derivedProgress === "number" && !Number.isNaN(derivedProgress)) {
+      return Math.max(0, Math.min(100, derivedProgress));
     }
     if (module.link && typeof moduleProgressMap[module.link] === "number") {
       return moduleProgressMap[module.link];
