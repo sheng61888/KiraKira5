@@ -6,6 +6,7 @@
     <title>Course Management - KiraKira Admin</title>
     <link rel="stylesheet" href="../css/learner.css">
     <link rel="stylesheet" href="../css/admin.css">
+
 </head>
 <body>
     <div class="app">
@@ -16,7 +17,7 @@
             <nav class="nav">
                 <a href="admin-dashboard.html">Dashboard</a>
                 <a href="admin-UserManagement.html">User Management</a>
-                <a href="admin-CourseManagement.html" aria-current="page">Course Management</a>
+                <a href="admin-CourseManagement.html" aria-current="page">Module Management</a>
                 <a href="admin-CommunityManagement.html">Community Management</a>
                 <a href="admin-Reporting.html">Reports</a>
                 <a href="admin-Profile.html">Profile</a>
@@ -28,17 +29,23 @@
             <header class="page-heading">
                 <div>
                     <p class="eyebrow">Admin Panel</p>
-                    <h1>Course Management</h1>
-                    <p>Create and manage courses, chapters, and sub-chapters</p>
+                    <h1>Module Management</h1>
+                    <p>View and manage learning modules for Form 4 and Form 5</p>
                 </div>
             </header>
 
             <section class="card">
-                <p class="muted">Course management features are currently unavailable.</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>Learning Modules</h2>
+                </div>
+                <div id="modulesList"></div>
             </section>
+
+
         </main>
     </div>
 
 
+    <script src="../js/admin-course-management.js"></script>
 </body>
 </html>
