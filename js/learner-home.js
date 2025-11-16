@@ -2,14 +2,10 @@
   const learnerId = sessionStorage.getItem("currentLearnerId");
   const onboarding = localStorage.getItem("kiraOnboarding");
 
-  if (!onboarding) {
-    // first-time user: redirect to onboarding page
-    window.location.href = "learner-onboarding.html";
-    return;
+  if (onboarding) {
+    // optional: preload their grade/confidence into the dashboard
+    window.kiraOnboardingData = JSON.parse(onboarding);
   }
-
-  // optional: preload their grade/confidence into the dashboard
-  window.kiraOnboardingData = JSON.parse(onboarding);
 })();
 
 (() => {
@@ -75,18 +71,70 @@
     selectedIds: new Set()
   };
 
-  const unitProgressKey = moduleId => `kiraUnitProgress:${moduleId}`;
+  const currentLearnerId = () =>
+    (window.kiraLearnerSession?.getId?.() || window.kiraCurrentLearnerId || "").toString().trim() ||
+    sessionStorage.getItem("currentLearnerId") ||
+    localStorage.getItem("currentLearnerId") ||
+    "";
+
+  const unitProgressKey = (moduleId, learnerId = currentLearnerId()) => {
+    const cleanModuleId = (moduleId || "").toString().trim();
+    if (!cleanModuleId) {
+      return "";
+    }
+    return learnerId ? `kiraUnitProgress:${learnerId}:${cleanModuleId}` : `kiraUnitProgress:${cleanModuleId}`;
+  };
+  const legacyProgressKey = moduleId => {
+    const cleanModuleId = (moduleId || "").toString().trim();
+    return cleanModuleId ? `kiraUnitProgress:${cleanModuleId}` : "";
+  };
 
   const loadUnitProgress = moduleId => {
     if (!moduleId) {
       return null;
     }
-    try {
-      const raw = localStorage.getItem(unitProgressKey(moduleId));
-      return raw ? JSON.parse(raw) : null;
-    } catch {
+    const learnerId = currentLearnerId();
+    const readJson = key => {
+      if (!key) {
+        return null;
+      }
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const scoped = readJson(unitProgressKey(moduleId, learnerId));
+    if (scoped) {
+      if (scoped.learnerId && learnerId && scoped.learnerId !== learnerId) {
+        return null;
+      }
+      return scoped;
+    }
+
+    const legacy = readJson(legacyProgressKey(moduleId));
+    if (!legacy) {
       return null;
     }
+    if (legacy.learnerId && learnerId && legacy.learnerId !== learnerId) {
+      return null;
+    }
+    if (learnerId && !legacy.learnerId) {
+      return null;
+    }
+    if (learnerId) {
+      const migrated = { ...legacy, learnerId };
+      try {
+        localStorage.setItem(unitProgressKey(moduleId, learnerId), JSON.stringify(migrated));
+        localStorage.removeItem(legacyProgressKey(moduleId));
+      } catch {
+        /* ignore */
+      }
+      return migrated;
+    }
+    return legacy;
   };
 
   const buildCourseMapLink = (moduleId, unitId) => {
@@ -874,9 +922,34 @@
       window.kiraBadgeCollections = badges.collections;
     }
     if (badges.stats) {
-      window.kiraBadgeStats = badges.stats;
+      const completedModules = Array.isArray(badges.completedModules)
+        ? badges.completedModules
+        : Array.isArray(badges.CompletedModules)
+          ? badges.CompletedModules
+          : (() => {
+              try {
+                const raw = localStorage.getItem("kiraModuleCompletions");
+                if (raw) {
+                  const parsed = JSON.parse(raw);
+                  if (Array.isArray(parsed)) {
+                    return parsed;
+                  }
+                  if (Array.isArray(parsed?.items)) {
+                    return parsed.items;
+                  }
+                }
+              } catch {
+                /* ignore parsing */
+              }
+              return [];
+            })();
+      const mergedStats = {
+        ...badges.stats,
+        completedModules
+      };
+      window.kiraBadgeStats = mergedStats;
       try {
-        localStorage.setItem("kiraUserStats", JSON.stringify(badges.stats));
+        localStorage.setItem("kiraUserStats", JSON.stringify(mergedStats));
       } catch (error) {
         console.warn("Unable to store badge stats", error);
       }

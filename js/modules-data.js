@@ -158,8 +158,15 @@ window.kiraModules = [
             id: "nb-overview",
             title: "Module overview",
             type: "overview",
-            duration: "2 min",
-            summary: "Preview why binary, octal, and hexadecimal show up in exams and computing."
+            duration: "3 min",
+            summary: "Preview why binary, octal, and hexadecimal show up in exams and computing.",
+            videos: [
+              {
+                title: "Number bases explainer",
+                description: "Quick primer on why different bases matter and how to think about them.",
+                src: "/videos/number bases.mp4"
+              }
+            ]
           },
           {
             id: "nb-place-values",

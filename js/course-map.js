@@ -78,7 +78,24 @@
     return path.endsWith("course-map.html") ? path : "/html/course-map.html";
   })();
 
-  const storageKey = moduleId => `kiraUnitProgress:${moduleId}`;
+  const currentLearnerId = () =>
+    (window.kiraLearnerSession?.getId?.() || window.kiraCurrentLearnerId || "").toString().trim() ||
+    sessionStorage.getItem("currentLearnerId") ||
+    localStorage.getItem("currentLearnerId") ||
+    "";
+
+  const storageKey = (moduleId, learnerId = currentLearnerId()) => {
+    const cleanModuleId = (moduleId || "").toString().trim();
+    if (!cleanModuleId) {
+      return "";
+    }
+    return learnerId ? `kiraUnitProgress:${learnerId}:${cleanModuleId}` : `kiraUnitProgress:${cleanModuleId}`;
+  };
+
+  const legacyStorageKey = moduleId => {
+    const cleanModuleId = (moduleId || "").toString().trim();
+    return cleanModuleId ? `kiraUnitProgress:${cleanModuleId}` : "";
+  };
 
   const normalizeId = value => (value || "").toString().trim().toLowerCase();
 
@@ -88,20 +105,69 @@
     if (!moduleId || typeof window === "undefined") {
       return null;
     }
-    try {
-      const raw = localStorage.getItem(storageKey(moduleId));
-      return raw ? JSON.parse(raw) : null;
-    } catch {
+    const learnerId = currentLearnerId();
+    const readJson = key => {
+      if (!key) {
+        return null;
+      }
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const scoped = readJson(storageKey(moduleId, learnerId));
+    if (scoped) {
+      if (scoped.learnerId && learnerId && scoped.learnerId !== learnerId) {
+        return null;
+      }
+      return scoped;
+    }
+
+    const legacy = readJson(legacyStorageKey(moduleId));
+    if (!legacy) {
       return null;
     }
+    if (legacy.learnerId && learnerId && legacy.learnerId !== learnerId) {
+      return null;
+    }
+    // Ignore legacy data that isn't tied to the active learner to avoid leaking progress between users.
+    if (learnerId && !legacy.learnerId) {
+      return null;
+    }
+    if (learnerId) {
+      // migrate legacy scoped data forward for this learner
+      const migrated = { ...legacy, learnerId };
+      try {
+        localStorage.setItem(storageKey(moduleId, learnerId), JSON.stringify(migrated));
+        localStorage.removeItem(legacyStorageKey(moduleId));
+      } catch {
+        /* ignore storage errors */
+      }
+      return migrated;
+    }
+    return legacy;
   };
 
   const saveUnitProgress = (moduleId, payload) => {
     if (!moduleId || typeof window === "undefined") {
       return;
     }
+    const learnerId = currentLearnerId();
+    const record = learnerId ? { ...payload, learnerId } : payload;
+    const key = storageKey(moduleId, learnerId);
+    if (!key) {
+      return;
+    }
     try {
-      localStorage.setItem(storageKey(moduleId), JSON.stringify(payload));
+      localStorage.setItem(key, JSON.stringify(record));
+      // clear legacy key to prevent cross-learner bleed
+      const legacyKey = legacyStorageKey(moduleId);
+      if (legacyKey && legacyKey !== key) {
+        localStorage.removeItem(legacyKey);
+      }
     } catch {
       /* ignore quota errors */
     }
@@ -711,15 +777,25 @@
       return;
     }
     const completions = new Set(readJson(MODULE_COMPLETIONS_KEY, []));
-    if (completions.has(state.moduleId)) {
+    const normalizedModuleId = normalizeId(state.moduleId);
+    if (completions.has(normalizedModuleId)) {
       return;
     }
-    completions.add(state.moduleId);
+    completions.add(normalizedModuleId);
     writeJson(MODULE_COMPLETIONS_KEY, Array.from(completions));
 
     const stats = readJson(USER_STATS_KEY, {});
-    const nextValue = Math.max(0, Number(stats.moduleMastery) || 0) + 1;
-    const mergedStats = { ...stats, moduleMastery: nextValue };
+    const completedModules = new Set(
+      Array.isArray(stats.completedModules)
+        ? stats.completedModules.map(normalizeId).filter(Boolean)
+        : []
+    );
+    completedModules.add(normalizedModuleId);
+    const mergedStats = {
+      ...stats,
+      moduleMastery: completions.size,
+      completedModules: Array.from(completedModules)
+    };
     writeJson(USER_STATS_KEY, mergedStats);
     window.kiraUserStats = mergedStats;
 

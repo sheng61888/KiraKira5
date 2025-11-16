@@ -948,6 +948,10 @@ public class LearnerService : ILearnerService
             return null;
         }
 
+        var completedModules = new HashSet<string>(
+            stats.CompletedModules ?? Enumerable.Empty<string>(),
+            StringComparer.OrdinalIgnoreCase);
+
         foreach (var collection in stats.Collections)
         {
             if (collection?.Rewards == null || string.IsNullOrWhiteSpace(collection.Metric))
@@ -957,8 +961,9 @@ public class LearnerService : ILearnerService
 
             var metricKey = collection.Metric;
             stats.Stats.TryGetValue(metricKey, out var metricValue);
+
             var unlocked = collection.Rewards
-                .Where(reward => reward != null && metricValue >= reward.Value)
+                .Where(reward => reward != null && IsRewardUnlocked(reward, metricKey, metricValue, completedModules))
                 .OrderByDescending(reward => reward.Value)
                 .FirstOrDefault();
 
@@ -976,6 +981,22 @@ public class LearnerService : ILearnerService
         return null;
     }
 
+    private static bool IsRewardUnlocked(BadgeRewardDto reward, string metricKey, int metricValue, HashSet<string> completedModules)
+    {
+        if (reward == null)
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(reward.ModuleId))
+        {
+            var target = NormalizeModuleKey(reward.ModuleId);
+            return completedModules.Contains(target);
+        }
+
+        return metricValue >= reward.Value;
+    }
+
     private static LearnerBadgeStatsDto SampleBadgeStats()
     {
         return new LearnerBadgeStatsDto
@@ -988,7 +1009,8 @@ public class LearnerService : ILearnerService
                 { "moduleMastery", 0 },
                 { "paperWarrior", 0 }
             },
-            Collections = BadgeLibrary()
+            Collections = BadgeLibrary(),
+            CompletedModules = new List<string>()
         };
     }
 
@@ -1022,23 +1044,27 @@ public class LearnerService : ILearnerService
                 {
                     new BadgeRewardDto(1, "DESPAIRRRR", "../images/module-mastery/DESPAIRRRRR.png")
                     {
-                        Hint = "Complete one module with 95% progress.",
-                        Requirement = "1 completed module"
+                        Hint = "Complete Quadratic Functions and Equations (Form 4 - Module 01).",
+                        Requirement = "Complete module form4-01",
+                        ModuleId = "form4-01"
                     },
                     new BadgeRewardDto(3, "Nyum", "../images/module-mastery/Nyum.png")
                     {
-                        Hint = "Keep momentum by finishing three modules.",
-                        Requirement = "3 completed modules"
+                        Hint = "Complete Number Bases (Form 4 - Module 02).",
+                        Requirement = "Complete module form4-02",
+                        ModuleId = "form4-02"
                     },
                     new BadgeRewardDto(6, "Butter", "../images/module-mastery/Butter.png")
                     {
-                        Hint = "Six full modules unlock gold fur.",
-                        Requirement = "6 completed modules"
+                        Hint = "Complete Variation (Form 5 - Module 01).",
+                        Requirement = "Complete module form5-01",
+                        ModuleId = "form5-01"
                     },
                     new BadgeRewardDto(8, "EEEEEEE", "../images/module-mastery/EEEEEEE.png")
                     {
-                        Hint = "Master almost every topic to meet the rare cat.",
-                        Requirement = "8 completed modules"
+                        Hint = "Complete Matrices (Form 5 - Module 02).",
+                        Requirement = "Complete module form5-02",
+                        ModuleId = "form5-02"
                     }
                 }
             },
@@ -1413,8 +1439,18 @@ public class LearnerService : ILearnerService
                 UnitId = "nb-overview",
                 Title = "Module overview",
                 Type = "overview",
-                Duration = "2 min",
+                Duration = "3 min",
                 Summary = "See how base-10 links to binary, octal, and hexadecimal systems.",
+                Resources = new List<ModuleUnitResourceDto>(),
+                Videos = new List<ModuleUnitVideoDto>
+                {
+                    new ModuleUnitVideoDto
+                    {
+                        Title = "Number bases explainer",
+                        Description = "Quick primer on why different bases matter and how to approach them.",
+                        Src = "/videos/number bases.mp4"
+                    }
+                },
                 Objectives = new List<string>
                 {
                     "Recall the place value idea behind every base",
@@ -3021,14 +3057,12 @@ public class LearnerService : ILearnerService
         stats["streak"] = Math.Max(stats.TryGetValue("streak", out var longest) ? longest : 0, streak.Longest);
         stats["consistency"] = streak.Current;
 
-        if (modules != null)
-        {
-            stats["moduleMastery"] = CountCompletedModulesFromSnapshot(modules);
-        }
-        else
-        {
-            stats["moduleMastery"] = await CountCompletedModulesAsync(learnerId);
-        }
+        var completedModules = modules != null
+            ? CollectCompletedModulesFromSnapshot(modules)
+            : await CollectCompletedModulesAsync(learnerId);
+
+        stats["moduleMastery"] = completedModules.Count;
+        badgeStats.CompletedModules = completedModules;
 
         stats["paperWarrior"] = await CountPastPaperSessionsAsync(learnerId);
 
@@ -3046,29 +3080,62 @@ public class LearnerService : ILearnerService
         return badgeStats;
     }
 
-    private static int CountCompletedModulesFromSnapshot(LearnerModuleSnapshot? modules)
+    private static HashSet<string> CollectCompletedModulesFromSnapshot(LearnerModuleSnapshot? modules)
     {
+        var completed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (modules == null)
         {
-            return 0;
+            return completed;
         }
 
-        return modules.Catalogue
-            .SelectMany(section => section.Modules)
-            .Count(module => (module.ProgressPercent ?? 0) >= 95);
+        foreach (var module in modules.Catalogue.SelectMany(section => section.Modules))
+        {
+            var moduleId = NormalizeModuleKey(module.ModuleId);
+            if (string.IsNullOrWhiteSpace(moduleId))
+            {
+                continue;
+            }
+
+            if ((module.ProgressPercent ?? 0) >= 95)
+            {
+                completed.Add(moduleId);
+            }
+        }
+
+        return completed;
     }
 
     private async Task<int> CountCompletedModulesAsync(string learnerId)
     {
+        var completed = await CollectCompletedModulesAsync(learnerId);
+        return completed.Count;
+    }
+
+    private async Task<HashSet<string>> CollectCompletedModulesAsync(string learnerId)
+    {
+        var completed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var progress = await FetchModuleProgressAsync(learnerId);
         if (progress == null || progress.Count == 0)
         {
-            return 0;
+            return completed;
         }
 
-        return progress.Values.Count(state =>
-            state.ProgressPercent >= 95 ||
-            string.Equals(state.Status, "completed", StringComparison.OrdinalIgnoreCase));
+        foreach (var entry in progress)
+        {
+            var moduleId = NormalizeModuleKey(entry.Key);
+            if (string.IsNullOrWhiteSpace(moduleId))
+            {
+                continue;
+            }
+
+            if (entry.Value.ProgressPercent >= 95 ||
+                string.Equals(entry.Value.Status, "completed", StringComparison.OrdinalIgnoreCase))
+            {
+                completed.Add(moduleId);
+            }
+        }
+
+        return completed;
     }
 
     private async Task<int> CountPastPaperSessionsAsync(string learnerId)
@@ -4331,6 +4398,7 @@ public class ModuleUnitDto
     public string Body { get; set; } = string.Empty;
     public List<string> Objectives { get; set; } = new();
     public List<ModuleUnitResourceDto> Resources { get; set; } = new();
+    public List<ModuleUnitVideoDto> Videos { get; set; } = new();
     public ModuleUnitCtaDto? Cta { get; set; }
     public bool RescueOnly { get; set; }
 }
@@ -4350,10 +4418,18 @@ public class ModuleUnitCtaDto
     public string Kind { get; set; } = string.Empty;
 }
 
+public class ModuleUnitVideoDto
+{
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Src { get; set; } = string.Empty;
+}
+
 public class LearnerBadgeStatsDto
 {
     public Dictionary<string, int> Stats { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public IEnumerable<BadgeCollectionDto> Collections { get; set; } = new List<BadgeCollectionDto>();
+    public IEnumerable<string> CompletedModules { get; set; } = new List<string>();
 }
 
 public class BadgeCollectionDto
@@ -4387,6 +4463,7 @@ public class BadgeRewardDto
     public string Requirement { get; set; } = string.Empty;
     public string Image { get; set; } = string.Empty;
     public string Emoji { get; set; } = string.Empty;
+    public string ModuleId { get; set; } = string.Empty;
 }
 
 public class LearnerProgressDto
