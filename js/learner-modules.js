@@ -4,13 +4,28 @@
   const activeModules = () => (Array.isArray(window.kiraActiveModules) ? window.kiraActiveModules : []);
 
   const moduleProgressMap = {};
+  const currentLearnerId = () =>
+    (window.kiraLearnerSession?.getId?.() || window.kiraCurrentLearnerId || "").toString().trim() ||
+    sessionStorage.getItem("currentLearnerId") ||
+    localStorage.getItem("currentLearnerId") ||
+    "";
 
   const gradeDefaults = {
     "Form 4": [0, 0, 0, 0, 0],
     "Form 5": [0, 0, 0, 0, 0]
   };
 
-  const storageKey = moduleId => `kiraUnitProgress:${moduleId}`;
+  const storageKey = (moduleId, learnerId = currentLearnerId()) => {
+    const cleanModuleId = (moduleId || "").toString().trim();
+    if (!cleanModuleId) {
+      return "";
+    }
+    return learnerId ? `kiraUnitProgress:${learnerId}:${cleanModuleId}` : `kiraUnitProgress:${cleanModuleId}`;
+  };
+  const legacyStorageKey = moduleId => {
+    const cleanModuleId = (moduleId || "").toString().trim();
+    return cleanModuleId ? `kiraUnitProgress:${cleanModuleId}` : "";
+  };
 
   const normalizeId = value => (value || "").toString().trim().toLowerCase();
 
@@ -18,12 +33,49 @@
     if (!moduleId || typeof window === "undefined") {
       return null;
     }
-    try {
-      const raw = localStorage.getItem(storageKey(moduleId));
-      return raw ? JSON.parse(raw) : null;
-    } catch {
+    const learnerId = currentLearnerId();
+    const readJson = key => {
+      if (!key) {
+        return null;
+      }
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const scoped = readJson(storageKey(moduleId, learnerId));
+    if (scoped) {
+      if (scoped.learnerId && learnerId && scoped.learnerId !== learnerId) {
+        return null;
+      }
+      return scoped;
+    }
+
+    const legacy = readJson(legacyStorageKey(moduleId));
+    if (!legacy) {
       return null;
     }
+    if (legacy.learnerId && learnerId && legacy.learnerId !== learnerId) {
+      return null;
+    }
+    // Do not reuse legacy data for a different learner to avoid incorrect progress displays.
+    if (learnerId && !legacy.learnerId) {
+      return null;
+    }
+    if (learnerId) {
+      const migrated = { ...legacy, learnerId };
+      try {
+        localStorage.setItem(storageKey(moduleId, learnerId), JSON.stringify(migrated));
+        localStorage.removeItem(legacyStorageKey(moduleId));
+      } catch {
+        /* ignore */
+      }
+      return migrated;
+    }
+    return legacy;
   };
 
   const wantsRescueVideos = () => {
@@ -122,11 +174,16 @@
     const completedSet = new Set(completed.map(normalizeId));
     const catalogueEntry = findCatalogueEntry(moduleId);
     const units = catalogueEntry ? collectVisibleUnits(catalogueEntry.module) : [];
+    const storedTotal = Number(stored?.unitCount ?? stored?.totalUnits);
     let totalUnits = units.length;
-    if (!totalUnits) {
-      const storedTotal = Number(stored?.unitCount ?? stored?.totalUnits);
-      if (Number.isFinite(storedTotal) && storedTotal > 0) {
+    if (Number.isFinite(storedTotal) && storedTotal > 0) {
+      if (!totalUnits || storedTotal < totalUnits) {
         totalUnits = storedTotal;
+      }
+    } else if (!totalUnits) {
+      const fallbackTotal = Number(stored?.totalUnits);
+      if (Number.isFinite(fallbackTotal) && fallbackTotal > 0) {
+        totalUnits = fallbackTotal;
       }
     }
     if (!totalUnits) {
@@ -142,13 +199,13 @@
   };
 
   const getProgressValue = (module, grade, index) => {
-    const derivedProgress = computeUnitProgressPercent(module);
-    if (typeof derivedProgress === "number" && !Number.isNaN(derivedProgress)) {
-      return Math.max(0, Math.min(100, derivedProgress));
-    }
     const provided = Number(module?.progressPercent);
     if (Number.isFinite(provided)) {
       return Math.max(0, Math.min(100, provided));
+    }
+    const derivedProgress = computeUnitProgressPercent(module);
+    if (typeof derivedProgress === "number" && !Number.isNaN(derivedProgress)) {
+      return Math.max(0, Math.min(100, derivedProgress));
     }
     if (module.link && typeof moduleProgressMap[module.link] === "number") {
       return moduleProgressMap[module.link];
