@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -19,6 +21,18 @@ public class UserManagement
     }
     
     /// <summary>
+    /// Hashes password using SHA256
+    /// </summary>
+    private static string HashPassword(string password)
+    {
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return BitConverter.ToString(bytes).Replace("-", "").ToLower();
+        }
+    }
+    
+    /// <summary>
     /// Authenticates user login
     /// </summary>
     public static User Login(string email, string password)
@@ -34,7 +48,7 @@ public class UserManagement
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Email", email);
-                    command.Parameters.AddWithValue("@Password", password);
+                    command.Parameters.AddWithValue("@Password", HashPassword(password));
                     
                     connection.Open();
                     using (MySqlDataReader reader = command.ExecuteReader())
@@ -84,7 +98,7 @@ public class UserManagement
                     command.Parameters.AddWithValue("@Username", username);
                     command.Parameters.AddWithValue("@Name", name);
                     command.Parameters.AddWithValue("@Email", email);
-                    command.Parameters.AddWithValue("@Password", password);
+                    command.Parameters.AddWithValue("@Password", HashPassword(password));
                     command.Parameters.AddWithValue("@Usertype", usertype);
                     
                     bool success = command.ExecuteNonQuery() > 0;
@@ -392,7 +406,7 @@ public class UserManagement
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Email", email);
-                    command.Parameters.AddWithValue("@Password", newPassword);
+                    command.Parameters.AddWithValue("@Password", HashPassword(newPassword));
                     
                     connection.Open();
                     int rowsAffected = command.ExecuteNonQuery();

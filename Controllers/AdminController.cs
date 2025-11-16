@@ -238,39 +238,5 @@ public class AdminController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Gets pending password reset requests
-    /// </summary>
-    [HttpGet("password-reset-requests")]
-    public async Task<IActionResult> GetPasswordResetRequests()
-    {
-        try
-        {
-            var requests = await AdminService.GetPasswordResetRequestsAsync(_configuration);
-            return Ok(requests);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting password reset requests: {ex.Message}");
-            return StatusCode(500, new { error = ex.Message });
-        }
-    }
 
-    /// <summary>
-    /// Approves or rejects a password reset request
-    /// </summary>
-    [HttpPost("password-reset-request/handle")]
-    public async Task<IActionResult> HandlePasswordResetRequest([FromQuery] int requestId, [FromQuery] string action)
-    {
-        try
-        {
-            var success = await AdminService.HandlePasswordResetRequestAsync(_configuration, requestId, action);
-            return Ok(new { success = success });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error handling password reset request: {ex.Message}");
-            return StatusCode(500, new { success = false, error = ex.Message });
-        }
-    }
 }
