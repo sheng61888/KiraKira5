@@ -1,4 +1,4 @@
-{
+s{
     "dbcode.connections": [
         {
             "connectionId": "vjPOetarP_WBZOTD5khjt",
@@ -6,7 +6,7 @@
             "driver": "mysql",
             "connectionType": "host",
             "host": "0.tcp.ap.ngrok.io",
-            "port": 14077,
+            "port": 19024,
             "ssl": false,
             "username": "root",
             "password": "",
@@ -15,7 +15,8 @@
             "postConnectionSqlType": "inline",
             "connectionTimeout": 30,
             "driverOptions": {
-                "retrievePublickey": true
+                "retrievePublickey": true,
+                "disableMultiStatements": false
             }
         }
     ]
